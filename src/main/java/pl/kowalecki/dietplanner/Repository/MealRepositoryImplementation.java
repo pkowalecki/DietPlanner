@@ -1,16 +1,13 @@
 package pl.kowalecki.dietplanner.Repository;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 import pl.kowalecki.dietplanner.Model.Meal;
 
 import java.util.List;
 
-@Service
+@Repository
 public class MealRepositoryImplementation{
 
     private final MealRepository mealRepository;
@@ -20,14 +17,23 @@ public class MealRepositoryImplementation{
         this.mealRepository=mealRepository;
     }
 
-    Meal getMealById(Long id){
-        return mealRepository.getMealById(id);
+    public List<Meal> getAllMeals(){
+        return mealRepository.findAll();
     }
 
-    List<Meal> getAllMeals(){
-        return mealRepository.getAllMeals();
+    public Meal getMealById(Long id){
+        return mealRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Meal not found with id: " + id));
     }
 
+    public boolean addMeal(Meal meal){
+        if (meal!=null){
+            mealRepository.save(meal);
+            return true;
+        }else {
+            return false;
+        }
 
+    }
 
 }
