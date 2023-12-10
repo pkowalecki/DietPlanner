@@ -1,11 +1,15 @@
-package pl.kowalecki.dietplanner.Repository;
+package pl.kowalecki.dietplanner.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import pl.kowalecki.dietplanner.Model.Meal;
+import pl.kowalecki.dietplanner.model.Meal;
+
+import java.util.List;
+import java.util.Optional;
 
 
 @Repository
 public interface MealRepository extends JpaRepository<Meal, Long> {
+
 
 }
