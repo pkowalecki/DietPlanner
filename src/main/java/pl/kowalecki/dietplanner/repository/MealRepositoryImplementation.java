@@ -2,10 +2,13 @@ package pl.kowalecki.dietplanner.repository;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.hibernate.HibernateError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import pl.kowalecki.dietplanner.IngredientsListHelper;
 import pl.kowalecki.dietplanner.model.AdministrationUser;
+import pl.kowalecki.dietplanner.model.DTO.FoodDTO;
+import pl.kowalecki.dietplanner.model.DTO.IngredientToBuyDTO;
 import pl.kowalecki.dietplanner.model.ingredient.Ingredient;
 import pl.kowalecki.dietplanner.model.ingredient.ingredientAmount.IngredientUnit;
 import pl.kowalecki.dietplanner.model.ingredient.ingredientMeasurement.MeasurementType;
@@ -38,12 +41,24 @@ public class MealRepositoryImplementation{
                 .orElseThrow(() -> new EntityNotFoundException("Meal not found with id: " + id));
     }
 
+    public boolean deleteMealById(Long id){
+        try {
+            mealRepository.deleteById(id);
+            return true;
+        }catch (HibernateError error){
+            error.printStackTrace();
+            return false;
+        }
+    }
+
     @Transactional
     public void addMeal(String userId, Meal newMeal) {
 
         if (newMeal.getIngredients() == null) {
             newMeal.setIngredients(new ArrayList<>());
         }
+        Optional<AdministrationUser> userOptional = administrationUserRepository.findById(Integer.valueOf(userId));
+
         newMeal.setAdditionDate(LocalDateTime.now());
         Meal savedMeal = mealRepository.save(newMeal);
 
@@ -61,16 +76,25 @@ public class MealRepositoryImplementation{
             return meal.getIngredients();
     }
 
-    public List<Ingredient> getMealIngredientsFinalList(List<Long> ids) {
+    public List<IngredientToBuyDTO> getMealIngredientsFinalList(List<Long> ids, Double multiplier) {
         List<Ingredient> combinedIngredients = new ArrayList<>();
 
         for (Long id : ids) {
+            if (id == 0) continue;
             List<Ingredient> ingredients = getMealIngredientsByMealId(id);
             combinedIngredients.addAll(ingredients);
         }
-        List<Ingredient> ingredients = IngredientsListHelper.prepareIngredientsList(combinedIngredients);
+        List<Ingredient> ingredients = IngredientsListHelper.prepareIngredientsList(combinedIngredients, multiplier);
 
-        return ingredients;
+        List<IngredientToBuyDTO> ingredientsToBuy = new ArrayList<>();
+
+        for (Ingredient ingredient : ingredients){
+            IngredientToBuyDTO ingredientDTO = new IngredientToBuyDTO(ingredient.getName(), ingredient.getIngredientAmount().toString(), ingredient.getIngredientUnit().getShortName(), ingredient.getMeasurementValue().toString(), ingredient.getMeasurementType().getMeasurementName());
+            ingredientsToBuy.add(ingredientDTO);
+        }
+
+
+        return ingredientsToBuy;
     }
     public Map<IngredientUnit, List<String>> getIngredientUnitMap(){
         Map<IngredientUnit, List<String>> ingredientListMap = IngredientUnit.getIngredientUnitMap();
@@ -81,4 +105,15 @@ public class MealRepositoryImplementation{
         return measurementNames;
     }
 
+    public List<FoodDTO> getMealRecipeFinalList(List<Long> ids) {
+        List<FoodDTO> mealList = new ArrayList<>();
+
+        for (Long id : ids) {
+            if (id == 0) continue;
+            Meal meal = getMealById(id);
+            FoodDTO foodDTO = new FoodDTO(meal.getName(), meal.getRecipe(), meal.getDescription(), meal.getIngredients());
+            mealList.add(foodDTO);
+        }
+        return mealList;
+    }
 }

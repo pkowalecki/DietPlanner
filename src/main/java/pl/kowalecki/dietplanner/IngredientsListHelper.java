@@ -6,24 +6,47 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class IngredientsListHelper {
-    public static List<Ingredient> prepareIngredientsList(List<Ingredient> ingredients){
+    public static List<Ingredient> prepareIngredientsList(List<Ingredient> ingredients, Double multiplier){
         Map<String, Ingredient> ingredientMap = new HashMap<>();
         for (Ingredient newIngredient: ingredients){
-            String ingredientName = newIngredient.getName() + newIngredient.getIngredientUnit().getShortName();
-            if (ingredientMap.containsKey(ingredientName)){ //Jak mapa nie ma tej nazwy, to od razu wrzucamy do listy zakupów.
-                Ingredient existingIngredient = ingredientMap.get(ingredientName);
+            String ingredientNameKey = newIngredient.getName() + newIngredient.getIngredientUnit().getShortName();
+            String measurementNameKey = newIngredient.getName() + newIngredient.getMeasurementType().getMeasurementName();
+            if (ingredientMap.containsKey(ingredientNameKey)){
+                Ingredient existingIngredient = ingredientMap.get(ingredientNameKey);
                 if(newIngredient.getName().equals(existingIngredient.getName())){
                     if (newIngredient.getIngredientUnit().equals(existingIngredient.getIngredientUnit())){
                         existingIngredient.setIngredientAmount(existingIngredient.sumTotalAmount(newIngredient.getIngredientAmount(),existingIngredient.getIngredientAmount()));
                         existingIngredient.setIngredientUnit(existingIngredient.getIngredientUnit());
-                        ingredientMap.put(ingredientName, existingIngredient);
+                        ingredientMap.put(ingredientNameKey, existingIngredient);
                     }else {
-                        ingredientMap.put(ingredientName, existingIngredient);
+                        ingredientMap.put(ingredientNameKey, existingIngredient);
                     }
                 }
-            }else{
-                ingredientMap.put(ingredientName, newIngredient);
+            } else{
+                newIngredient.setIngredientAmount(newIngredient.getIngredientAmount()*multiplier);
+                newIngredient.setMeasurementValue(newIngredient.getMeasurementValue()*multiplier);
+                ingredientMap.put(ingredientNameKey, newIngredient);
             }
+
+//            if (ingredientMap.containsKey(measurementNameKey)){
+//                Ingredient existingMeasurement = ingredientMap.get(measurementNameKey);
+//                if(newIngredient.getName().equals(existingMeasurement.getName())){
+//                    if (newIngredient.getMeasurementType().equals(existingMeasurement.getMeasurementType())){
+//                        existingMeasurement.setMeasurementValue(existingMeasurement.sumTotalAmount(newIngredient.getMeasurementValue(),existingMeasurement.getMeasurementValue()));
+//                        existingMeasurement.setMeasurementType(existingMeasurement.getMeasurementType());
+//                        ingredientMap.put(measurementNameKey, existingMeasurement);
+//                    }else {
+//                        ingredientMap.put(measurementNameKey, existingMeasurement);
+//                    }
+//                }
+//            }else{
+//                newIngredient.setMeasurementValue(newIngredient.getMeasurementValue()*multiplier);
+//                ingredientMap.put(measurementNameKey, newIngredient);
+//            }
+
+
+
+
         }
 
         //Sortujemy mapkę, żeby dostać listę posortowaną alfabetycznie.

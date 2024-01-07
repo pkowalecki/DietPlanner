@@ -96,7 +96,7 @@ public class Ingredient {
 
     @Transient
     public Double sumTotalAmount(double d1, double d2){
-        return d1+d2;
+        return (d1+d2);
     }
     @Transient
     public static IngredientAmount getOnlyDoubleFromAmount(String totalAmount){
