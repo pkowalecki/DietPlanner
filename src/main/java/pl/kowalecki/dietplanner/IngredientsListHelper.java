@@ -6,23 +6,30 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class IngredientsListHelper {
+
     public static List<Ingredient> prepareIngredientsList(List<Ingredient> ingredients, Double multiplier){
         Map<String, Ingredient> ingredientMap = new HashMap<>();
         for (Ingredient newIngredient: ingredients){
+            Ingredient newIngredientToPut = new Ingredient();
             String ingredientNameKey = newIngredient.getName() + newIngredient.getIngredientUnit().getShortName();
             String measurementNameKey = newIngredient.getName() + newIngredient.getMeasurementType().getMeasurementName();
             if (ingredientMap.containsKey(ingredientNameKey)){
                 Ingredient existingIngredient = ingredientMap.get(ingredientNameKey);
                 if(newIngredient.getName().equals(existingIngredient.getName())){
+                    //Tutaj lecimy z jednostkami danego składnika
                     if (newIngredient.getIngredientUnit().equals(existingIngredient.getIngredientUnit())){
                         existingIngredient.setIngredientAmount(existingIngredient.sumTotalAmount(newIngredient.getIngredientAmount(),existingIngredient.getIngredientAmount()));
                         existingIngredient.setIngredientUnit(existingIngredient.getIngredientUnit());
-                        ingredientMap.put(ingredientNameKey, existingIngredient);
-                    }else {
-                        ingredientMap.put(ingredientNameKey, existingIngredient);
                     }
+                    //Tutaj lecimy z rodzajem danego składnika
+                    if(newIngredient.getMeasurementType().equals(existingIngredient.getMeasurementType())){
+                        existingIngredient.setMeasurementValue(existingIngredient.sumTotalAmount(newIngredient.getMeasurementValue(), existingIngredient.getMeasurementValue()));
+                        existingIngredient.setMeasurementType(existingIngredient.getMeasurementType());
+                    }
+                    newIngredientToPut = existingIngredient;
+                    ingredientMap.put(ingredientNameKey, newIngredientToPut);
                 }
-            } else{
+            }else{
                 newIngredient.setIngredientAmount(newIngredient.getIngredientAmount()*multiplier);
                 newIngredient.setMeasurementValue(newIngredient.getMeasurementValue()*multiplier);
                 ingredientMap.put(ingredientNameKey, newIngredient);

@@ -43,7 +43,8 @@ public class MealController {
         if (mealRepository.getMealById(id) != null) return new ResponseEntity<>(mealRepository.getMealById(id), HttpStatus.OK);
         else return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-    @DeleteMapping(value = "/deleteMeal/{id}")
+    //Nie robimy delete, bo nie chcemy usuwać danych z bazy - ukrywamy je po prostu
+    @GetMapping(value = "/deleteMeal/{id}")
     public ResponseEntity<?> deleteMealById(@PathVariable Long id) {
         if (mealRepository.getMealById(id) != null)
             return new ResponseEntity<>(mealRepository.deleteMealById(id), HttpStatus.OK);

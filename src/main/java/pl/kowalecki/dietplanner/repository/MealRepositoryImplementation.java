@@ -22,14 +22,13 @@ public class MealRepositoryImplementation{
 
     private final MealRepository mealRepository;
     private final IngredientRepository ingredientRepository;
+    private final AdministrationUserRepository administrationUserRepository;
 
     @Autowired
-    private AdministrationUserRepository administrationUserRepository;
-
-    @Autowired
-    public MealRepositoryImplementation(MealRepository mealRepository, IngredientRepository ingredientRepository){
+    public MealRepositoryImplementation(MealRepository mealRepository, IngredientRepository ingredientRepository, AdministrationUserRepository administrationUserRepository){
         this.mealRepository=mealRepository;
         this.ingredientRepository=ingredientRepository;
+        this.administrationUserRepository=administrationUserRepository;
     }
 
     public List<Meal> getAllMeals(){
@@ -42,13 +41,14 @@ public class MealRepositoryImplementation{
     }
 
     public boolean deleteMealById(Long id){
-        try {
-            mealRepository.deleteById(id);
-            return true;
-        }catch (HibernateError error){
-            error.printStackTrace();
-            return false;
-        }
+//        try {
+//            mealRepository.deleteById(id);
+//            return true;
+//        }catch (HibernateError error){
+//            error.printStackTrace();
+//            return false;
+//        }
+        return true;
     }
 
     @Transactional
