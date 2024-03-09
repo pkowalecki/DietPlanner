@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import pl.kowalecki.dietplanner.model.DTO.FoodDTO;
 import pl.kowalecki.dietplanner.model.DTO.IngredientToBuyDTO;
+import pl.kowalecki.dietplanner.model.DTO.MealWithNamesDto;
 import pl.kowalecki.dietplanner.model.ingredient.Ingredient;
 import pl.kowalecki.dietplanner.model.ingredient.ingredientAmount.IngredientUnit;
 import pl.kowalecki.dietplanner.model.ingredient.ingredientMeasurement.MeasurementType;
@@ -43,7 +44,6 @@ public class MealController {
         if (mealRepository.getMealById(id) != null) return new ResponseEntity<>(mealRepository.getMealById(id), HttpStatus.OK);
         else return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-    //Nie robimy delete, bo nie chcemy usuwać danych z bazy - ukrywamy je po prostu
     @GetMapping(value = "/deleteMeal/{id}")
     public ResponseEntity<?> deleteMealById(@PathVariable Long id) {
         if (mealRepository.getMealById(id) != null)
@@ -53,14 +53,9 @@ public class MealController {
 
     @PostMapping( "/addMeal")
     public ResponseEntity<?> addMeal(@RequestParam(name = "userId") String userId, @RequestBody Meal newMeal){
-
-//        System.out.println(userId + " " + newMeal);
         mealRepository.addMeal(userId, newMeal);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
-
-
-    //Tu zwracamy listę zakupów
     @PostMapping("/generateFoodBoard")
     public ResponseEntity<List<IngredientToBuyDTO>> generateFoodBoard(@RequestParam("ids") String ids, @RequestParam("multiplier") Double multiplier) {
         System.out.println("ids: " + ids);
@@ -69,15 +64,12 @@ public class MealController {
                 .collect(Collectors.toList());
         return new ResponseEntity<>(mealRepository.getMealIngredientsFinalList(idsList, multiplier), HttpStatus.OK);
     }
-
-    //Tu zwracamy listę przepisów
     @PostMapping("/generateFoodRecipe")
-    public ResponseEntity<List<FoodDTO>> generateFoodRecipe(@RequestParam("ids") String ids) {
+    public ResponseEntity<List<FoodDTO>> generateFoodRecipe(@RequestParam("ids") String ids, @RequestParam("multiplier") Double multiplier) {
         List<Long> idsList = Arrays.stream(ids.split(","))
                 .map(Long::parseLong)
                 .collect(Collectors.toList());
-        System.out.println(mealRepository.getMealRecipeFinalList(idsList).stream().toList());
-        return new ResponseEntity<>(mealRepository.getMealRecipeFinalList(idsList), HttpStatus.OK);
+        return new ResponseEntity<>(mealRepository.getMealRecipeFinalList(idsList, multiplier), HttpStatus.OK);
     }
 
     @GetMapping(value = "/getMealIngredientsList/{id}")
@@ -93,6 +85,20 @@ public class MealController {
     @GetMapping(value = "/getMeasurementMap")
     public ResponseEntity<Map<MeasurementType, List<String>>> getListMeasurementName(){
         return new ResponseEntity<>(mealRepository.getMeasurementTypeMap(), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/getMealsByUserId/{id}")
+    public ResponseEntity<List<Meal>> getMealsByUserId(@PathVariable Long id){
+        if (id != null) return new ResponseEntity<>(mealRepository.getMealByUserId(id), HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @PostMapping("/generateWeeklyFoodRecipe")
+    public ResponseEntity<MealWithNamesDto> generateWeeklyFoodRecipe(@RequestParam("ids") String ids, @RequestParam("multiplier") Double multiplier) {
+        List<Long> idsList = Arrays.stream(ids.split(","))
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(mealRepository.generateWeeklyFoodRecipe(idsList, multiplier) , HttpStatus.OK);
     }
 
 }

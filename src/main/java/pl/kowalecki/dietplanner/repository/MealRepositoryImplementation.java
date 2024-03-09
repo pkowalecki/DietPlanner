@@ -9,6 +9,7 @@ import pl.kowalecki.dietplanner.IngredientsListHelper;
 import pl.kowalecki.dietplanner.model.AdministrationUser;
 import pl.kowalecki.dietplanner.model.DTO.FoodDTO;
 import pl.kowalecki.dietplanner.model.DTO.IngredientToBuyDTO;
+import pl.kowalecki.dietplanner.model.DTO.MealWithNamesDto;
 import pl.kowalecki.dietplanner.model.ingredient.Ingredient;
 import pl.kowalecki.dietplanner.model.ingredient.ingredientAmount.IngredientUnit;
 import pl.kowalecki.dietplanner.model.ingredient.ingredientMeasurement.MeasurementType;
@@ -89,7 +90,7 @@ public class MealRepositoryImplementation{
         List<IngredientToBuyDTO> ingredientsToBuy = new ArrayList<>();
 
         for (Ingredient ingredient : ingredients){
-            IngredientToBuyDTO ingredientDTO = new IngredientToBuyDTO(ingredient.getName(), ingredient.getIngredientAmount().toString(), ingredient.getIngredientUnit().getShortName(), ingredient.getMeasurementValue().toString(), ingredient.getMeasurementType().getMeasurementName());
+            IngredientToBuyDTO ingredientDTO = new IngredientToBuyDTO(ingredient.getName(), ingredient.getIngredientAmount().toString(), ingredient.getIngredientUnit().getShortName(), ingredient.getMeasurementValue().toString(), ingredient.getMeasurementType().getMeasurementName().toString());
             ingredientsToBuy.add(ingredientDTO);
         }
 
@@ -105,15 +106,53 @@ public class MealRepositoryImplementation{
         return measurementNames;
     }
 
-    public List<FoodDTO> getMealRecipeFinalList(List<Long> ids) {
+    public List<FoodDTO> getMealRecipeFinalList(List<Long> ids, Double multiplier) {
         List<FoodDTO> mealList = new ArrayList<>();
-
+        List<Ingredient> combinedIngredients = new ArrayList<>();
         for (Long id : ids) {
             if (id == 0) continue;
             Meal meal = getMealById(id);
-            FoodDTO foodDTO = new FoodDTO(meal.getName(), meal.getRecipe(), meal.getDescription(), meal.getIngredients());
+            for (Long ingredientIds : ids) {
+                if (ingredientIds == 0) continue;
+                List<Ingredient> ingredients = getMealIngredientsByMealId(id);
+                combinedIngredients.addAll(ingredients);
+            }
+            List<Ingredient> ingredients = IngredientsListHelper.prepareIngredientsList(combinedIngredients, multiplier);
+            FoodDTO foodDTO = new FoodDTO(meal.getName(), meal.getRecipe(), meal.getDescription(), ingredients);
             mealList.add(foodDTO);
         }
         return mealList;
     }
+
+    public List<Meal> getMealByUserId(Long userId) {
+        return mealRepository.findMealsByAdministrationUserId(userId);
+    }
+
+    public MealWithNamesDto generateWeeklyFoodRecipe(List<Long> ids, Double multiplier) {
+        List<FoodDTO> mealList = new ArrayList<>();
+        List<String> mealName = new ArrayList<>();
+        List<Ingredient> combinedIngredients = new ArrayList<>();
+        for (Long id : ids) {
+            if (id == 0) continue;
+            Meal meal = getMealById(id);
+            for (Long ingredientIds : ids) {
+                if (ingredientIds == 0) continue;
+                if (meal.getMealTypes().stream().anyMatch(mealType -> mealType.getMealTypenEn().equals("snack"))){
+                    mealName.add(meal.getName());
+                    mealList.add(new FoodDTO(meal.getName(), meal.getRecipe(), meal.getDescription(), meal.getIngredients()));
+                    continue;
+                }
+                List<Ingredient> ingredients = getMealIngredientsByMealId(id);
+                combinedIngredients.addAll(ingredients);
+            }
+
+            List<Ingredient> ingredients = IngredientsListHelper.prepareIngredientsList(combinedIngredients, multiplier);
+            FoodDTO foodDTO = new FoodDTO(meal.getName(), meal.getRecipe(), meal.getDescription(), ingredients);
+            mealName.add(meal.getName());
+            mealList.add(foodDTO);
+        }
+
+        return new MealWithNamesDto(mealList, mealName);
+    }
+
 }
