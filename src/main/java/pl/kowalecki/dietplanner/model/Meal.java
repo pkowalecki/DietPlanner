@@ -1,8 +1,8 @@
 package pl.kowalecki.dietplanner.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import pl.kowalecki.dietplanner.model.enums.MealType;
 import pl.kowalecki.dietplanner.model.ingredient.Ingredient;
 
 import java.io.Serializable;
@@ -18,16 +18,18 @@ public class Meal implements Serializable {
     private LocalDateTime additionDate;
     private LocalDateTime editDate;
     private String name;
-    @Lob
+    @Column(columnDefinition="TEXT")
     private String description;
-    @Lob
+    @Column(columnDefinition="TEXT")
     private String recipe;
 
     @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Ingredient> ingredients;
-    @Lob
+    @Column(columnDefinition="TEXT")
     private String notes;
+    @Enumerated(EnumType.STRING)
+    private List<MealType> mealTypes;
 
     private boolean isDeleted;
 
@@ -121,6 +123,23 @@ public class Meal implements Serializable {
         isDeleted = deleted;
     }
 
+    public Long getMealId() {
+        return mealId;
+    }
+
+    public void setMealId(Long mealId) {
+        this.mealId = mealId;
+    }
+
+    public List<MealType> getMealTypes() {
+        return mealTypes;
+    }
+
+    public void setMealTypes(List<MealType> mealTypes) {
+        this.mealTypes = mealTypes;
+    }
+
+
     @Override
     public String toString() {
         return "Meal{" +
@@ -130,8 +149,11 @@ public class Meal implements Serializable {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", recipe='" + recipe + '\'' +
-                ", ingredients='" + ingredients + '\'' +
+                ", ingredients=" + ingredients +
                 ", notes='" + notes + '\'' +
+                ", mealTypes=" + mealTypes +
+                ", isDeleted=" + isDeleted +
                 '}';
     }
+
 }
