@@ -10,6 +10,7 @@ public class FoodBoardPageData {
     Integer id;
     Double multiplier;
     List<Long> mealValues = new ArrayList<>();
+    Boolean isSnackMultiplied;
 
     public Integer getId() {
         return id;
@@ -35,12 +36,21 @@ public class FoodBoardPageData {
         this.mealValues = mealValues;
     }
 
+    public Boolean getSnackMultiplied() {
+        return isSnackMultiplied;
+    }
+
+    public void setSnackMultiplied(Boolean snackMultiplied) {
+        isSnackMultiplied = snackMultiplied;
+    }
+
     @Override
     public String toString() {
         return "FoodBoardPageData{" +
                 "id=" + id +
                 ", multiplier=" + multiplier +
                 ", mealValues=" + mealValues +
+                ", isSnackMultiplied=" + isSnackMultiplied +
                 '}';
     }
 }

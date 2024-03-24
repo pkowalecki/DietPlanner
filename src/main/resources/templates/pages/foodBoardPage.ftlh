@@ -88,6 +88,7 @@
             </tbody>
         </table>
         <span>Przelicznik: <input id="multiplier" name="multiplier" type="number" step="0.1"></span>
+        <span>Mnożyć przekąskę?<input type="checkbox" name="isSnackMultiplied"></span>
         <input type="submit" value="Wygeneruj listę zakupów">
     </form>
 </div>

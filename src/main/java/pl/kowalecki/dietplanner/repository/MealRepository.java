@@ -17,5 +17,8 @@ public interface MealRepository extends JpaRepository<Meal, Long> {
             nativeQuery = true)
     List<Meal> findMealsByAdministrationUserId(Long id);
 
+    @Query(value = "SELECT m.* FROM meals m " +
+            "WHERE m.meal_id IN :mealIds",
+            nativeQuery = true)
     List<Meal> findMealsByMealIdIn(List<Long> mealIds);
 }
