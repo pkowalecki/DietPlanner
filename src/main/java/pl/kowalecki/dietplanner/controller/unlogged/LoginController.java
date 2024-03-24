@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
 
 
 @CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
-@RequestMapping("/public")
 @RestController
 public class LoginController {
 
@@ -59,6 +58,12 @@ public class LoginController {
     MealRepository mealRepository;
     @Autowired
     private LoginControllerHelper loginControllerHelper;
+
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public String index(){
+        return "pages/unlogged/index";
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> postLoginPage(@RequestBody LoginRequestDTO loginRequestDto, HttpServletResponse response, HttpSession session){
         try {

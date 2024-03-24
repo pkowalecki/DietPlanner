@@ -64,13 +64,13 @@ public class MealController {
                 .collect(Collectors.toList());
         return new ResponseEntity<>(mealRepository.getMealIngredientsFinalList(idsList, multiplier), HttpStatus.OK);
     }
-    @PostMapping("/generateFoodRecipe")
-    public ResponseEntity<List<FoodDTO>> generateFoodRecipe(@RequestParam("ids") String ids, @RequestParam("multiplier") Double multiplier) {
-        List<Long> idsList = Arrays.stream(ids.split(","))
-                .map(Long::parseLong)
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(mealRepository.getMealRecipeFinalList(idsList, multiplier), HttpStatus.OK);
-    }
+//    @PostMapping("/generateFoodRecipe")
+//    public ResponseEntity<List<FoodDTO>> generateFoodRecipe(@RequestParam("ids") String ids, @RequestParam("multiplier") Double multiplier) {
+//        List<Long> idsList = Arrays.stream(ids.split(","))
+//                .map(Long::parseLong)
+//                .collect(Collectors.toList());
+//        return new ResponseEntity<>(mealRepository.getMealRecipeFinalList(idsList, multiplier), HttpStatus.OK);
+//    }
 
     @GetMapping(value = "/getMealIngredientsList/{id}")
     public ResponseEntity<List<Ingredient>> getMealIngredientsByMealId(@PathVariable Long id){
@@ -91,14 +91,6 @@ public class MealController {
     public ResponseEntity<List<Meal>> getMealsByUserId(@PathVariable Long id){
         if (id != null) return new ResponseEntity<>(mealRepository.getMealByUserId(id), HttpStatus.OK);
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    @PostMapping("/generateWeeklyFoodRecipe")
-    public ResponseEntity<MealWithNamesDto> generateWeeklyFoodRecipe(@RequestParam("ids") String ids, @RequestParam("multiplier") Double multiplier) {
-        List<Long> idsList = Arrays.stream(ids.split(","))
-                .map(Long::parseLong)
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(mealRepository.generateWeeklyFoodRecipe(idsList, multiplier) , HttpStatus.OK);
     }
 
 }

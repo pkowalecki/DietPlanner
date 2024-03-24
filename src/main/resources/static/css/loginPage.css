@@ -1,0 +1,72 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,700&family=Work+Sans:wght@600&display=swap");
+
+body {
+    font-family: "DM Sans", Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    overflow-x: hidden;
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    margin:0;
+}
+
+.wrapper {
+    flex: 1;
+}
+
+input {
+    border-radius: 0 !important;
+}
+
+h1:after {
+    content: "";
+    display: block;
+    width: 82px;
+    height: 3px;
+    margin: 10px 0 40px;
+}
+
+.login-form {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 5px 5px 0 0;
+    width: 105%;
+    max-width: 400px;
+    padding: 10px 10px 30px 10px;
+    margin: 30px 0 0 0 ;
+}
+
+.login-error{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background-color: rgba(211, 87, 85, 1);
+    width: 105%;
+    max-width: 400px;
+    color: black;
+}
+
+
+.alert {
+    display: none;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #ccc;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    cursor: pointer;
+}
+
+.alert p {
+    margin: 0;
+}
+
+img{
+    max-width: 256px;
+    max-height: 256px;
+}

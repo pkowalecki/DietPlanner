@@ -15,7 +15,6 @@ public class IngredientToBuyDTO {
     String ingredientAmount;
     String ingredientUnit;
 
-
     String measurementAmount;
     String measurementUnit;
 

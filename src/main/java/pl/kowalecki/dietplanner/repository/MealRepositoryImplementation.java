@@ -106,53 +106,8 @@ public class MealRepositoryImplementation{
         return measurementNames;
     }
 
-    public List<FoodDTO> getMealRecipeFinalList(List<Long> ids, Double multiplier) {
-        List<FoodDTO> mealList = new ArrayList<>();
-        List<Ingredient> combinedIngredients = new ArrayList<>();
-        for (Long id : ids) {
-            if (id == 0) continue;
-            Meal meal = getMealById(id);
-            for (Long ingredientIds : ids) {
-                if (ingredientIds == 0) continue;
-                List<Ingredient> ingredients = getMealIngredientsByMealId(id);
-                combinedIngredients.addAll(ingredients);
-            }
-            List<Ingredient> ingredients = IngredientsListHelper.prepareIngredientsList(combinedIngredients, multiplier);
-            FoodDTO foodDTO = new FoodDTO(meal.getName(), meal.getRecipe(), meal.getDescription(), ingredients);
-            mealList.add(foodDTO);
-        }
-        return mealList;
-    }
-
     public List<Meal> getMealByUserId(Long userId) {
         return mealRepository.findMealsByAdministrationUserId(userId);
-    }
-
-    public MealWithNamesDto generateWeeklyFoodRecipe(List<Long> ids, Double multiplier) {
-        List<FoodDTO> mealList = new ArrayList<>();
-        List<String> mealName = new ArrayList<>();
-        List<Ingredient> combinedIngredients = new ArrayList<>();
-        for (Long id : ids) {
-            if (id == 0) continue;
-            Meal meal = getMealById(id);
-            for (Long ingredientIds : ids) {
-                if (ingredientIds == 0) continue;
-                if (meal.getMealTypes().stream().anyMatch(mealType -> mealType.getMealTypenEn().equals("snack"))){
-                    mealName.add(meal.getName());
-                    mealList.add(new FoodDTO(meal.getName(), meal.getRecipe(), meal.getDescription(), meal.getIngredients()));
-                    continue;
-                }
-                List<Ingredient> ingredients = getMealIngredientsByMealId(id);
-                combinedIngredients.addAll(ingredients);
-            }
-
-            List<Ingredient> ingredients = IngredientsListHelper.prepareIngredientsList(combinedIngredients, multiplier);
-            FoodDTO foodDTO = new FoodDTO(meal.getName(), meal.getRecipe(), meal.getDescription(), ingredients);
-            mealName.add(meal.getName());
-            mealList.add(foodDTO);
-        }
-
-        return new MealWithNamesDto(mealList, mealName);
     }
 
 }

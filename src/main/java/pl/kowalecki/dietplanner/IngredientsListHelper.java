@@ -17,7 +17,7 @@ public class IngredientsListHelper {
                 if(newIngredient.getName().equals(existingIngredient.getName())){
                     //Tutaj lecimy z jednostkami danego składnika
                     if (newIngredient.getIngredientUnit().equals(existingIngredient.getIngredientUnit())){
-                        existingIngredient.setIngredientAmount(existingIngredient.sumTotalAmount(newIngredient.getIngredientAmount()*multiplier,existingIngredient.getIngredientAmount()));
+                        existingIngredient.setIngredientAmount(existingIngredient.sumTotalAmount(getRoundedIngredientAmount(newIngredient.getIngredientAmount(),multiplier),existingIngredient.getIngredientAmount()));
                         existingIngredient.setIngredientUnit(existingIngredient.getIngredientUnit());
                     }
                     //Tutaj lecimy z rodzajem danego składnika
@@ -29,7 +29,7 @@ public class IngredientsListHelper {
                     ingredientMap.put(ingredientNameKey, newIngredientToPut);
                 }
             }else{
-                newIngredient.setIngredientAmount(newIngredient.getIngredientAmount()*multiplier);
+                newIngredient.setIngredientAmount(getRoundedIngredientAmount(newIngredient.getIngredientAmount(), multiplier));
                 newIngredient.setMeasurementValue(newIngredient.getMeasurementValue()*multiplier);
                 ingredientMap.put(ingredientNameKey, newIngredient);
             }
@@ -42,6 +42,10 @@ public class IngredientsListHelper {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
 
         return new ArrayList<>(sortedMap.values());
+    }
+
+    private static Double getRoundedIngredientAmount(Double ingredient, Double multiplier) {
+        return (double)Math.round(((ingredient*multiplier)*100)/100);
     }
 
 }
