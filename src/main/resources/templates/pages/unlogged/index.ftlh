@@ -4,7 +4,7 @@
     <div class="row mt-5">
         <img src = "../../../static/images/recipe-book-svgrepo-com.svg" alt="Happy book SVG">
         <div class="col-12 col-md-4 mx-auto py-4">
-            <form class="row g-3 login-form" method="POST" id="loginForm">
+            <form class="row g-3 login-form" method="POST" name="loginForm" action="/login">
                 <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
                     <input type="email" class="form-control validation" id="email" name="email" placeholder="User email" required>
@@ -19,5 +19,20 @@
             </form>
         </div>
     </div>
+
+    <#if error?? && error != "">
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var swalContent = {};
+                swalContent = {
+                    title: "Error",
+                    text: '${error}',
+                    icon: "error",
+                    confirmButtonColor: "#052d73"
+                };
+                Swal.fire(swalContent);
+            });
+        </script>
+    </#if>
 </div>
 <#include "../../webData/footer.ftlh">

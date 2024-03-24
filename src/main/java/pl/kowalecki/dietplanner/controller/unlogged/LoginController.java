@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 
 
 @CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
-@RestController
+@Controller
 public class LoginController {
 
     @Autowired
@@ -65,7 +65,7 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> postLoginPage(@RequestBody LoginRequestDTO loginRequestDto, HttpServletResponse response, HttpSession session){
+    public String postLoginPage(@ModelAttribute("loginForm") LoginRequestDTO loginRequestDto, HttpServletResponse response, HttpSession session, Model model){
         try {
             Authentication authentication = authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(), loginRequestDto.getPassword()));
@@ -85,15 +85,17 @@ public class LoginController {
             ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
 
             response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
-            return new ResponseEntity<>(new AdministrationUser(userDetails.getId(),
+            session.setAttribute("user", new AdministrationUser(userDetails.getId(),
                     userDetails.getName(),
                     userDetails.getSurname(),
                     userDetails.getEmail(),
-                    roles), HttpStatus.OK);
+                    roles));
+            return "pages/foodBoardPage";
 
         } catch (AuthenticationException e) {
             System.out.println("Próbowałem się zalogować: " + loginRequestDto.getEmail());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            model.addAttribute("error", "Bad data, try again");
+            return "pages/unlogged/index";
         }
 
     }
