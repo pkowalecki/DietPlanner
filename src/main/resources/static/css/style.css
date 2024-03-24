@@ -1,0 +1,29 @@
+header {
+    min-height: 100px;
+}
+
+header a {
+    color: white;
+    text-decoration: none;
+}
+nav,
+header {
+    background: #005da2;
+    color: white;
+}
+
+footer {
+    min-height: 100px;
+    bottom: 0;
+    width: 100%;
+}
+
+footer a {
+    color: white;
+    text-decoration: none;
+}
+nav,
+footer {
+    background: #005da2;
+    color: white;
+}
