@@ -28,45 +28,38 @@ h1:after {
     margin: 10px 0 40px;
 }
 
-.login-form {
-    background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 5px 5px 0 0;
-    width: 105%;
-    max-width: 400px;
-    padding: 10px 10px 30px 10px;
-    margin: 30px 0 0 0 ;
-}
-
-.login-error{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px;
-    background-color: rgba(211, 87, 85, 1);
-    width: 105%;
-    max-width: 400px;
-    color: black;
-}
-
-
-.alert {
-    display: none;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #fff;
-    padding: 20px;
-    border: 1px solid #ccc;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    cursor: pointer;
-}
-
-.alert p {
-    margin: 0;
+.login-form{
+    width: 400px;
+    border-radius: 4px;
+    margin: 2em auto;
+    padding: 3em 2em 2em 3em;
+    background: #fafafa;
+    border: 1px solid #ebebeb;
+    color: black !important;
+    box-shadow: rgba(0, 0, 0, 0.14902) 0px 1px 1px 0px, rgba(0, 0, 0, 0.09804) 0px 1px 2px 0px;
 }
 
 img{
     max-width: 256px;
     max-height: 256px;
+}
+
+.login-form a{
+    font-size: 14px;
+    font-weight: 500;
+    color: black;
+}
+
+.login-form a{
+    font-size: 14px;
+    font-weight: 500;
+    color: black;
+}
+
+.form-link{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
 }
