@@ -41,11 +41,13 @@ public class MealPageController {
     @PostMapping(value = "/generateMealBoard")
     public String resultPage(Model model,HttpSession httpSession, HttpServletRequest req, HttpServletResponse resp, @ModelAttribute("form") FoodBoardPageData form){
         List<Long> idsList = form.getMealValues();
+        List<String> mealNames = mealRepositoryImpl.getMealNamesByIdList(idsList);
         List<Meal> meal = mealRepository.findMealsByMealIdIn(idsList);
 
         model.addAttribute("result", mealRepositoryImpl.getMealIngredientsFinalList(idsList, form.getMultiplier()));
         model.addAttribute("meals", meal);
         model.addAttribute("idsList", idsList);
+        model.addAttribute("mealNames", mealNames);
         return "pages/foodBoardResult";
     }
 }
