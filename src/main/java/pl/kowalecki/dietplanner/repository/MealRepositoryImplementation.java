@@ -2,14 +2,11 @@ package pl.kowalecki.dietplanner.repository;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import org.hibernate.HibernateError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import pl.kowalecki.dietplanner.IngredientsListHelper;
 import pl.kowalecki.dietplanner.model.AdministrationUser;
-import pl.kowalecki.dietplanner.model.DTO.FoodDTO;
 import pl.kowalecki.dietplanner.model.DTO.IngredientToBuyDTO;
-import pl.kowalecki.dietplanner.model.DTO.MealWithNamesDto;
 import pl.kowalecki.dietplanner.model.ingredient.Ingredient;
 import pl.kowalecki.dietplanner.model.ingredient.ingredientAmount.IngredientUnit;
 import pl.kowalecki.dietplanner.model.ingredient.ingredientMeasurement.MeasurementType;
@@ -77,6 +74,17 @@ public class MealRepositoryImplementation{
             return meal.getIngredients();
     }
 
+    public Map<Boolean, List<Ingredient>> getMealTypeAndIngredientsByMealId(Long mealId){
+        Map<Boolean, List<Ingredient>> map = new HashMap<>();
+        Meal meal = mealRepository.findById(mealId).orElse(null);
+        if (meal == null) {
+            return map;
+        }
+        map.put(meal.getMealTypes().stream()
+                .anyMatch(type -> "SNACK".equals(type.getMealTypenEn())), meal.getIngredients());
+        return map;
+    }
+
     public List<IngredientToBuyDTO> getMealIngredientsFinalList(List<Long> ids, Double multiplier) {
         List<Ingredient> combinedIngredients = new ArrayList<>();
 
@@ -93,8 +101,6 @@ public class MealRepositoryImplementation{
             IngredientToBuyDTO ingredientDTO = new IngredientToBuyDTO(ingredient.getName(), ingredient.getIngredientAmount().toString(), ingredient.getIngredientUnit().getShortName(), ingredient.getMeasurementValue().toString(), ingredient.getMeasurementType().getMeasurementName().toString());
             ingredientsToBuy.add(ingredientDTO);
         }
-
-
         return ingredientsToBuy;
     }
     public Map<IngredientUnit, List<String>> getIngredientUnitMap(){
@@ -109,5 +115,15 @@ public class MealRepositoryImplementation{
     public List<Meal> getMealByUserId(Long userId) {
         return mealRepository.findMealsByAdministrationUserId(userId);
     }
-
+    public List<String> getMealNamesByIdList(List<Long> list) {
+        List<String> mealNames = new ArrayList<>();
+        for (Long mealId : list){
+            if (mealId == 0){
+                mealNames.add("-");
+                continue;
+            }
+            mealNames.add(mealRepository.getMealNameByMealId(mealId));
+        }
+        return mealNames;
+    }
 }

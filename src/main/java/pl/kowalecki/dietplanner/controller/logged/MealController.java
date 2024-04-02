@@ -72,11 +72,11 @@ public class MealController {
 //        return new ResponseEntity<>(mealRepository.getMealRecipeFinalList(idsList, multiplier), HttpStatus.OK);
 //    }
 
-    @GetMapping(value = "/getMealIngredientsList/{id}")
-    public ResponseEntity<List<Ingredient>> getMealIngredientsByMealId(@PathVariable Long id){
-        if (mealRepository.getMealIngredientsByMealId(id) != null) return new ResponseEntity<>(mealRepository.getMealIngredientsByMealId(id), HttpStatus.OK);
-        else return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
+//    @GetMapping(value = "/getMealIngredientsList/{id}")
+//    public ResponseEntity<List<Ingredient>> getMealIngredientsByMealId(@PathVariable Long id){
+//        if (mealRepository.getMealIngredientsByMealId(id) != null) return new ResponseEntity<>(mealRepository.getMealIngredientsByMealId(id), HttpStatus.OK);
+//        else return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+//    }
 
     @GetMapping(value = "/getIngredientMap")
     public ResponseEntity<Map<IngredientUnit,List<String>>> getListIngredientUnit(){

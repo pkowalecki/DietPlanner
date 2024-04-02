@@ -123,14 +123,6 @@ public class Meal implements Serializable {
         isDeleted = deleted;
     }
 
-    public Long getMealId() {
-        return mealId;
-    }
-
-    public void setMealId(Long mealId) {
-        this.mealId = mealId;
-    }
-
     public List<MealType> getMealTypes() {
         return mealTypes;
     }
