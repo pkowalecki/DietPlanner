@@ -1,7 +1,5 @@
 package pl.kowalecki.dietplanner.controller.unlogged;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
@@ -12,24 +10,21 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import pl.kowalecki.dietplanner.controller.helper.LoginControllerHelper;
-import pl.kowalecki.dietplanner.model.AdministrationUser;
+import pl.kowalecki.dietplanner.model.User;
 import pl.kowalecki.dietplanner.model.DTO.LoginRequestDTO;
 import pl.kowalecki.dietplanner.model.Role;
 import pl.kowalecki.dietplanner.model.enums.EnumRole;
-import pl.kowalecki.dietplanner.repository.AdministrationUserRepository;
+import pl.kowalecki.dietplanner.repository.UserRepository;
 import pl.kowalecki.dietplanner.repository.MealRepository;
 import pl.kowalecki.dietplanner.repository.RoleRepository;
 import pl.kowalecki.dietplanner.security.jwt.AuthJwtUtils;
-import pl.kowalecki.dietplanner.security.services.AdministrationUserDetailsImpl;
+import pl.kowalecki.dietplanner.security.services.UserDetailsImpl;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -52,7 +47,7 @@ public class LoginController {
     RoleRepository roleRepository;
 
     @Autowired
-    AdministrationUserRepository administrationUserRepository;
+    UserRepository userRepository;
 
     @Autowired
     MealRepository mealRepository;
@@ -70,7 +65,7 @@ public class LoginController {
             Authentication authentication = authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(), loginRequestDto.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            AdministrationUserDetailsImpl userDetails = (AdministrationUserDetailsImpl) authentication.getPrincipal();
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
             Set<Role> roles = userDetails.getAuthorities().stream()
                     .map(authority -> {
@@ -85,8 +80,9 @@ public class LoginController {
             ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
 
             response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
-            session.setAttribute("user", new AdministrationUser(userDetails.getId(),
+            session.setAttribute("user", new User(userDetails.getId(),
                     userDetails.getName(),
+                    userDetails.getNickName(),
                     userDetails.getSurname(),
                     userDetails.getEmail(),
                     roles));
@@ -99,6 +95,5 @@ public class LoginController {
         }
 
     }
-
 
 }

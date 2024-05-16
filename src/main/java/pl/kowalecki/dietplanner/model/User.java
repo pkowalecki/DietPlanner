@@ -1,20 +1,18 @@
 package pl.kowalecki.dietplanner.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import pl.kowalecki.dietplanner.model.ingredient.Ingredient;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "administrationusers",
+@Table(name = "users",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = "email")
         })
@@ -22,7 +20,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @ToString
-public class AdministrationUser {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -33,6 +31,8 @@ public class AdministrationUser {
 
     @Column(unique = true, nullable = false)
     private String email;
+    @Column(unique = true, nullable = false)
+    private String nickName;
 
     @Column(nullable = false)
     @JsonIgnore
@@ -40,28 +40,30 @@ public class AdministrationUser {
 
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "administrationuser_roles",
-            joinColumns = @JoinColumn(name = "administrationuser_id"),
+    @JoinTable(name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "administrationuser_meal",
-            joinColumns = @JoinColumn(name = "administrationuser_id"),
+    @JoinTable(name = "user_meal",
+            joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "meal_id"))
     private List<Meal> mealList;
 
-    public AdministrationUser(Integer id, String name, String surname, String email, Set<Role> roles) {
+    public User(Integer id, String name, String nickName, String surname, String email, Set<Role> roles) {
         this.id = id;
         this.name = name;
+        this.nickName = nickName;
         this.surname = surname;
         this.email = email;
         this.roles = roles;
 
     }
 
-    public AdministrationUser(String name, String surname, String email, String password) {
+    public User(String name, String nickName, String surname, String email, String password) {
         this.name = name;
+        this.nickName = nickName;
         this.surname = surname;
         this.email = email;
         this.password = password;

@@ -27,3 +27,16 @@ footer {
     background: #005da2;
     color: white;
 }
+
+.goRight {
+    text-align: right;
+}
+.goCenter {
+    text-align: center;
+}
+.floatLeft {
+    float: left;
+}
+.floatRight {
+    float: right;
+}

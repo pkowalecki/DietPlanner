@@ -63,3 +63,10 @@ img{
     justify-content: space-between;
     font-size: 12px;
 }
+ .center-content {
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     height: 100%;
+     flex-direction: column;
+ }

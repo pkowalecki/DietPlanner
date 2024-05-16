@@ -2,14 +2,11 @@ package pl.kowalecki.dietplanner.repository;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import org.hibernate.HibernateError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import pl.kowalecki.dietplanner.IngredientsListHelper;
-import pl.kowalecki.dietplanner.model.AdministrationUser;
-import pl.kowalecki.dietplanner.model.DTO.FoodDTO;
+import pl.kowalecki.dietplanner.model.User;
 import pl.kowalecki.dietplanner.model.DTO.IngredientToBuyDTO;
-import pl.kowalecki.dietplanner.model.DTO.MealWithNamesDto;
 import pl.kowalecki.dietplanner.model.ingredient.Ingredient;
 import pl.kowalecki.dietplanner.model.ingredient.ingredientAmount.IngredientUnit;
 import pl.kowalecki.dietplanner.model.ingredient.ingredientMeasurement.MeasurementType;
@@ -23,13 +20,13 @@ public class MealRepositoryImplementation{
 
     private final MealRepository mealRepository;
     private final IngredientRepository ingredientRepository;
-    private final AdministrationUserRepository administrationUserRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public MealRepositoryImplementation(MealRepository mealRepository, IngredientRepository ingredientRepository, AdministrationUserRepository administrationUserRepository){
+    public MealRepositoryImplementation(MealRepository mealRepository, IngredientRepository ingredientRepository, UserRepository userRepository){
         this.mealRepository=mealRepository;
         this.ingredientRepository=ingredientRepository;
-        this.administrationUserRepository=administrationUserRepository;
+        this.userRepository = userRepository;
     }
 
     public List<Meal> getAllMeals(){
@@ -58,7 +55,7 @@ public class MealRepositoryImplementation{
         if (newMeal.getIngredients() == null) {
             newMeal.setIngredients(new ArrayList<>());
         }
-        Optional<AdministrationUser> userOptional = administrationUserRepository.findById(Integer.valueOf(userId));
+        Optional<User> userOptional = userRepository.findById(Integer.valueOf(userId));
 
         newMeal.setAdditionDate(LocalDateTime.now());
         Meal savedMeal = mealRepository.save(newMeal);
@@ -107,7 +104,7 @@ public class MealRepositoryImplementation{
     }
 
     public List<Meal> getMealByUserId(Long userId) {
-        return mealRepository.findMealsByAdministrationUserId(userId);
+        return mealRepository.findMealsByUserId(userId);
     }
 
 }

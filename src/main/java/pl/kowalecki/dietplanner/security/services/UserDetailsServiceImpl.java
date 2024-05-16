@@ -6,21 +6,21 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import pl.kowalecki.dietplanner.model.AdministrationUser;
-import pl.kowalecki.dietplanner.repository.AdministrationUserRepository;
+import pl.kowalecki.dietplanner.model.User;
+import pl.kowalecki.dietplanner.repository.UserRepository;
 
 @Service
-public class AdministrationUserDetailsServiceImpl implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
-    AdministrationUserRepository administrationUserRepository;
+    UserRepository userRepository;
 
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        AdministrationUser user = administrationUserRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
-        return AdministrationUserDetailsImpl.build(user);
+        return UserDetailsImpl.build(user);
     }
 
 }
