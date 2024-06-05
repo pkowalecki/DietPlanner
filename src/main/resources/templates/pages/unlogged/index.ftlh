@@ -56,6 +56,10 @@
                             <label class="form-label" for="password2">Password</label>
                             <input type="password" id="password2" class="form-control" autocomplete="off" required/>
                         </div>
+                        <div data-mdb-input-init class="form-outline mb-4">
+                            <label class="form-label" for="password3">Confirm password</label>
+                            <input type="password" id="password3" class="form-control" autocomplete="off" required/>
+                        </div>
                         <div data-mdb-input-init class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary btn-block">Register</button>
                         </div>
