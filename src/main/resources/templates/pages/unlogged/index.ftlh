@@ -60,6 +60,14 @@
                             <input type="password" id="password2" class="form-control" autocomplete="off" required/>
                         </div>
                         <div data-mdb-input-init class="form-outline mb-4">
+                            <label>Strength of password</label>
+                            <div class="group-pass">
+                                <div class="power-container">
+                                    <div id="power-point"></div> <div id="minRequirementsDone"><i class="fa-regular fa-circle-xmark"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div data-mdb-input-init class="form-outline mb-4">
                             <label class="form-label" for="password3">Confirm password*</label>
                             <input type="password" id="password3" class="form-control" autocomplete="off" required/>
                         </div>
@@ -114,7 +122,7 @@
                     data: JSON.stringify(formData),
                     success: function (response) {
                         alert('Registration successful');
-                        $('#registerModal').modal('hide'); // Zamknij modal
+                        $('#registerModal').modal('hide');
                     },
                     error: function (jqXHR) {
                         alert('Registration failed: ' + jqXHR.responseText);
@@ -124,4 +132,42 @@
         });
     </script>
 </div>
+
+<script>
+    let password = document.getElementById("password2");
+    let strength = document.getElementById("power-point");
+    password.oninput = function () {
+        let point = 0;
+        let value = password.value;
+        let widthPower = ["0%", "20%", "35%", "50%","65%","80%", "90%", "100%"];
+        let colorPower = ["#D73F40", "#D73F40", "#DC6551", "#F2B84F", "#BDE952", "#3ba62f"];
+        let minRequirementsMet = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[\]{}:;',?/*~$^+=<>]).{8,20}$/.test(value);
+
+        if (minRequirementsMet) {
+            point = 1;
+            let arrayTest = [
+                /[0-9]/,
+                /[a-z]/,
+                /[A-Z]/,
+                /[!@#&()–[\]{}:;',?/*~$^+=<>]/
+            ];
+            arrayTest.forEach((item) => {
+                if (item.test(value)) {
+                    point += 1;
+                }
+            });
+            if (value.length >= 12) {
+                point += 1;
+            }
+            if (value.length >= 16) {
+                point += 1;
+            }
+        }
+
+        point = Math.min(point, widthPower.length - 1);
+
+        strength.style.width = widthPower[point];
+        strength.style.backgroundColor = colorPower[Math.min(point, colorPower.length - 1)];
+    };
+</script>
 <#include "../../webData/footer.ftlh">

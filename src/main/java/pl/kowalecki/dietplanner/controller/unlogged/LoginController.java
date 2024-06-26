@@ -34,24 +34,12 @@ import java.util.stream.Collectors;
 @Controller
 public class LoginController {
 
-    @Autowired
     AuthenticationManager authenticationManager;
-
-    @Autowired
     AuthJwtUtils jwtUtils;
-
-    @Autowired
     PasswordEncoder encoder;
-
-    @Autowired
     RoleRepository roleRepository;
-
-    @Autowired
     UserRepository userRepository;
-
-    @Autowired
     MealRepository mealRepository;
-    @Autowired
     private LoginControllerHelper loginControllerHelper;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)

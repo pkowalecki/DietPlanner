@@ -4,9 +4,9 @@ import pl.kowalecki.dietplanner.model.DTO.RegistrationRequestDTO;
 
 public class RegisterControllerHelper {
 
-    public static boolean checkUser(RegistrationRequestDTO registrationRequest) {
+    public boolean checkRegistrationData(RegistrationRequestDTO registrationRequest) {
         boolean error = false;
-
+        //Sprawdzam wprowadzone dane czy rozmiar się zgadza z frontem, czy tam gdzie wymagam powtórzeń są poprawne, czy nie istnieją zapisy w bazie
 
         return error;
     }
