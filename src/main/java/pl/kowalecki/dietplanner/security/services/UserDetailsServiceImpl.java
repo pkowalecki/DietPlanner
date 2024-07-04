@@ -10,10 +10,14 @@ import pl.kowalecki.dietplanner.model.User;
 import pl.kowalecki.dietplanner.repository.UserRepository;
 
 @Service
-public class UserDetailsServiceImpl implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService{
+
+    private UserRepository userRepository;
 
     @Autowired
-    UserRepository userRepository;
+    public UserDetailsServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     @Transactional
@@ -23,4 +27,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return UserDetailsImpl.build(user);
     }
 
+    public boolean existsUserByEmail(String userEmail){
+        return userRepository.existsByEmail(userEmail);
+    }
 }
