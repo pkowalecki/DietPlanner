@@ -33,7 +33,7 @@ public class TextTools {
     * At least 1 spec. char "!@#&()–[{}]:;',?/*~$^+=<>"
     * Min 8 max 20 chars {8,20}
     * */
-    private static final String PASSWORD_PATTERN = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~$^+=<>]).{8,20}$";
+    private static final String PASSWORD_PATTERN = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~$^+=<>]).{8,255}$";
     private static final Pattern passPattern = Pattern.compile(PASSWORD_PATTERN);
     public static boolean passwordPatternValidate(String password){
         try{

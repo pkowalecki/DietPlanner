@@ -38,43 +38,54 @@
                 <div class="modal-body">
                     <form id="registerForm">
                         <div data-mdb-input-init class="form-outline mb-4">
-                            <label class="form-label" for="nickname2">Nickname*</label>
-                            <input type="text" id="nickname2" class="form-control" autocomplete="off" required/>
+                            <label class="form-label" for="nickname">Nickname*</label>
+                            <input type="text" id="nickname" name="nickname" class="form-control" required minlength="1" maxlength="50"/>
+                            <div class="error-message" id="nicknameError"></div>
                         </div>
                         <div class="row">
                             <div data-mdb-input-init class="form-outline mb-4 col-md-6">
-                                <label class="form-label" for="name2">Name</label>
-                                <input type="text" id="name2" class="form-control" autocomplete="off"/>
+                                <label class="form-label" for="name">Name</label>
+                                <input type="text" id="name" name="name" class="form-control" minlength="5" maxlength="50"/>
+                                <div class="error-message" id="nameError"></div>
                             </div>
                             <div data-mdb-input-init class="form-outline mb-4 col-md-6">
-                                <label class="form-label" for="surname2">Surname</label>
-                                <input type="text" id="surname2" class="form-control" autocomplete="off"/>
+                                <label class="form-label" for="surname">Surname</label>
+                                <input type="text" id="surname" name="surname" class="form-control" minlength="5" maxlength="50"/>
+                                <div class="error-message" id="surnameError"></div>
                             </div>
                         </div>
                         <div data-mdb-input-init class="form-outline mb-4">
-                            <label class="form-label" for="email2">Email address*</label>
-                            <input type="email" id="email2" class="form-control" autocomplete="off" required/>
+                            <label class="form-label" for="emailReg">Email address*</label>
+                            <input type="email" id="emailReg" name="emailReg" class="form-control" required minlength="10" maxlength="80"/>
+                            <div class="error-message" id="emailRegError"></div>
                         </div>
                         <div data-mdb-input-init class="form-outline mb-4">
-                            <label class="form-label" for="password2">Password*</label>
-                            <input type="password" id="password2" class="form-control" autocomplete="off" required/>
+                            <label class="form-label" for="passwordReg">Password*</label>
+                            <div class="hover-text">
+                                <i class="bi bi-info-circle"></i>
+                            <span class="tooltip-text" id="bottom">Widoczek z rikłajermentsami</span>
+                            </div>
+                            <input type="password" id="passwordReg" name="passwordReg" class="form-control" required minlength="8" maxlength="255"/>
+                            <div class="error-message" id="passwordRegError"></div>
                         </div>
                         <div data-mdb-input-init class="form-outline mb-4">
                             <label>Strength of password</label>
                             <div class="group-pass">
                                 <div class="power-container">
-                                    <div id="power-point"></div> <div id="minRequirementsDone"><i class="fa-regular fa-circle-xmark"></i></div>
+                                    <div id="power-point"></div> <div id="minRequirementsDone"></div>
                                 </div>
                             </div>
                         </div>
                         <div data-mdb-input-init class="form-outline mb-4">
-                            <label class="form-label" for="password3">Confirm password*</label>
-                            <input type="password" id="password3" class="form-control" autocomplete="off" required/>
+                            <label class="form-label" for="passwordReg2">Confirm password*</label>
+                            <input type="password" id="passwordReg2" name="passwordReg2" class="form-control" required minlength="8" maxlength="255"/>
+                            <div class="error-message" id="passwordReg2Error"></div>
                         </div>
                         <div data-mdb-input-init class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary btn-block">Register</button>
                         </div>
                     </form>
+
                 </div>
             </div>
         </div>
@@ -100,20 +111,24 @@
             $("#registerBtn").click(function (e) {
                 e.preventDefault();
                 $("#registerModal").modal("show");
+                $('#registerForm')[0].reset();
             });
             $("#closeModal").click(function (e) {
                 e.preventDefault();
                 $("#registerModal").modal("hide");
+                $('#registerForm')[0].reset();
             });
 
             $("#registerForm").submit(function (e) {
                 e.preventDefault();
+                $(".error-message").text("");
                 var formData = {
-                    nickname: $('#nickname2').val(),
-                    name: $('#name2').val(),
-                    surname: $('#surname2').val(),
-                    email: $('#email2').val(),
-                    password: $('#password2').val()
+                    nickname: $('#nickname').val(),
+                    name: $('#name').val(),
+                    surname: $('#surname').val(),
+                    emailReg: $('#emailReg').val(),
+                    passwordReg: $('#passwordReg').val(),
+                    passwordReg2: $('#passwordReg2').val()
                 };
                 $.ajax({
                     type: 'POST',
@@ -123,9 +138,17 @@
                     success: function (response) {
                         alert('Registration successful');
                         $('#registerModal').modal('hide');
+                        $('#registerForm')[0].reset();
                     },
                     error: function (jqXHR) {
-                        alert('Registration failed: ' + jqXHR.responseText);
+                        if (jqXHR.responseJSON && jqXHR.responseJSON.errors) {
+                            var errors = jqXHR.responseJSON.errors;
+                            for (var field in errors) {
+                                if (field !== ""){
+                                    $("#" + field + "Error").text(errors[field]);
+                                }
+                            }
+                        }
                     }
                 });
             });
@@ -134,28 +157,17 @@
 </div>
 
 <script>
-    let password = document.getElementById("password2");
+    let password = document.getElementById("passwordReg");
     let strength = document.getElementById("power-point");
     password.oninput = function () {
         let point = 0;
         let value = password.value;
-        let widthPower = ["0%", "20%", "35%", "50%","65%","80%", "90%", "100%"];
-        let colorPower = ["#D73F40", "#D73F40", "#DC6551", "#F2B84F", "#BDE952", "#3ba62f"];
-        let minRequirementsMet = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[\]{}:;',?/*~$^+=<>]).{8,20}$/.test(value);
+        let widthPower = ["0%", "50%", "75%", "100%"];
+        let colorPower = ["#D73F40", "#F2B84F", "#BDE952", "#3ba62f"];
+        let minRequirements = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[\]{}:;',?/*~$^+=<>]).{8,255}$/.test(value);
 
-        if (minRequirementsMet) {
+        if (minRequirements) {
             point = 1;
-            let arrayTest = [
-                /[0-9]/,
-                /[a-z]/,
-                /[A-Z]/,
-                /[!@#&()–[\]{}:;',?/*~$^+=<>]/
-            ];
-            arrayTest.forEach((item) => {
-                if (item.test(value)) {
-                    point += 1;
-                }
-            });
             if (value.length >= 12) {
                 point += 1;
             }
