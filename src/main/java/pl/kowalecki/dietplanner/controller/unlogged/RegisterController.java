@@ -5,15 +5,21 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import pl.kowalecki.dietplanner.controller.helper.RegisterHelper;
+import pl.kowalecki.dietplanner.controller.helper.RegisterPole;
 import pl.kowalecki.dietplanner.exception.RegistrationException;
-import pl.kowalecki.dietplanner.model.DTO.ErrorResponseDTO;
+import pl.kowalecki.dietplanner.model.DTO.RegisterResponseDTO;
 import pl.kowalecki.dietplanner.model.DTO.RegistrationRequestDTO;
+import pl.kowalecki.dietplanner.model.Role;
+import pl.kowalecki.dietplanner.model.User;
+import pl.kowalecki.dietplanner.model.enums.EnumRole;
+import pl.kowalecki.dietplanner.repository.RoleRepository;
 import pl.kowalecki.dietplanner.repository.UserRepository;
 
-import java.util.Map;
+import java.util.*;
 
 @CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 @Controller
@@ -21,24 +27,49 @@ public class RegisterController {
 
     UserRepository userRepository;
     RegisterHelper registerHelper;
+    PasswordEncoder passwordEncoder;
+    RoleRepository roleRepository;
 
     @Autowired
-    public RegisterController(UserRepository userRepository, RegisterHelper registerHelper) {
+    public RegisterController(UserRepository userRepository, RegisterHelper registerHelper, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.registerHelper = registerHelper;
+        this.passwordEncoder = passwordEncoder;
+        this.roleRepository = roleRepository;
     }
 
+
     @PostMapping("/register")
-    public ResponseEntity<Object> registerUser(@RequestBody RegistrationRequestDTO registrationRequest){
+    public ResponseEntity<RegisterResponseDTO> registerUser(@RequestBody RegistrationRequestDTO registrationRequest) {
+        Map<String, String> errors;
         HttpHeaders header = new HttpHeaders();
         header.setContentType(MediaType.APPLICATION_JSON);
-
-        Map<String, String> errors = registerHelper.checkRegistrationData(registrationRequest);
-        if (!errors.isEmpty()) {
-            return ResponseEntity.badRequest().body(new ErrorResponseDTO(errors));
+        errors = registerHelper.checkRegistrationData(registrationRequest);
+        User user = createUser(registrationRequest);
+        user.setRoles(registerHelper.setUserRole(Collections.singletonList("ROLE_USER")));
+        if (user.getRoles() == null || user.getRoles().size() == 0) {
+            errors.put(RegisterPole.ROLE.getFieldName(), "Role error");
         }
-        // Implement user registration logic here
-        return ResponseEntity.ok("Łi didit");
+        if (!errors.isEmpty()) {
+            RegisterResponseDTO respo = RegisterResponseDTO.builder().status(RegisterResponseDTO.RegisterStatus.BADDATA).errors(errors).build();
+            return new ResponseEntity<>(respo, HttpStatus.OK);
+        }
+        userRepository.save(user);
+
+        //Jedziemy z mailerem
+
+        return ResponseEntity.ok(new RegisterResponseDTO(RegisterResponseDTO.RegisterStatus.OK));
+
+    }
+
+
+    private User createUser(RegistrationRequestDTO registrationRequest) {
+        return new User(
+                registrationRequest.getName() != null ? registrationRequest.getName() : "",
+                registrationRequest.getSurname() != null ? registrationRequest.getSurname() : "",
+                registrationRequest.getEmailReg(),
+                registrationRequest.getNickname(),
+                passwordEncoder.encode(registrationRequest.getPasswordReg()));
     }
 
     @ExceptionHandler(RegistrationException.class)

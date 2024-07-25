@@ -7,7 +7,8 @@ public enum RegisterPole {
     SURNAME("surname"),
     EMAIL("emailReg"),
     PASSWORD("passwordReg"),
-    PASSWORD2("passwordReg2")
+    PASSWORD2("passwordReg2"),
+    ROLE("role")
     ;
 
     private String fieldName;

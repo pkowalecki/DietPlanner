@@ -63,7 +63,13 @@
                             <label class="form-label" for="passwordReg">Password*</label>
                             <div class="hover-text">
                                 <i class="bi bi-info-circle"></i>
-                            <span class="tooltip-text" id="bottom">Widoczek z rikłajermentsami</span>
+                            <span class="tooltip-text" id="bottom">
+                                Wymagania dotyczące mocy hasła:<br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                            </span>
                             </div>
                             <input type="password" id="passwordReg" name="passwordReg" class="form-control" required minlength="8" maxlength="255"/>
                             <div class="error-message" id="passwordRegError"></div>

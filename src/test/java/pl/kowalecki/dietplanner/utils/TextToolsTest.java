@@ -12,10 +12,12 @@ public class TextToolsTest {
 //    }
     @Test
     void emailShouldBeValid(){
-        assertTrue(TextTools.isValidEmail("testtet@gmail.com"));
-        assertTrue(TextTools.isValidEmail("234hg2ui3yh489fdsf@wp.pl"));
-        assertTrue(TextTools.isValidEmail("sdfsdf28.0u3jnrmf@o2.pl"));
-        assertTrue(TextTools.isValidEmail("fsdfjbh2i3hfi32f@yahoo.com"));
+        assertAll(
+                ()-> assertTrue(TextTools.isValidEmail("testtet@gmail.com")),
+                ()-> assertTrue(TextTools.isValidEmail("234hg2ui3yh489fdsf@wp.pl")),
+                ()-> assertTrue(TextTools.isValidEmail("sdfsdf28.0u3jnrmf@o2.pl")),
+                ()-> assertTrue(TextTools.isValidEmail("fsdfjbh2i3hfi32f@yahoo.com"))
+                );
     }
     @Test
     void emailShouldNotBeValid(){
