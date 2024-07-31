@@ -3,6 +3,7 @@ package pl.kowalecki.dietplanner.utils;
 import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.InternetAddress;
 
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,4 +46,7 @@ public class TextTools {
     }
 
 
+    public static String generateActivationHash() {
+        return UUID.randomUUID().toString();
+    }
 }

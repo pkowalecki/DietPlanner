@@ -2,12 +2,9 @@ package pl.kowalecki.dietplanner.controller.helper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import pl.kowalecki.dietplanner.exception.RegistrationException;
 import pl.kowalecki.dietplanner.model.DTO.RegistrationRequestDTO;
-import pl.kowalecki.dietplanner.model.Role;
-import pl.kowalecki.dietplanner.model.enums.EnumRole;
 import pl.kowalecki.dietplanner.repository.RoleRepository;
-import pl.kowalecki.dietplanner.security.services.UserDetailsServiceImpl;
+import pl.kowalecki.dietplanner.services.UserDetailsServiceImpl;
 import pl.kowalecki.dietplanner.utils.TextTools;
 
 import java.util.*;
@@ -72,29 +69,4 @@ public class RegisterHelper {
             errors.put(RegisterPole.PASSWORD.getFieldName(), "Pattern not match");
     }
 
-
-    public Set<Role> setUserRole(List<String> role) {
-        Set<Role> roles = new HashSet<>();
-        for (String singleRole: role) {
-            if (singleRole == null) {
-                Role userRole = roleRepository.findByName(EnumRole.ROLE_USER)
-                        .orElseThrow(() -> new RegistrationException("Role user not found!"));
-                roles.add(userRole);
-            } else {
-                roles.add(getRoleFromString(singleRole));
-            }
-        }
-        return roles;
-    }
-
-    //FIXME fix return value
-    private Role getRoleFromString(String role) {
-        Optional<Role> roleEn = switch (role) {
-            case "ROLE_ADMIN" -> roleRepository.findByName(EnumRole.ROLE_ADMIN);
-            case "ROLE_USER" -> roleRepository.findByName(EnumRole.ROLE_USER);
-            default -> roleRepository.findByName(EnumRole.ROLE_USER);
-        };
-        if (roleEn!= null && roleEn.isPresent()) return roleEn.get();
-        return new Role();
-    }
 }

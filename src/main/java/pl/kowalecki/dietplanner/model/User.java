@@ -50,6 +50,8 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "meal_id"))
     private List<Meal> mealList;
+    boolean isActive;
+    String hash;
 
     public User(Integer id, String name, String nickName, String surname, String email, Set<Role> roles) {
         this.id = id;
@@ -61,11 +63,13 @@ public class User {
 
     }
 
-    public User(String name, String nickName, String surname, String email, String password) {
+    public User(String name, String nickName, String surname, String email, String password, boolean isActive, String hash) {
         this.name = name;
         this.nickName = nickName;
         this.surname = surname;
         this.email = email;
         this.password = password;
+        this.isActive = isActive;
+        this.hash = hash;
     }
 }

@@ -3,7 +3,6 @@ package pl.kowalecki.dietplanner.controller.unlogged;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,7 +23,7 @@ import pl.kowalecki.dietplanner.repository.UserRepository;
 import pl.kowalecki.dietplanner.repository.MealRepository;
 import pl.kowalecki.dietplanner.repository.RoleRepository;
 import pl.kowalecki.dietplanner.security.jwt.AuthJwtUtils;
-import pl.kowalecki.dietplanner.security.services.UserDetailsImpl;
+import pl.kowalecki.dietplanner.services.UserDetailsImpl;
 
 import java.util.Set;
 import java.util.stream.Collectors;
