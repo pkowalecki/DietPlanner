@@ -33,9 +33,9 @@ public class UserService {
     public User createUser(RegistrationRequestDTO registrationRequest) {
         return new User(
                 registrationRequest.getName() != null ? registrationRequest.getName() : "",
+                registrationRequest.getNickname(),
                 registrationRequest.getSurname() != null ? registrationRequest.getSurname() : "",
                 registrationRequest.getEmailReg(),
-                registrationRequest.getNickname(),
                 passwordEncoder.encode(registrationRequest.getPasswordReg()),
                 false, TextTools.generateActivationHash());
     }

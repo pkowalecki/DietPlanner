@@ -39,7 +39,6 @@ public class RegistrationRequestDTO {
     @Size(min = 8, max = 255, message = "Password must be at least 8 characters long")
     private String passwordReg2;
 
-    @NotNull
     private Set<String> role;
 
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.kowalecki.dietplanner.controller.helper.RegisterHelper;
 import pl.kowalecki.dietplanner.controller.helper.RegisterPole;
 import pl.kowalecki.dietplanner.exception.RegistrationException;
+import pl.kowalecki.dietplanner.mailService.MailerService;
 import pl.kowalecki.dietplanner.model.DTO.RegisterResponseDTO;
 import pl.kowalecki.dietplanner.model.DTO.RegistrationRequestDTO;
 import pl.kowalecki.dietplanner.model.User;
@@ -24,11 +25,13 @@ public class RegisterController {
 
     UserService userService;
     RegisterHelper registerHelper;
+    MailerService mailerService;
 
     @Autowired
-    public RegisterController(UserService userService, RegisterHelper registerHelper) {
+    public RegisterController(UserService userService, RegisterHelper registerHelper, MailerService mailerService) {
         this.userService = userService;
         this.registerHelper = registerHelper;
+        this.mailerService = mailerService;
     }
 
 
@@ -54,9 +57,9 @@ public class RegisterController {
         }
 
         userService.registerUser(user);
-
-        //Jedziemy z mailerem
-
+        //Jedziemy z mailerem gmail nie czyta html
+        boolean isHtml = !user.getEmail().contains("@gmail.com");
+        mailerService.sendRegistrationEmail(user.getEmail(), user.getHash(), isHtml);
 
         return ResponseEntity.ok(new RegisterResponseDTO(RegisterResponseDTO.RegisterStatus.OK));
 
