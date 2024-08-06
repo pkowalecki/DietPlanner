@@ -8,7 +8,7 @@ import pl.kowalecki.dietplanner.model.Meal;
 import java.util.List;
 
 
-@Repository
+
 public interface MealRepository extends JpaRepository<Meal, Long> {
 
     @Query(value = "SELECT m.* FROM meals m " +

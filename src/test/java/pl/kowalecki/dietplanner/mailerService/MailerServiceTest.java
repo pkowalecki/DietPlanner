@@ -13,7 +13,6 @@ import pl.kowalecki.dietplanner.mailService.MailerService;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-//FIXME EOEOEO TEST MAILERA NIE WYSYŁA MAILA, DO SPRAWDZENIA
 class MailerServiceTest {
 
     @Mock

@@ -10,18 +10,19 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RegisterResponseDTO {
+public class ResponseDTO {
 
-    private RegisterStatus status;
+    private ResponseStatus status;
     private Map<String, String> errors;
 
-    public enum RegisterStatus{
+    public enum ResponseStatus {
         OK,
         BADDATA,
+        INVALID_TOKEN
         ;
     }
 
-    public RegisterResponseDTO(RegisterStatus status){
+    public ResponseDTO(ResponseStatus status){
         this.status=status;
     }
 

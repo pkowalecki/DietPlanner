@@ -1,5 +1,6 @@
 package pl.kowalecki.dietplanner.security;
 
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,12 +24,10 @@ import pl.kowalecki.dietplanner.services.UserDetailsServiceImpl;
 
 @Configuration
 @EnableMethodSecurity
+@AllArgsConstructor
 public class WebSecurityConfig{
 
-    @Autowired
     private UserDetailsServiceImpl userDetailsService;
-
-    @Autowired
     private AuthEntryPoint authEntryPoint;
 
     @Bean

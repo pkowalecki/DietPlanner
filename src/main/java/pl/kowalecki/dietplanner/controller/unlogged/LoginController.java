@@ -3,6 +3,7 @@ package pl.kowalecki.dietplanner.controller.unlogged;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import lombok.AllArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,26 +20,28 @@ import pl.kowalecki.dietplanner.model.User;
 import pl.kowalecki.dietplanner.model.DTO.LoginRequestDTO;
 import pl.kowalecki.dietplanner.model.Role;
 import pl.kowalecki.dietplanner.model.enums.EnumRole;
-import pl.kowalecki.dietplanner.repository.UserRepository;
-import pl.kowalecki.dietplanner.repository.MealRepository;
 import pl.kowalecki.dietplanner.repository.RoleRepository;
 import pl.kowalecki.dietplanner.security.jwt.AuthJwtUtils;
+import pl.kowalecki.dietplanner.services.MealServiceImpl;
 import pl.kowalecki.dietplanner.services.UserDetailsImpl;
+import pl.kowalecki.dietplanner.services.UserServiceImpl;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
 
 @CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
+@RequestMapping("/app")
 @Controller
+@AllArgsConstructor
 public class LoginController {
 
     AuthenticationManager authenticationManager;
     AuthJwtUtils jwtUtils;
     PasswordEncoder encoder;
     RoleRepository roleRepository;
-    UserRepository userRepository;
-    MealRepository mealRepository;
+    UserServiceImpl userService;
+    MealServiceImpl mealService;
     private LoginControllerHelper loginControllerHelper;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)

@@ -6,62 +6,62 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import pl.kowalecki.dietplanner.controller.helper.RegisterHelper;
 import pl.kowalecki.dietplanner.controller.helper.RegisterPole;
 import pl.kowalecki.dietplanner.exception.RegistrationException;
 import pl.kowalecki.dietplanner.mailService.MailerService;
-import pl.kowalecki.dietplanner.model.DTO.RegisterResponseDTO;
+import pl.kowalecki.dietplanner.model.DTO.ResponseDTO;
 import pl.kowalecki.dietplanner.model.DTO.RegistrationRequestDTO;
 import pl.kowalecki.dietplanner.model.User;
-import pl.kowalecki.dietplanner.services.UserService;
+import pl.kowalecki.dietplanner.services.UserServiceImpl;
 
 import java.util.*;
 
+@RequestMapping("/app")
 @CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
-@Controller
+@RestController
 public class RegisterController {
 
-    UserService userService;
+    UserServiceImpl userServiceImpl;
     RegisterHelper registerHelper;
     MailerService mailerService;
 
     @Autowired
-    public RegisterController(UserService userService, RegisterHelper registerHelper, MailerService mailerService) {
-        this.userService = userService;
+    public RegisterController(UserServiceImpl userServiceImpl, RegisterHelper registerHelper, MailerService mailerService) {
+        this.userServiceImpl = userServiceImpl;
         this.registerHelper = registerHelper;
         this.mailerService = mailerService;
     }
 
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponseDTO> registerUser(@Valid @RequestBody RegistrationRequestDTO registrationRequest) {
+    public ResponseEntity<ResponseDTO> registerUser(@Valid @RequestBody RegistrationRequestDTO registrationRequest) {
         HttpHeaders header = new HttpHeaders();
         header.setContentType(MediaType.APPLICATION_JSON);
         Map<String, String> errors = registerHelper.checkRegistrationData(registrationRequest);
         if (!errors.isEmpty()) {
-            RegisterResponseDTO response = RegisterResponseDTO.builder().status(RegisterResponseDTO.RegisterStatus.BADDATA).errors(errors).build();
+            ResponseDTO response = ResponseDTO.builder().status(ResponseDTO.ResponseStatus.BADDATA).errors(errors).build();
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        User user = userService.createUser(registrationRequest);
+        User user = userServiceImpl.createUser(registrationRequest);
         try {
-            user.setRoles(userService.setUserRoles(Collections.singletonList("ROLE_USER")));
+            user.setRoles(userServiceImpl.setUserRoles(Collections.singletonList("ROLE_USER")));
         }catch (RegistrationException e){
             errors.put(RegisterPole.ROLE.getFieldName(), "Role error, contact administration");
-            RegisterResponseDTO response = RegisterResponseDTO.builder()
-                    .status(RegisterResponseDTO.RegisterStatus.BADDATA)
+            ResponseDTO response = ResponseDTO.builder()
+                    .status(ResponseDTO.ResponseStatus.BADDATA)
                     .errors(errors)
                     .build();
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
 
-        userService.registerUser(user);
+        userServiceImpl.registerUser(user);
         //Jedziemy z mailerem gmail nie czyta html
         boolean isHtml = !user.getEmail().contains("@gmail.com");
         mailerService.sendRegistrationEmail(user.getEmail(), user.getHash(), isHtml);
 
-        return ResponseEntity.ok(new RegisterResponseDTO(RegisterResponseDTO.RegisterStatus.OK));
+        return ResponseEntity.ok(new ResponseDTO(ResponseDTO.ResponseStatus.OK));
 
     }
 
