@@ -1,54 +1,44 @@
 package pl.kowalecki.dietplanner.controller.unlogged;
 
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.WebRequest;
-import pl.kowalecki.dietplanner.model.DTO.ConfirmationTokenDTO;
+import org.springframework.web.client.RestTemplate;
 import pl.kowalecki.dietplanner.model.DTO.ResponseDTO;
-import pl.kowalecki.dietplanner.services.UserServiceImpl;
+import pl.kowalecki.dietplanner.utils.UrlTools;
 
-import java.util.HashMap;
-import java.util.Locale;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @RequestMapping("/app")
-@RestController
+@Controller
 @AllArgsConstructor
 public class RegisterConfirmationController {
 
-    private UserServiceImpl userService;
+    private final RestTemplate restTemplate;
 
-    @GetMapping(value = "/confirm")
-    public ResponseEntity<ResponseDTO> confirmUser(WebRequest webRequest, @RequestParam("token") String confirmationToken){
-        Map<String, String> errors = new HashMap<>();
-        ConfirmationTokenDTO token = new ConfirmationTokenDTO(confirmationToken);
-        Locale locale = webRequest.getLocale();
-        System.out.println(locale);
-
-        if (token.getToken() != null){
-            boolean isActivated = userService.findAndActivateUserByHash(token.getToken());
-            if (isActivated){
-                return new ResponseEntity<>(HttpStatus.OK);
-            }else {
-                errors.put("ACTIVATED", "Account is already active");
-                ResponseDTO response = ResponseDTO.builder()
-                        .errors(errors)
-                        .status(ResponseDTO.ResponseStatus.INVALID_TOKEN)
-                        .build();
-                return new ResponseEntity<>(response, HttpStatus.OK);
-            }
-        }else {
-            errors.put(ResponseDTO.ResponseStatus.INVALID_TOKEN.name(), "Invalid token");
-            ResponseDTO response = ResponseDTO.builder()
-                    .errors(errors)
-                    .status(ResponseDTO.ResponseStatus.INVALID_TOKEN)
-                    .build();
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    @GetMapping("/confirm")
+    public String confirmUser(Model model, @RequestParam("token") String confirmationToken) {
+        ResponseEntity<ResponseDTO> response = restTemplate.getForEntity(
+                "http://"+ UrlTools.appCleanUrl +"/api/confirm?token=" + confirmationToken,
+                ResponseDTO.class
+        );
+        ResponseDTO responseDTO = response.getBody();
+        assert responseDTO != null;
+        if (responseDTO.getStatus().equals(ResponseDTO.ResponseStatus.ERROR)){
+            model.addAttribute("message", responseDTO.getErrors());
+        }else if(responseDTO.getStatus().equals(ResponseDTO.ResponseStatus.OK)){
+            model.addAttribute("activated", true);
+        }else{
+            model.addAttribute("message", "other error, contact administrator");
         }
+        return "pages/unlogged/confirmation";
     }
 }
