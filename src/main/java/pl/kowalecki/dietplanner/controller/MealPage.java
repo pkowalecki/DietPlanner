@@ -15,7 +15,7 @@ import pl.kowalecki.dietplanner.services.MealServiceImpl;
 
 import java.util.List;
 
-@RequestMapping("/app/auth")
+@RequestMapping("/api/auth")
 @Controller
 @AllArgsConstructor
 public class MealPage {

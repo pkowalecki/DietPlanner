@@ -27,7 +27,9 @@ import pl.kowalecki.dietplanner.services.UserDetailsServiceImpl;
 @AllArgsConstructor
 public class WebSecurityConfig{
 
+    @Autowired
     private UserDetailsServiceImpl userDetailsService;
+    @Autowired
     private AuthEntryPoint authEntryPoint;
 
     @Bean
@@ -57,12 +59,12 @@ public class WebSecurityConfig{
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(authEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/public/**").permitAll()
-//                        .requestMatchers("/auth/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
+                                .requestMatchers("/auth/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER").anyRequest().permitAll()
+//                                .requestMatchers("/api/confirm").permitAll()
 //                        .requestMatchers("/auth/meal/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
-                                .anyRequest().permitAll()
+//                                .anyRequest().permitAll()
 //                        .requestMatchers("/meal/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
-                ).cors().disable();
+                );
 
         return http.build();
     }

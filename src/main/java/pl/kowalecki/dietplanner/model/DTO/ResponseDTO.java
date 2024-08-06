@@ -18,7 +18,7 @@ public class ResponseDTO {
     public enum ResponseStatus {
         OK,
         BADDATA,
-        INVALID_TOKEN
+        ERROR
         ;
     }
 

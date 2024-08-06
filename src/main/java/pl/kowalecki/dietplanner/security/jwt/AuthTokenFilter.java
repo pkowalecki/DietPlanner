@@ -22,6 +22,7 @@ import java.io.IOException;
 @NoArgsConstructor
 public class AuthTokenFilter extends OncePerRequestFilter {
 
+    @Autowired
     private AuthJwtUtils jwtUtils;
     private UserDetailsServiceImpl userDetailsService;
 

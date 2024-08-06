@@ -18,7 +18,7 @@ import pl.kowalecki.dietplanner.services.UserServiceImpl;
 
 import java.util.*;
 
-@RequestMapping("/app")
+@RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 @RestController
 public class RegisterController {
