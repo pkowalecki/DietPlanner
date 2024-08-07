@@ -1,43 +1,42 @@
-package pl.kowalecki.dietplanner.repository;
+package pl.kowalecki.dietplanner.services;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 import pl.kowalecki.dietplanner.IngredientsListHelper;
-import pl.kowalecki.dietplanner.model.AdministrationUser;
 import pl.kowalecki.dietplanner.model.DTO.IngredientToBuyDTO;
+import pl.kowalecki.dietplanner.model.Meal;
+import pl.kowalecki.dietplanner.model.User;
 import pl.kowalecki.dietplanner.model.ingredient.Ingredient;
 import pl.kowalecki.dietplanner.model.ingredient.ingredientAmount.IngredientUnit;
 import pl.kowalecki.dietplanner.model.ingredient.ingredientMeasurement.MeasurementType;
-import pl.kowalecki.dietplanner.model.Meal;
+import pl.kowalecki.dietplanner.repository.IngredientRepository;
+import pl.kowalecki.dietplanner.repository.MealRepository;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
-@Repository
-public class MealRepositoryImplementation{
+@Service
+@AllArgsConstructor
+public class MealServiceImpl implements MealService{
 
     private final MealRepository mealRepository;
     private final IngredientRepository ingredientRepository;
-    private final AdministrationUserRepository administrationUserRepository;
+    private final UserServiceImpl userService;
 
-    @Autowired
-    public MealRepositoryImplementation(MealRepository mealRepository, IngredientRepository ingredientRepository, AdministrationUserRepository administrationUserRepository){
-        this.mealRepository=mealRepository;
-        this.ingredientRepository=ingredientRepository;
-        this.administrationUserRepository=administrationUserRepository;
-    }
-
+    @Override
     public List<Meal> getAllMeals(){
         return mealRepository.findAll();
     }
 
+    @Override
     public Meal getMealById(Long id){
         return mealRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Meal not found with id: " + id));
     }
 
+    @Override
     public boolean deleteMealById(Long id){
 //        try {
 //            mealRepository.deleteById(id);
@@ -49,13 +48,14 @@ public class MealRepositoryImplementation{
         return true;
     }
 
+    @Override
     @Transactional
     public void addMeal(String userId, Meal newMeal) {
 
         if (newMeal.getIngredients() == null) {
             newMeal.setIngredients(new ArrayList<>());
         }
-        Optional<AdministrationUser> userOptional = administrationUserRepository.findById(Integer.valueOf(userId));
+        Optional<User> userOptional = userService.findById(Integer.valueOf(userId));
 
         newMeal.setAdditionDate(LocalDateTime.now());
         Meal savedMeal = mealRepository.save(newMeal);
@@ -67,11 +67,11 @@ public class MealRepositoryImplementation{
     }
 
     public List<Ingredient> getMealIngredientsByMealId(Long mealId){
-    Meal meal = mealRepository.findById(mealId).orElse(null);
+        Meal meal = mealRepository.findById(mealId).orElse(null);
         if (meal == null) {
             return Collections.emptyList();
         }
-            return meal.getIngredients();
+        return meal.getIngredients();
     }
 
     public Map<Boolean, List<Ingredient>> getMealTypeAndIngredientsByMealId(Long mealId){
@@ -101,6 +101,8 @@ public class MealRepositoryImplementation{
             IngredientToBuyDTO ingredientDTO = new IngredientToBuyDTO(ingredient.getName(), ingredient.getIngredientAmount().toString(), ingredient.getIngredientUnit().getShortName(), ingredient.getMeasurementValue().toString(), ingredient.getMeasurementType().getMeasurementName().toString());
             ingredientsToBuy.add(ingredientDTO);
         }
+
+
         return ingredientsToBuy;
     }
     public Map<IngredientUnit, List<String>> getIngredientUnitMap(){
@@ -112,9 +114,12 @@ public class MealRepositoryImplementation{
         return measurementNames;
     }
 
+    @Override
     public List<Meal> getMealByUserId(Long userId) {
-        return mealRepository.findMealsByAdministrationUserId(userId);
+        return mealRepository.findMealsByUserId(userId);
     }
+
+
     public List<String> getMealNamesByIdList(List<Long> list) {
         List<String> mealNames = new ArrayList<>();
         for (Long mealId : list){

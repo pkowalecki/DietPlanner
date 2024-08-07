@@ -1,26 +1,31 @@
-package pl.kowalecki.dietplanner.security.services;
+package pl.kowalecki.dietplanner.services;
 
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import pl.kowalecki.dietplanner.model.AdministrationUser;
-import pl.kowalecki.dietplanner.repository.AdministrationUserRepository;
+import pl.kowalecki.dietplanner.model.User;
 
 @Service
-public class AdministrationUserDetailsServiceImpl implements UserDetailsService {
+@AllArgsConstructor
+@NoArgsConstructor
+public class UserDetailsServiceImpl implements UserDetailsService{
 
-    @Autowired
-    AdministrationUserRepository administrationUserRepository;
+    private UserServiceImpl userService;
 
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        AdministrationUser user = administrationUserRepository.findByEmail(email)
+        User user = userService.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
-        return AdministrationUserDetailsImpl.build(user);
+        return UserDetailsImpl.build(user);
+    }
+
+    public boolean existsUserByEmail(String userEmail){
+        return userService.existsByEmail(userEmail);
     }
 
 }

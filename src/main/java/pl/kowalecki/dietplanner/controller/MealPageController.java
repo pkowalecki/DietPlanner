@@ -1,53 +1,39 @@
 package pl.kowalecki.dietplanner.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import pl.kowalecki.dietplanner.model.Meal;
 import pl.kowalecki.dietplanner.model.page.FoodBoardPageData;
-import pl.kowalecki.dietplanner.repository.MealRepository;
-import pl.kowalecki.dietplanner.repository.MealRepositoryImplementation;
 
-import java.util.HashMap;
+import pl.kowalecki.dietplanner.services.MealServiceImpl;
+
 import java.util.List;
-import java.util.Map;
 
+@RequestMapping("/api/auth")
 @Controller
-public class MealPageController {
+@AllArgsConstructor
+public class MealPage {
 
-    @Autowired
-    MealRepository mealRepository;
-
-    @Autowired
-    MealRepositoryImplementation mealRepositoryImpl;
-
-    public MealPageController(MealRepository mealRepository) {
-        this.mealRepository = mealRepository;
-    }
+    private final MealServiceImpl mealService;
 
     @GetMapping(value = "/generateMealBoard")
     public String mealPage(Model model){
-        List<Meal> mealList = mealRepository.findAll();
+        List<Meal> mealList = mealService.getAllMeals();
         model.addAttribute("mealList", mealList);
         return "pages/foodBoardPage";
     }
 
     @PostMapping(value = "/generateMealBoard")
-    public String resultPage(Model model,HttpSession httpSession, HttpServletRequest req, HttpServletResponse resp, @ModelAttribute("form") FoodBoardPageData form){
+    public String resultPage(Model model, HttpServletResponse response, @ModelAttribute("form") FoodBoardPageData form){
         List<Long> idsList = form.getMealValues();
-        List<String> mealNames = mealRepositoryImpl.getMealNamesByIdList(idsList);
-        List<Meal> meal = mealRepository.findMealsByMealIdIn(idsList);
-
-        model.addAttribute("result", mealRepositoryImpl.getMealIngredientsFinalList(idsList, form.getMultiplier()));
-        model.addAttribute("meals", meal);
-        model.addAttribute("idsList", idsList);
-        model.addAttribute("mealNames", mealNames);
+        model.addAttribute("result", mealService.getMealIngredientsFinalList(idsList, form.getMultiplier()));
+//        model.addAttribute("meals", mealRepositoryImpl.getmeal)
         return "pages/foodBoardResult";
     }
 }

@@ -16,6 +16,8 @@ footer {
     min-height: 100px;
     bottom: 0;
     width: 100%;
+    position: absolute;
+    height: 2.5rem;
 }
 
 footer a {
@@ -26,4 +28,27 @@ nav,
 footer {
     background: #005da2;
     color: white;
+
+}
+
+.goRight {
+    text-align: right;
+}
+.goCenter {
+    text-align: center;
+}
+.floatLeft {
+    float: left;
+}
+.floatRight {
+    float: right;
+}
+
+#page-container {
+    position: relative;
+    min-height: 100vh;
+}
+
+#content-wrap {
+    padding-bottom: 2.5rem;    /* Footer height */
 }

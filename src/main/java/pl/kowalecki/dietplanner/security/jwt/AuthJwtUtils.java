@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
-import pl.kowalecki.dietplanner.security.services.AdministrationUserDetailsImpl;
+import pl.kowalecki.dietplanner.services.UserDetailsImpl;
 
 import java.security.Key;
 import java.util.Date;
@@ -37,7 +37,7 @@ public class AuthJwtUtils {
         }
     }
 
-    public ResponseCookie generateJwtCookie(AdministrationUserDetailsImpl userPrincipal){
+    public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal){
         String jsonWebToken = generateTokenFromEmail(userPrincipal.getEmail());
         ResponseCookie respCookie = ResponseCookie.from(jwtCookie, jsonWebToken).path("/").maxAge(12 * 60 * 60).httpOnly(true).build();
         return respCookie;

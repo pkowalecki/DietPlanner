@@ -1,11 +1,11 @@
 package pl.kowalecki.dietplanner.security;
 
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,21 +16,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import pl.kowalecki.dietplanner.security.jwt.AuthEntryPoint;
 import pl.kowalecki.dietplanner.security.jwt.AuthTokenFilter;
-import pl.kowalecki.dietplanner.security.services.AdministrationUserDetailsServiceImpl;
+import pl.kowalecki.dietplanner.services.UserDetailsServiceImpl;
 
 
 
 @Configuration
 @EnableMethodSecurity
+@AllArgsConstructor
 public class WebSecurityConfig{
 
     @Autowired
-    private AdministrationUserDetailsServiceImpl userDetailsService;
-
+    private UserDetailsServiceImpl userDetailsService;
     @Autowired
     private AuthEntryPoint authEntryPoint;
 
@@ -61,12 +59,12 @@ public class WebSecurityConfig{
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(authEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/public/**").permitAll()
-//                        .requestMatchers("/auth/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
+                                .requestMatchers("/auth/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER").anyRequest().permitAll()
+//                                .requestMatchers("/api/confirm").permitAll()
 //                        .requestMatchers("/auth/meal/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
-                                .anyRequest().permitAll()
+//                                .anyRequest().permitAll()
 //                        .requestMatchers("/meal/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
-                ).cors().disable();
+                );
 
         return http.build();
     }

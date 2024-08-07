@@ -1,3 +1,3 @@
-<footer>
-    <#include "starter.ftlh">
+<footer id="footer">
+
 </footer>
