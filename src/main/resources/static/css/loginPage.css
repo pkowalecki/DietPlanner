@@ -115,7 +115,9 @@ img{
     padding: 5px 5px 5px 0px;
     font-weight: bold;
 }
-
+.is-invalid {
+    border-color: #dc3545;
+}
 
 
 .tooltip-text {
@@ -128,6 +130,7 @@ img{
     background-color: #192733;
     border-radius: 10px;
     padding: 10px 15px 10px 15px;
+    text-align: left;
 }
 
 .hover-text:hover .tooltip-text {

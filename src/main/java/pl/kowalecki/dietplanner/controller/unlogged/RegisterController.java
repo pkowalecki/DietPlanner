@@ -6,6 +6,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import pl.kowalecki.dietplanner.controller.helper.RegisterHelper;
 import pl.kowalecki.dietplanner.controller.helper.RegisterPole;
@@ -18,9 +20,9 @@ import pl.kowalecki.dietplanner.services.UserServiceImpl;
 
 import java.util.*;
 
-@RequestMapping("/api")
+@RequestMapping("/app")
 @CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
-@RestController
+@Controller
 public class RegisterController {
 
     UserServiceImpl userServiceImpl;
@@ -36,33 +38,41 @@ public class RegisterController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<ResponseDTO> registerUser(@Valid @RequestBody RegistrationRequestDTO registrationRequest) {
-        HttpHeaders header = new HttpHeaders();
-        header.setContentType(MediaType.APPLICATION_JSON);
+    public ResponseEntity<ResponseDTO> registerUser(@RequestBody RegistrationRequestDTO registrationRequest) {
         Map<String, String> errors = registerHelper.checkRegistrationData(registrationRequest);
+        ResponseDTO response;
         if (!errors.isEmpty()) {
-            ResponseDTO response = ResponseDTO.builder().status(ResponseDTO.ResponseStatus.BADDATA).data(errors).build();
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        }
-        User user = userServiceImpl.createUser(registrationRequest);
-        try {
-            user.setRoles(userServiceImpl.setUserRoles(Collections.singletonList("ROLE_USER")));
-        }catch (RegistrationException e){
-            errors.put(RegisterPole.ROLE.getFieldName(), "Role error, contact administration");
-            ResponseDTO response = ResponseDTO.builder()
+            response = ResponseDTO.builder()
                     .status(ResponseDTO.ResponseStatus.BADDATA)
                     .data(errors)
                     .build();
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
+//
+//        HttpHeaders header = new HttpHeaders();
+//        header.setContentType(MediaType.APPLICATION_JSON);
+//        User user = userServiceImpl.createUser(registrationRequest);
+//        try {
+//            user.setRoles(userServiceImpl.setUserRoles(Collections.singletonList("ROLE_USER")));
+//        }catch (RegistrationException e){
+//            errors.put(RegisterPole.ROLE.getFieldName(), "Role error, contact administration");
+//            ResponseDTO response = ResponseDTO.builder()
+//                    .status(ResponseDTO.ResponseStatus.BADDATA)
+//                    .data(errors)
+//                    .build();
+//            return new ResponseEntity<>(response, HttpStatus.OK);
+//        }
+//
+//        userServiceImpl.registerUser(user);
+//        //Jedziemy z mailerem gmail nie czyta html
+//        boolean isHtml = !user.getEmail().contains("@gmail.com");
+//        mailerService.sendRegistrationEmail(user.getEmail(), user.getHash(), isHtml);
 
-        userServiceImpl.registerUser(user);
-        //Jedziemy z mailerem gmail nie czyta html
-        boolean isHtml = !user.getEmail().contains("@gmail.com");
-        mailerService.sendRegistrationEmail(user.getEmail(), user.getHash(), isHtml);
-
-        return ResponseEntity.ok(new ResponseDTO(ResponseDTO.ResponseStatus.OK));
-
+        response = ResponseDTO.builder()
+                .status(ResponseDTO.ResponseStatus.OK)
+                .message("Registration successful")
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
