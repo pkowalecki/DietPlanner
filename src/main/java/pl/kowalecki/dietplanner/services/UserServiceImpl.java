@@ -1,5 +1,6 @@
 package pl.kowalecki.dietplanner.services;
 
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,18 +19,12 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
+@AllArgsConstructor
 public class UserServiceImpl implements UserService{
 
     private PasswordEncoder passwordEncoder;
     private RoleRepository roleRepository;
     private UserRepository userRepository;
-
-    @Autowired
-    public UserServiceImpl(PasswordEncoder passwordEncoder, RoleRepository roleRepository, UserRepository userRepository) {
-        this.passwordEncoder = passwordEncoder;
-        this.roleRepository = roleRepository;
-        this.userRepository = userRepository;
-    }
 
     public User createUser(RegistrationRequestDTO registrationRequest) {
         return new User(

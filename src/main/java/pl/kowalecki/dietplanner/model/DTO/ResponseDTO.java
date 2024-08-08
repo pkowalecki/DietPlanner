@@ -13,7 +13,9 @@ import java.util.Map;
 public class ResponseDTO {
 
     private ResponseStatus status;
-    private Map<String, String> errors;
+    private String message;
+    private Map<String, ?> data;
+
 
     public enum ResponseStatus {
         OK,
