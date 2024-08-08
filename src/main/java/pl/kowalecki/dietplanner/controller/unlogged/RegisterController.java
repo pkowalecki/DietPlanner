@@ -41,7 +41,7 @@ public class RegisterController {
         header.setContentType(MediaType.APPLICATION_JSON);
         Map<String, String> errors = registerHelper.checkRegistrationData(registrationRequest);
         if (!errors.isEmpty()) {
-            ResponseDTO response = ResponseDTO.builder().status(ResponseDTO.ResponseStatus.BADDATA).errors(errors).build();
+            ResponseDTO response = ResponseDTO.builder().status(ResponseDTO.ResponseStatus.BADDATA).data(errors).build();
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         User user = userServiceImpl.createUser(registrationRequest);
@@ -51,7 +51,7 @@ public class RegisterController {
             errors.put(RegisterPole.ROLE.getFieldName(), "Role error, contact administration");
             ResponseDTO response = ResponseDTO.builder()
                     .status(ResponseDTO.ResponseStatus.BADDATA)
-                    .errors(errors)
+                    .data(errors)
                     .build();
             return new ResponseEntity<>(response, HttpStatus.OK);
         }

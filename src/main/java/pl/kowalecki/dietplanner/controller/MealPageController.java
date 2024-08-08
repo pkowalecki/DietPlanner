@@ -18,7 +18,7 @@ import java.util.List;
 @RequestMapping("/api/auth")
 @Controller
 @AllArgsConstructor
-public class MealPage {
+public class MealPageController {
 
     private final MealServiceImpl mealService;
 

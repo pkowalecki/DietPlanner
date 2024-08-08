@@ -28,28 +28,13 @@ public class AuthJwtUtils {
     @Value("${dietplanner.app.jwtCookieName}")
     private String jwtCookie;
 
-    public String getJwtFromCookies(HttpServletRequest request){
+    private Key key() {
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+    }
+
+    public String getJwtFromCookies(HttpServletRequest request) {
         Cookie cookie = WebUtils.getCookie(request, jwtCookie);
-        if (cookie != null){
-            return cookie.getValue();
-        }else{
-            return null;
-        }
-    }
-
-    public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal){
-        String jsonWebToken = generateTokenFromEmail(userPrincipal.getEmail());
-        ResponseCookie respCookie = ResponseCookie.from(jwtCookie, jsonWebToken).path("/").maxAge(12 * 60 * 60).httpOnly(true).build();
-        return respCookie;
-    }
-
-    public ResponseCookie getCleanJwtCookie() {
-        ResponseCookie cookie = ResponseCookie
-                .from(jwtCookie, null)
-                .maxAge(0)
-                .path("/auth")
-                .build();
-        return cookie;
+        return cookie != null ? cookie.getValue() : null;
     }
 
     private String generateTokenFromEmail(String email) {
@@ -60,13 +45,32 @@ public class AuthJwtUtils {
                 .signWith(key(), SignatureAlgorithm.HS256)
                 .compact();
     }
-    private Key key() {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+
+
+    public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal) {
+        String jwt = generateTokenFromEmail(userPrincipal.getEmail());
+        return ResponseCookie.from(jwtCookie, jwt)
+                .path("/")
+                .maxAge(12 * 60 * 60)
+                .httpOnly(true)
+                .build();
     }
 
+    public ResponseCookie getCleanJwtCookie() {
+        return ResponseCookie
+                .from(jwtCookie, null)
+                .maxAge(0)
+                .path("/")
+                .build();
+    }
 
-    public String getAdminUserEmailFromJwtToken(String token){
-        return Jwts.parserBuilder().setSigningKey(key()).build().parseClaimsJws(token).getBody().getSubject();
+    public String getEmailFromJwtToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 
     public boolean validateJwtToken(String authToken) {
@@ -82,7 +86,6 @@ public class AuthJwtUtils {
         } catch (IllegalArgumentException e) {
             log.error("JWT claims string is empty: {}", e.getMessage());
         }
-
         return false;
     }
 }

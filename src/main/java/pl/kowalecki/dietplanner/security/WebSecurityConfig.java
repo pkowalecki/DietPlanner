@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -27,9 +28,7 @@ import pl.kowalecki.dietplanner.services.UserDetailsServiceImpl;
 @AllArgsConstructor
 public class WebSecurityConfig{
 
-    @Autowired
     private UserDetailsServiceImpl userDetailsService;
-    @Autowired
     private AuthEntryPoint authEntryPoint;
 
     @Bean
@@ -59,11 +58,13 @@ public class WebSecurityConfig{
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(authEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                                .requestMatchers("/auth/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER").anyRequest().permitAll()
-//                                .requestMatchers("/api/confirm").permitAll()
-//                        .requestMatchers("/auth/meal/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
-//                                .anyRequest().permitAll()
-//                        .requestMatchers("/meal/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
+                                .requestMatchers("/app/login", "/api/login").permitAll()
+                                .requestMatchers("/app/register", "/api/register").permitAll()
+                                .requestMatchers("/", "/app/").permitAll()
+                                .requestMatchers("/static/**").permitAll()
+                                .requestMatchers("/auth/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
+                                .anyRequest().authenticated()
+
                 );
 
         return http.build();

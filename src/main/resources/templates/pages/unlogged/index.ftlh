@@ -4,7 +4,7 @@
     <div class="row col-12 col-md-6 mx-auto py-4 center-content">
         <img class="row g-3" src="../../../static/images/recipe-book-svgrepo-com.svg" alt="Happy book SVG">
         <form class="row g-3 login-form" style="padding-left: 42px; padding-right: 42px;" method="POST" name="loginForm"
-              action="/login">
+              action="/app/login">
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="email" name="email" placeholder="User email"
@@ -17,7 +17,7 @@
             </div>
             <div class="mb-3 group form-link">
                 <span><input type="checkbox" name="rememberMe" autocomplete="off">Remember me</span>
-                <a href="/forgotPassword">Forogot password?</a>
+                <a href="/forgotPassword">Forgot password?</a>
             </div>
             <div class="mb-3 goCenter">
                 <a id="registerBtn" href="#">Create account</a>
@@ -138,7 +138,7 @@
                 };
                 $.ajax({
                     type: 'POST',
-                    url: '/register',
+                    url: '/api/register',
                     contentType: 'application/json',
                     data: JSON.stringify(formData),
                     success: function (response) {
@@ -188,4 +188,4 @@
         strength.style.backgroundColor = colorPower[Math.min(point, colorPower.length - 1)];
     };
 </script>
-<#include "../../webData/footer.ftlh">
+<#--<#include "../../webData/footer.ftlh">-->

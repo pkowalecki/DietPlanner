@@ -21,6 +21,7 @@ public class RegisterConfirmationRestController {
 
     private UserServiceImpl userService;
 
+
     @GetMapping(value = "/confirm")
     public ResponseEntity<ResponseDTO> confirmUser(@RequestParam("token") String confirmationToken){
         Map<String, String> errors = new HashMap<>();
@@ -34,7 +35,7 @@ public class RegisterConfirmationRestController {
                 errors.put("ACTIVATED", "Account is already active");
                 ResponseDTO response = ResponseDTO.builder()
                         .status(ResponseDTO.ResponseStatus.ERROR)
-                        .errors(errors)
+                        .data(errors)
                         .build();
                 return new ResponseEntity<>(response, HttpStatus.OK);
             }
@@ -42,7 +43,7 @@ public class RegisterConfirmationRestController {
             errors.put("INVALID_TOKEN", "Invalid token");
             ResponseDTO response = ResponseDTO.builder()
                     .status(ResponseDTO.ResponseStatus.ERROR)
-                    .errors(errors)
+                    .data(errors)
                     .build();
             return new ResponseEntity<>(response, HttpStatus.OK);
         }

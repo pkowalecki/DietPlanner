@@ -1,8 +1,6 @@
 package pl.kowalecki.dietplanner.controller.unlogged;
 
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,10 +10,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 import pl.kowalecki.dietplanner.model.DTO.ResponseDTO;
 import pl.kowalecki.dietplanner.utils.UrlTools;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 @RequestMapping("/app")
 @Controller
@@ -27,13 +21,13 @@ public class RegisterConfirmationController {
     @GetMapping("/confirm")
     public String confirmUser(Model model, @RequestParam("token") String confirmationToken) {
         ResponseEntity<ResponseDTO> response = restTemplate.getForEntity(
-                "http://"+ UrlTools.appCleanUrl +"/api/confirm?token=" + confirmationToken,
+                "http://"+ UrlTools.apiUrl +"/api/confirm?token=" + confirmationToken,
                 ResponseDTO.class
         );
         ResponseDTO responseDTO = response.getBody();
         assert responseDTO != null;
         if (responseDTO.getStatus().equals(ResponseDTO.ResponseStatus.ERROR)){
-            model.addAttribute("message", responseDTO.getErrors());
+            model.addAttribute("message", responseDTO.getData());
         }else if(responseDTO.getStatus().equals(ResponseDTO.ResponseStatus.OK)){
             model.addAttribute("activated", true);
         }else{
