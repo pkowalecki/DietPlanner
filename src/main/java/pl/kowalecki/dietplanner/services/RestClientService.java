@@ -33,11 +33,15 @@ public class RestClientService {
     }
 
     public <T> ResponseEntity<T> sendPostRequest(String url, Object request, Class<T> responseType) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Object> entity = new HttpEntity<>(request, headers);
-
-        return restTemplate.exchange(url, HttpMethod.POST, entity, responseType);
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<Object> entity = new HttpEntity<>(request, headers);
+            ResponseEntity response = restTemplate.exchange(url, HttpMethod.POST, entity, responseType);
+            return response;
+        }catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
 }

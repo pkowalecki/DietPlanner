@@ -48,25 +48,25 @@ public class RegisterController {
                     .build();
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
-//
-//        HttpHeaders header = new HttpHeaders();
-//        header.setContentType(MediaType.APPLICATION_JSON);
-//        User user = userServiceImpl.createUser(registrationRequest);
-//        try {
-//            user.setRoles(userServiceImpl.setUserRoles(Collections.singletonList("ROLE_USER")));
-//        }catch (RegistrationException e){
-//            errors.put(RegisterPole.ROLE.getFieldName(), "Role error, contact administration");
-//            ResponseDTO response = ResponseDTO.builder()
-//                    .status(ResponseDTO.ResponseStatus.BADDATA)
-//                    .data(errors)
-//                    .build();
-//            return new ResponseEntity<>(response, HttpStatus.OK);
-//        }
-//
-//        userServiceImpl.registerUser(user);
-//        //Jedziemy z mailerem gmail nie czyta html
-//        boolean isHtml = !user.getEmail().contains("@gmail.com");
-//        mailerService.sendRegistrationEmail(user.getEmail(), user.getHash(), isHtml);
+
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(MediaType.APPLICATION_JSON);
+        User user = userServiceImpl.createUser(registrationRequest);
+        try {
+            user.setRoles(userServiceImpl.setUserRoles(Collections.singletonList("ROLE_USER")));
+        }catch (RegistrationException e){
+            errors.put(RegisterPole.ROLE.getFieldName(), "Role error, contact administration");
+             response = ResponseDTO.builder()
+                    .status(ResponseDTO.ResponseStatus.BADDATA)
+                    .data(errors)
+                    .build();
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        userServiceImpl.registerUser(user);
+        //Jedziemy z mailerem gmail nie czyta html
+        boolean isHtml = !user.getEmail().contains("@gmail.com");
+        mailerService.sendRegistrationEmail(user.getEmail(), user.getHash(), isHtml);
 
         response = ResponseDTO.builder()
                 .status(ResponseDTO.ResponseStatus.OK)

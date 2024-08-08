@@ -21,7 +21,7 @@ public class RegisterConfirmationController {
     @GetMapping("/confirm")
     public String confirmUser(Model model, @RequestParam("token") String confirmationToken) {
         ResponseEntity<ResponseDTO> response = restTemplate.getForEntity(
-                "http://"+ UrlTools.apiUrl +"/api/confirm?token=" + confirmationToken,
+                "http://"+ UrlTools.apiUrl +"/confirm?token=" + confirmationToken,
                 ResponseDTO.class
         );
         ResponseDTO responseDTO = response.getBody();
