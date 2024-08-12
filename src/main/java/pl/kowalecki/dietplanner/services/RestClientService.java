@@ -37,9 +37,9 @@ public class RestClientService {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<Object> entity = new HttpEntity<>(request, headers);
-            ResponseEntity response = restTemplate.exchange(url, HttpMethod.POST, entity, responseType);
-            return response;
+            return restTemplate.exchange(url, HttpMethod.POST, entity, responseType);
         }catch (Exception e){
+            e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }

@@ -21,19 +21,17 @@ import pl.kowalecki.dietplanner.utils.UrlTools;
 @Controller
 @AllArgsConstructor
 public class LoginController {
-
-
     private final RestClientService restClientService;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public String index(){
+    public String index() {
         return "pages/unlogged/index";
     }
 
     @PostMapping("/login")
-    public String postLoginPage(@ModelAttribute("loginForm") LoginRequestDTO loginRequestDto, HttpSession session, Model model){
+    public String postLoginPage(@ModelAttribute("loginForm") LoginRequestDTO loginRequestDto, HttpSession session, Model model) {
         try {
-            String url = "http://"+UrlTools.apiUrl +"/login";
+            String url = "http://" + UrlTools.apiUrl + "/login";
             ResponseEntity<ResponseDTO> response = restClientService.sendPostRequest(url, loginRequestDto, ResponseDTO.class);
             if (response.getStatusCode() == HttpStatus.OK) {
                 ResponseDTO responseDTO = response.getBody();
