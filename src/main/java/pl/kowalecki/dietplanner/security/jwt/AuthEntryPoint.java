@@ -18,7 +18,6 @@ import java.util.Map;
 @Slf4j
 public class AuthEntryPoint implements AuthenticationEntryPoint {
 
-    //TODO gdy jest 401 to mamy po prostu body, do poprawy na osobny endpoint z błędami.
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         log.error("Unauthorized " + authException.getMessage());

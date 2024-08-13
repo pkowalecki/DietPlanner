@@ -53,7 +53,8 @@ public class LoginRestController {
                     .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                     .body(new ResponseDTO(ResponseDTO.ResponseStatus.OK, "Login successful", userDetailsResponse));
         } catch (AuthenticationException e) {
-            e.printStackTrace();
+            log.error("LoginRestController error: Email: {}", loginRequestDto.getEmail());
+            log.error(e.getMessage());
             Map<String, String> errors = new HashMap<>();
             errors.put("error", "Invalid email or password");
             return new ResponseEntity<>(new ResponseDTO(ResponseDTO.ResponseStatus.ERROR, "Authentication error", errors), HttpStatus.UNAUTHORIZED);

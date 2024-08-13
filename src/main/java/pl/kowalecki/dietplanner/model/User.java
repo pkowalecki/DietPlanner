@@ -1,6 +1,7 @@
 package pl.kowalecki.dietplanner.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jdk.jfr.Name;
 import lombok.Getter;
@@ -45,6 +46,7 @@ public class User {
     @Column(nullable = false)
     @JsonIgnore
     @Name(value = "password")
+    @ToString.Exclude
     private String password;
 
 

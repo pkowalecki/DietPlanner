@@ -24,7 +24,7 @@ import java.util.List;
 @RequestMapping("/app")
 @Controller
 @AllArgsConstructor
-public class LoginController {
+public class LoginController extends WebData{
     private final RestClientService restClientService;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
@@ -52,7 +52,6 @@ public class LoginController {
                 model.addAttribute("error", "Invalid email or password");
                 return "pages/unlogged/index";
             }
-//            return "pages/foodBoardPage";
 
         } catch (AuthenticationException e) {
             System.out.println("Próbowałem się zalogować: " + loginRequestDto.getEmail());

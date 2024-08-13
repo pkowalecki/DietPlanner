@@ -55,7 +55,7 @@ public class WebSecurityConfig{
         http.authenticationProvider(daoAuthenticationProvider());
         http.addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         http.csrf(AbstractHttpConfigurer::disable)
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(authEntryPoint))
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(authEntryPoint).accessDeniedPage("/app/?error=Access denied"))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/app/register", "/app/registerModal", "/api/register").permitAll()
@@ -63,6 +63,7 @@ public class WebSecurityConfig{
                                 .requestMatchers("/app/login","/api/login").permitAll()
                                 .requestMatchers("/", "/app/").permitAll()
                                 .requestMatchers("/static/**").permitAll()
+                                .requestMatchers("/app/error").permitAll()
                                 .requestMatchers("/app/auth/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
                                 .requestMatchers("/api/auth/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
                                 .anyRequest().authenticated())
