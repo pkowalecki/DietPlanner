@@ -57,15 +57,15 @@ public class WebSecurityConfig{
         http.csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(authEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                .authorizeHttpRequests(auth -> auth
-//                                .requestMatchers("/app/login", "/api/login").permitAll()
-//                                .requestMatchers("/app/register", "/app/registerModal", "/api/register").permitAll()
-//                                .requestMatchers("/app/confirm","/api/confirm").permitAll()
-//                                .requestMatchers("/", "/app/").permitAll()
-//                                .requestMatchers("/static/**").permitAll()
-//                                .requestMatchers("/auth/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
-//                                .anyRequest().authenticated()
-
+                .authorizeHttpRequests(auth -> auth
+                                .requestMatchers("/app/register", "/app/registerModal", "/api/register").permitAll()
+                                .requestMatchers("/app/confirm","/api/confirm").permitAll()
+                                .requestMatchers("/app/login","/api/login").permitAll()
+                                .requestMatchers("/", "/app/").permitAll()
+                                .requestMatchers("/static/**").permitAll()
+                                .requestMatchers("/app/auth/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
+                                .requestMatchers("/api/auth/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
+                                .anyRequest().authenticated())
                 ;
 
         return http.build();

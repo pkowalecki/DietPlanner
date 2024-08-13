@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
-@RequestMapping("/auth/meal")
+@RequestMapping("/api/auth/meal")
 @RestController
 @AllArgsConstructor
 public class MealController {

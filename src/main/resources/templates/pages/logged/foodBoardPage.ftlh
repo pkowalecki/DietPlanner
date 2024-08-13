@@ -1,4 +1,4 @@
-<#include "../webData/header.ftlh">
+<#include "../../webData/header.ftlh">
 <style>
     table {
         border-collapse: collapse;
@@ -92,4 +92,4 @@
         <input type="submit" value="Wygeneruj listę zakupów">
     </form>
 </div>
-<#include "../webData/footer.ftlh">
+<#include "../../webData/footer.ftlh">

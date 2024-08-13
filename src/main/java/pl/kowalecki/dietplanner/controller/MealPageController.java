@@ -15,7 +15,7 @@ import pl.kowalecki.dietplanner.services.MealServiceImpl;
 
 import java.util.List;
 
-@RequestMapping("/api/auth")
+@RequestMapping("/app/auth")
 @Controller
 @AllArgsConstructor
 public class MealPageController {
@@ -26,7 +26,7 @@ public class MealPageController {
     public String mealPage(Model model){
         List<Meal> mealList = mealService.getAllMeals();
         model.addAttribute("mealList", mealList);
-        return "pages/foodBoardPage";
+        return "pages/logged/foodBoardPage";
     }
 
     @PostMapping(value = "/generateMealBoard")
@@ -34,6 +34,6 @@ public class MealPageController {
         List<Long> idsList = form.getMealValues();
         model.addAttribute("result", mealService.getMealIngredientsFinalList(idsList, form.getMultiplier()));
 //        model.addAttribute("meals", mealRepositoryImpl.getmeal)
-        return "pages/foodBoardResult";
+        return "pages/logged/foodBoardResult";
     }
 }

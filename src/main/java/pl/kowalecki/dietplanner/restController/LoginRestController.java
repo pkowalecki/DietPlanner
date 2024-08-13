@@ -33,7 +33,6 @@ public class LoginRestController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO loginRequestDto, HttpServletResponse response) {
         try {
-            System.out.println(loginRequestDto);
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(), loginRequestDto.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -53,8 +52,6 @@ public class LoginRestController {
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                     .body(new ResponseDTO(ResponseDTO.ResponseStatus.OK, "Login successful", userDetailsResponse));
-
-
         } catch (AuthenticationException e) {
             e.printStackTrace();
             Map<String, String> errors = new HashMap<>();
