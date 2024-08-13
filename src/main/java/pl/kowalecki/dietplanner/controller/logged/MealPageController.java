@@ -1,4 +1,4 @@
-package pl.kowalecki.dietplanner.controller;
+package pl.kowalecki.dietplanner.controller.logged;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;

@@ -29,6 +29,6 @@ public class PageAuthEntryPoint implements AuthenticationEntryPoint {
         body.put("message", authException.getMessage());
         body.put("path", request.getServletPath());
         log.error("Exception body: " + body.toString());
-        response.sendRedirect("/app/error?error=Access denied");
+        response.sendRedirect("/app/error");
     }
 }
