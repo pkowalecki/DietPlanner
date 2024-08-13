@@ -16,24 +16,19 @@ import java.util.Map;
 
 @Component
 @Slf4j
-public class AuthEntryPoint implements AuthenticationEntryPoint {
+public class PageAuthEntryPoint implements AuthenticationEntryPoint {
 
-    //TODO gdy jest 401 to mamy po prostu body, do poprawy na osobny endpoint z błędami.
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         log.error("Unauthorized " + authException.getMessage());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-
         final Map<String, Object> body = new HashMap<>();
         body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
         body.put("error", "Unauthorized");
         body.put("message", authException.getMessage());
         body.put("path", request.getServletPath());
-
         log.error("Exception body: " + body.toString());
-
-        final ObjectMapper mapper = new ObjectMapper();
-        mapper.writeValue(response.getOutputStream(), body);
+        response.sendRedirect("/app/error");
     }
 }

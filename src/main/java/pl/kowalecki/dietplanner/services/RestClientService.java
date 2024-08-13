@@ -38,7 +38,10 @@ public class RestClientService {
             HttpEntity<Object> entity = new HttpEntity<>(request, headers);
             return restTemplate.exchange(url, HttpMethod.POST, entity, responseType);
         }catch (Exception e){
-            e.printStackTrace();
+            log.error("url: {}", url);
+            log.error("request: {}", request);
+            log.error("responseType: {}", responseType);
+            log.error("message: {}", e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }

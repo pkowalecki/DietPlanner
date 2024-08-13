@@ -1,4 +1,4 @@
-<#include "../webData/header.ftlh">
+<#include "../../webData/header.ftlh">
 <style>
     table {
         border-collapse: collapse;
@@ -36,4 +36,4 @@
             <#assign id = id + 1/>
         </#list>
     </div>
-<#include "../webData/footer.ftlh">
+<#include "../../webData/footer.ftlh">
