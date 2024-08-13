@@ -20,7 +20,6 @@ public class RestClientService {
         try {
             return restTemplate.getForEntity(url, responseType);
         } catch (HttpClientErrorException e) {
-            // Handle HTTP error responses (e.g., 404, 500)
             HttpStatusCode status = e.getStatusCode();
             T body = null;
             try {
@@ -33,11 +32,15 @@ public class RestClientService {
     }
 
     public <T> ResponseEntity<T> sendPostRequest(String url, Object request, Class<T> responseType) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Object> entity = new HttpEntity<>(request, headers);
-
-        return restTemplate.exchange(url, HttpMethod.POST, entity, responseType);
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<Object> entity = new HttpEntity<>(request, headers);
+            return restTemplate.exchange(url, HttpMethod.POST, entity, responseType);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
 }

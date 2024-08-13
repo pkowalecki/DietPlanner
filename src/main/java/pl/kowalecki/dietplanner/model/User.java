@@ -2,6 +2,7 @@ package pl.kowalecki.dietplanner.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jdk.jfr.Name;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,19 +25,26 @@ import java.util.Set;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Name(value = "id")
     private Integer id;
 
+    @Name(value = "name")
     private String name;
 
+    @Name(value = "surname")
     private String surname;
 
     @Column(unique = true, nullable = false)
+    @Name(value = "email")
     private String email;
+
     @Column(unique = true, nullable = false)
+    @Name(value = "nickName")
     private String nickName;
 
     @Column(nullable = false)
     @JsonIgnore
+    @Name(value = "password")
     private String password;
 
 
@@ -44,14 +52,20 @@ public class User {
     @JoinTable(name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @Name(value = "roles")
     private Set<Role> roles = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_meal",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "meal_id"))
+    @Name(value = "mealList")
     private List<Meal> mealList;
+
+    @Name(value = "isActive")
     boolean isActive;
+
+    @Name(value = "hash")
     String hash;
 
     public User(Integer id, String name, String nickName, String surname, String email, Set<Role> roles) {

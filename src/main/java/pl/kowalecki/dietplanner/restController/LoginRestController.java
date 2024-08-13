@@ -1,25 +1,19 @@
 package pl.kowalecki.dietplanner.restController;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import pl.kowalecki.dietplanner.model.DTO.LoginRequestDTO;
 import pl.kowalecki.dietplanner.model.DTO.LoginResponseDTO;
 import pl.kowalecki.dietplanner.model.DTO.ResponseDTO;
-import pl.kowalecki.dietplanner.model.User;
 import pl.kowalecki.dietplanner.security.jwt.AuthJwtUtils;
 import pl.kowalecki.dietplanner.services.UserDetailsImpl;
 
@@ -31,14 +25,15 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 @AllArgsConstructor
 @Slf4j
-public class AuthRestController {
+public class LoginRestController {
 
     AuthenticationManager authenticationManager;
     AuthJwtUtils jwtUtils;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@ModelAttribute("loginForm") LoginRequestDTO loginRequestDto, HttpServletResponse response) {
+    public ResponseEntity<?> login(@RequestBody LoginRequestDTO loginRequestDto, HttpServletResponse response) {
         try {
+            System.out.println(loginRequestDto);
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(), loginRequestDto.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -61,6 +56,7 @@ public class AuthRestController {
 
 
         } catch (AuthenticationException e) {
+            e.printStackTrace();
             Map<String, String> errors = new HashMap<>();
             errors.put("error", "Invalid email or password");
             return new ResponseEntity<>(new ResponseDTO(ResponseDTO.ResponseStatus.ERROR, "Authentication error", errors), HttpStatus.UNAUTHORIZED);

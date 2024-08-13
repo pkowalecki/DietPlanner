@@ -41,13 +41,13 @@ public class RegisterHelper {
     }
 
     private void checkUserName(String userName) {
-        if (!TextTools.isTextLengthOk(userName, 5, 50)) {
+        if (!userName.equals("") && !TextTools.isTextLengthOk(userName, 5, 50)) {
             errors.put(RegisterPole.NAME.getFieldName(), "Length must be between 5-50");
         }
     }
 
     private void checkSurname(String surname) {
-        if (!TextTools.isTextLengthOk(surname, 5, 50)) {
+        if (!surname.equals("") && !TextTools.isTextLengthOk(surname, 5, 50)) {
             errors.put(RegisterPole.SURNAME.getFieldName(), "Length must be between 5-50");
         }
     }

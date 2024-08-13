@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.web.client.RestTemplate;
 import pl.kowalecki.dietplanner.model.DTO.ResponseDTO;
 import pl.kowalecki.dietplanner.model.DTO.LoginRequestDTO;
 import pl.kowalecki.dietplanner.services.RestClientService;
@@ -20,21 +21,18 @@ import pl.kowalecki.dietplanner.utils.UrlTools;
 @Controller
 @AllArgsConstructor
 public class LoginController {
-
-
     private final RestClientService restClientService;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public String index(){
+    public String index() {
         return "pages/unlogged/index";
     }
 
     @PostMapping("/login")
-    public String postLoginPage(@ModelAttribute("loginForm") LoginRequestDTO loginRequestDto, HttpSession session, Model model){
+    public String postLoginPage(@ModelAttribute("loginForm") LoginRequestDTO loginRequestDto, HttpSession session, Model model) {
         try {
-            String url = "http://"+UrlTools.apiUrl +"/login";
+            String url = "http://" + UrlTools.apiUrl + "/login";
             ResponseEntity<ResponseDTO> response = restClientService.sendPostRequest(url, loginRequestDto, ResponseDTO.class);
-
             if (response.getStatusCode() == HttpStatus.OK) {
                 ResponseDTO responseDTO = response.getBody();
                 session.setAttribute("user", loginRequestDto.getEmail());
@@ -44,6 +42,7 @@ public class LoginController {
                 model.addAttribute("error", "Invalid email or password");
                 return "pages/unlogged/index";
             }
+//            return "pages/foodBoardPage";
 
         } catch (AuthenticationException e) {
             System.out.println("Próbowałem się zalogować: " + loginRequestDto.getEmail());
