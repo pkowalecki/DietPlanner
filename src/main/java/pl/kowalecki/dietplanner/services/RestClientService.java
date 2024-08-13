@@ -20,7 +20,6 @@ public class RestClientService {
         try {
             return restTemplate.getForEntity(url, responseType);
         } catch (HttpClientErrorException e) {
-            // Handle HTTP error responses (e.g., 404, 500)
             HttpStatusCode status = e.getStatusCode();
             T body = null;
             try {

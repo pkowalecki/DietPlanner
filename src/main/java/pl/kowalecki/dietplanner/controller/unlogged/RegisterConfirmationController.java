@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 import pl.kowalecki.dietplanner.model.DTO.ResponseDTO;
+import pl.kowalecki.dietplanner.services.RestClientService;
 import pl.kowalecki.dietplanner.utils.UrlTools;
 
 @RequestMapping("/app")
@@ -16,14 +17,17 @@ import pl.kowalecki.dietplanner.utils.UrlTools;
 @AllArgsConstructor
 public class RegisterConfirmationController {
 
-    private final RestTemplate restTemplate;
+    private final RestClientService restClientService;
+
 
     @GetMapping("/confirm")
     public String confirmUser(Model model, @RequestParam("token") String confirmationToken) {
-        ResponseEntity<ResponseDTO> response = restTemplate.getForEntity(
-                "http://"+ UrlTools.apiUrl +"/confirm?token=" + confirmationToken,
-                ResponseDTO.class
-        );
+        String url = "http://" + UrlTools.apiUrl + "/confirm?token=" + confirmationToken;
+        ResponseEntity<ResponseDTO> response = restClientService.sendGetRequest(url, ResponseDTO.class);
+//        ResponseEntity<ResponseDTO> response = restTemplate.getForEntity(
+//                "http://"+ UrlTools.apiUrl +"/confirm?token=" + confirmationToken,
+//                ResponseDTO.class
+//        );
         ResponseDTO responseDTO = response.getBody();
         assert responseDTO != null;
         if (responseDTO.getStatus().equals(ResponseDTO.ResponseStatus.ERROR)){
