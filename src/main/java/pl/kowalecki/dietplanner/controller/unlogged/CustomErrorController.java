@@ -14,7 +14,9 @@ public class CustomErrorController implements ErrorController {
     @RequestMapping("/error")
     public String handleError(HttpServletRequest request, Model model) {
         Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
-        model.addAttribute("error", "An error occurred: " + status);
+        String errorMessage = "Wystąpił nieoczekiwany błąd";
+        model.addAttribute("error", errorMessage);
         return "pages/unlogged/errorPage";
     }
+
 }

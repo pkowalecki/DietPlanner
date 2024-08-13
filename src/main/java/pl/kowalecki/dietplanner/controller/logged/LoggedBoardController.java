@@ -16,7 +16,6 @@ public class LoggedBoardController {
         if (session.getAttribute("user") == null) {
             return "redirect:/app/";
         }
-
         model.addAttribute("user", session.getAttribute("user"));
         return "pages/logged/loggedPage";
     }
