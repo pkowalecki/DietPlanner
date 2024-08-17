@@ -98,7 +98,7 @@ public class MealServiceImpl implements MealService{
         List<IngredientToBuyDTO> ingredientsToBuy = new ArrayList<>();
 
         for (Ingredient ingredient : ingredients){
-            IngredientToBuyDTO ingredientDTO = new IngredientToBuyDTO(ingredient.getName(), ingredient.getIngredientAmount().toString(), ingredient.getIngredientUnit().getShortName(), ingredient.getMeasurementValue().toString(), ingredient.getMeasurementType().getMeasurementName().toString());
+            IngredientToBuyDTO ingredientDTO = new IngredientToBuyDTO(ingredient.getIngredientNameId().getName(), ingredient.getIngredientAmount().toString(), ingredient.getIngredientUnit().getShortName(), ingredient.getMeasurementValue().toString(), ingredient.getMeasurementType().getMeasurementName().toString());
             ingredientsToBuy.add(ingredientDTO);
         }
 

@@ -11,10 +11,10 @@ public class IngredientsListHelper {
         Map<String, Ingredient> ingredientMap = new HashMap<>();
         for (Ingredient newIngredient: ingredients){
             Ingredient newIngredientToPut = new Ingredient();
-            String ingredientNameKey = newIngredient.getName() + newIngredient.getIngredientUnit().getShortName();
+            String ingredientNameKey = newIngredient.getIngredientNameId().getName() + newIngredient.getIngredientUnit().getShortName();
             if (ingredientMap.containsKey(ingredientNameKey)){
                 Ingredient existingIngredient = ingredientMap.get(ingredientNameKey);
-                if(newIngredient.getName().equals(existingIngredient.getName())){
+                if(newIngredient.getIngredientNameId().getName().equals(existingIngredient.getIngredientNameId().getName())){
                     //Tutaj lecimy z jednostkami danego składnika
                     if (newIngredient.getIngredientUnit().equals(existingIngredient.getIngredientUnit())){
                         existingIngredient.setIngredientAmount(existingIngredient.sumTotalAmount(getRoundedIngredientAmount(newIngredient.getIngredientAmount(),multiplier),existingIngredient.getIngredientAmount()));
