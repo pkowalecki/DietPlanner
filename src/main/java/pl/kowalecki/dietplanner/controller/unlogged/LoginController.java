@@ -10,11 +10,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import org.springframework.web.client.RestTemplate;
+import pl.kowalecki.dietplanner.IWebPageService;
 import pl.kowalecki.dietplanner.model.DTO.ResponseDTO;
 import pl.kowalecki.dietplanner.model.DTO.LoginRequestDTO;
-import pl.kowalecki.dietplanner.security.jwt.AuthJwtUtils;
-import pl.kowalecki.dietplanner.services.RestClientService;
 import pl.kowalecki.dietplanner.utils.UrlTools;
 
 import java.util.List;
@@ -24,8 +22,8 @@ import java.util.List;
 @RequestMapping("/app")
 @Controller
 @AllArgsConstructor
-public class LoginController extends WebData{
-    private final RestClientService restClientService;
+public class LoginController{
+    private final IWebPageService webPageService;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String index() {
@@ -36,7 +34,7 @@ public class LoginController extends WebData{
     public String postLoginPage(@ModelAttribute("loginForm") LoginRequestDTO loginRequestDto, HttpSession session, Model model, HttpServletResponse response) {
         try {
             String url = "http://" + UrlTools.apiUrl + "/login";
-            ResponseEntity<ResponseDTO> apiResponse = restClientService.sendPostRequest(url, loginRequestDto, ResponseDTO.class);
+            ResponseEntity<ResponseDTO> apiResponse = webPageService.sendPostRequest(url, loginRequestDto, ResponseDTO.class);
             if (apiResponse.getStatusCode() == HttpStatus.OK) {
                 ResponseDTO responseDTO = apiResponse.getBody();
                 List<String> cookies = apiResponse.getHeaders().get(HttpHeaders.SET_COOKIE);
@@ -45,6 +43,7 @@ public class LoginController extends WebData{
                         response.addHeader(HttpHeaders.SET_COOKIE, cookieHeader);
                     }
                 }
+                webPageService.addCommonWebData(model);
                 session.setAttribute("user", loginRequestDto.getEmail());
                 model.addAttribute("roles", responseDTO.getData());
                 return "redirect:/app/auth/loggedUserBoard";

@@ -7,9 +7,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.client.RestTemplate;
+import pl.kowalecki.dietplanner.IWebPageService;
 import pl.kowalecki.dietplanner.model.DTO.ResponseDTO;
-import pl.kowalecki.dietplanner.services.RestClientService;
 import pl.kowalecki.dietplanner.utils.UrlTools;
 
 @RequestMapping("/app")
@@ -17,25 +16,26 @@ import pl.kowalecki.dietplanner.utils.UrlTools;
 @AllArgsConstructor
 public class RegisterConfirmationController {
 
-    private final RestClientService restClientService;
+    private final IWebPageService webPageService;
 
 
     @GetMapping("/confirm")
     public String confirmUser(Model model, @RequestParam("token") String confirmationToken) {
         String url = "http://" + UrlTools.apiUrl + "/confirm?token=" + confirmationToken;
-        ResponseEntity<ResponseDTO> response = restClientService.sendGetRequest(url, ResponseDTO.class);
+        ResponseEntity<ResponseDTO> response = webPageService.sendGetRequest(url, ResponseDTO.class);
 //        ResponseEntity<ResponseDTO> response = restTemplate.getForEntity(
 //                "http://"+ UrlTools.apiUrl +"/confirm?token=" + confirmationToken,
 //                ResponseDTO.class
 //        );
         ResponseDTO responseDTO = response.getBody();
-        assert responseDTO != null;
-        if (responseDTO.getStatus().equals(ResponseDTO.ResponseStatus.ERROR)){
-            model.addAttribute("message", responseDTO.getData());
-        }else if(responseDTO.getStatus().equals(ResponseDTO.ResponseStatus.OK)){
-            model.addAttribute("activated", true);
-        }else{
-            model.addAttribute("message", "other error, contact administrator");
+        if (responseDTO != null) {
+            switch (responseDTO.getStatus()) {
+                case ERROR -> model.addAttribute("message", responseDTO.getData());
+                case OK -> model.addAttribute("activated", true);
+                default -> model.addAttribute("message", "other error, contact administrator");
+            }
+        } else {
+            model.addAttribute("message", "Unexpected error, please try again later.");
         }
         return "pages/unlogged/confirmation";
     }

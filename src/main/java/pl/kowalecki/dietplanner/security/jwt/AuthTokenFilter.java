@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
+import pl.kowalecki.dietplanner.WebPageService;
 import pl.kowalecki.dietplanner.services.UserDetailsServiceImpl;
 
 import java.io.IOException;
@@ -22,32 +23,29 @@ import java.io.IOException;
 @NoArgsConstructor
 public class AuthTokenFilter extends OncePerRequestFilter {
 
+//    @Autowired
+//    private AuthJwtUtils jwtUtils;
+//    @Autowired
+//    private UserDetailsServiceImpl userDetailsService;
     @Autowired
-    private AuthJwtUtils jwtUtils;
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+    private WebPageService webPageService;
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        try{
-            String jwt = parseJwt(request);
-            if (jwt != null && jwtUtils.validateJwtToken(jwt)){
-                String userEmail = jwtUtils.getEmailFromJwtToken(jwt);
-                UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
-
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(auth);
+        try {
+            if (webPageService.validateToken(request)) {
+                UserDetails userDetails = webPageService.getUserDetailsFromToken(request);
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                webPageService.refreshUserSession(request);
             }
-        }catch (Exception e){
-            log.error("Cannot set user authentication: {}", e);
+        } catch (Exception e) {
+            log.error("Cannot set user authentication: {}", e.getMessage());
         }
         filterChain.doFilter(request, response);
-    }
-
-    private String parseJwt(HttpServletRequest request) {
-        String jwt = jwtUtils.getJwtFromCookies(request);
-        return jwt;
     }
 }
