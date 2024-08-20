@@ -2,6 +2,7 @@ package pl.kowalecki.dietplanner.repository;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import pl.kowalecki.dietplanner.IngredientsListHelper;
@@ -16,18 +17,14 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Repository
+@AllArgsConstructor
+
 public class MealRepositoryImplementation{
 
     private final MealRepository mealRepository;
     private final IngredientRepository ingredientRepository;
     private final AdministrationUserRepository administrationUserRepository;
 
-    @Autowired
-    public MealRepositoryImplementation(MealRepository mealRepository, IngredientRepository ingredientRepository, AdministrationUserRepository administrationUserRepository){
-        this.mealRepository=mealRepository;
-        this.ingredientRepository=ingredientRepository;
-        this.administrationUserRepository=administrationUserRepository;
-    }
 
     public List<Meal> getAllMeals(){
         return mealRepository.findAll();
