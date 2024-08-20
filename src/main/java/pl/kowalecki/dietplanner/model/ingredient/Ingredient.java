@@ -2,22 +2,29 @@ package pl.kowalecki.dietplanner.model.ingredient;
 
 import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import pl.kowalecki.dietplanner.model.ingredient.ingredientAmount.IngredientAmount;
 import pl.kowalecki.dietplanner.model.ingredient.ingredientAmount.IngredientUnit;
 import pl.kowalecki.dietplanner.model.ingredient.ingredientMeasurement.IngredientMeasurement;
 import pl.kowalecki.dietplanner.model.ingredient.ingredientMeasurement.MeasurementType;
 import pl.kowalecki.dietplanner.model.Meal;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+@Getter
+@Setter
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "ingredients")
 public class Ingredient {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long ingredientId;
-    private String name;
 
     private Double ingredientAmount;
 
@@ -29,70 +36,15 @@ public class Ingredient {
     @Enumerated(EnumType.STRING)
     private MeasurementType measurementType;
 
-
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="id_ingredient_name")
+    private IngredientName ingredientNameId;
 
     @ManyToOne
     @JoinColumn(name = "meal_id")
     @JsonBackReference
     private Meal meal;
 
-
-    public Ingredient(String name, Double ingredientAmount, IngredientUnit ingredientUnit, Double measurementValue, MeasurementType measurementType) {
-        this.name = name;
-        this.ingredientAmount = ingredientAmount;
-        this.ingredientUnit = ingredientUnit;
-        this.measurementValue = measurementValue;
-        this.measurementType = measurementType;
-    }
-
-    public Ingredient() {
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Double getMeasurementValue() {
-        return measurementValue;
-    }
-
-    public void setMeasurementValue(Double measurementValue) {
-        this.measurementValue = measurementValue;
-    }
-
-    public MeasurementType getMeasurementType() {
-        return measurementType;
-    }
-
-    public void setMeasurementType(MeasurementType measurementType) {
-        this.measurementType = measurementType;
-    }
-
-    public Double getIngredientAmount() {
-        return ingredientAmount;
-    }
-
-    public void setIngredientAmount(Double ingredientAmount) {this.ingredientAmount = ingredientAmount;}
-
-    public IngredientUnit getIngredientUnit() {
-        return ingredientUnit;
-    }
-
-    public void setIngredientUnit(IngredientUnit ingredientUnit) {
-        this.ingredientUnit = ingredientUnit;
-    }
-
-    public Meal getMeal() {
-        return meal;
-    }
-
-    public void setMeal(Meal meal) {
-        this.meal = meal;
-    }
 
     @Transient
     public Double sumTotalAmount(double d1, double d2){
@@ -139,13 +91,5 @@ public class Ingredient {
 //            return new IngredientMeasurement(value, "sztuki");
         }
         return new IngredientMeasurement();
-    }
-
-    public Long getIngredientId() {
-        return ingredientId;
-    }
-
-    public void setIngredientId(Long ingredientId) {
-        this.ingredientId = ingredientId;
     }
 }

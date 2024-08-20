@@ -15,6 +15,7 @@ import pl.kowalecki.dietplanner.repository.UserRepository;
 @AllArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService{
 
+    @Autowired
     private UserRepository userService;
 
     @Override
