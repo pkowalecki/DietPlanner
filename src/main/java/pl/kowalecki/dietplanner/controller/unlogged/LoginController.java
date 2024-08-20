@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import pl.kowalecki.dietplanner.IWebPageService;
 import pl.kowalecki.dietplanner.model.DTO.ResponseDTO;
-import pl.kowalecki.dietplanner.model.DTO.LoginRequestDTO;
+import pl.kowalecki.dietplanner.model.DTO.User.LoginRequestDTO;
 import pl.kowalecki.dietplanner.utils.UrlTools;
 
 import java.util.List;
@@ -43,9 +43,8 @@ public class LoginController{
                         response.addHeader(HttpHeaders.SET_COOKIE, cookieHeader);
                     }
                 }
+                session.setAttribute("user", responseDTO.getData().get("user"));
                 webPageService.addCommonWebData(model);
-                session.setAttribute("user", loginRequestDto.getEmail());
-                model.addAttribute("roles", responseDTO.getData());
                 return "redirect:/app/auth/loggedUserBoard";
             } else {
                 model.addAttribute("error", "Invalid email or password");
