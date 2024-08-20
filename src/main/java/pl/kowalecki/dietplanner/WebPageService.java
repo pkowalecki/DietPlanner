@@ -2,9 +2,7 @@ package pl.kowalecki.dietplanner;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,13 +10,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.ui.Model;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import pl.kowalecki.dietplanner.model.DTO.User.LoginResponseDTO;
+import pl.kowalecki.dietplanner.model.DTO.User.UserDTO;
 import pl.kowalecki.dietplanner.security.jwt.AuthJwtUtils;
+import pl.kowalecki.dietplanner.services.UserDetailsImpl;
 import pl.kowalecki.dietplanner.services.UserDetailsServiceImpl;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Configuration
 @Slf4j
@@ -36,6 +42,9 @@ public class WebPageService implements IWebPageService {
 
     @Autowired
     private final RestTemplate restTemplate;
+
+    @Autowired
+    private AuthJwtUtils authJwtUtils;
 
     @Override
     public boolean hasPermission() {
@@ -58,11 +67,14 @@ public class WebPageService implements IWebPageService {
         return null;
     }
 
+    //TODO REFRESH SESSION
     @Override
     public void refreshUserSession(HttpServletRequest request) {
         UserDetails userDetails = getUserDetailsFromToken(request);
         if (userDetails != null) {
-            log.info("Refreshed session for user: {}", userDetails.getUsername());
+            log.info("Refreshed session for user: {}", ((UserDetailsImpl) userDetails).getEmail());
+//            return authJwtUtils.generateJwtCookie(userDetails);
+
         }
     }
 
@@ -136,14 +148,36 @@ public class WebPageService implements IWebPageService {
     }
 
     @Override
-    public String getLoggedUser() {
-        return (String) session.getAttribute("user");
+    public UserDTO getLoggedUser() {
+//        UserDTO user = (UserDTO) session.getAttribute("user");
+        LinkedHashMap<String, Object> userMap = (LinkedHashMap<String, Object>) session.getAttribute("user");
+        if (userMap != null) {
+            return buildUser(userMap);
+        }
+        return null;
+    }
+
+    private UserDTO buildUser(LinkedHashMap<String, Object> userMap) {
+        LoginResponseDTO userRespo = new LoginResponseDTO();
+        userRespo.setEmail((String) userMap.get("email"));
+        UserDetailsImpl userDetails = (UserDetailsImpl)userDetailsService.loadUserByUsername(userRespo.getEmail());
+       return UserDTO.builder()
+                .id(userDetails.getId())
+                .name(userDetails.getName())
+                .surname(userDetails.getSurname())
+                .email(userDetails.getEmail())
+                .nickName(userDetails.getNickName())
+                .roles(userDetails.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.toList())).build();
     }
 
     @Override
     public void addCommonWebData(Model model) {
-        String user = getLoggedUser();
-        model.addAttribute("user", user);
-//        model.addAttribute("roles", getUserRoles(user));
+        UserDTO user = getLoggedUser();
+        if (user != null) {
+//            session.setAttribute("user", user);
+            model.addAttribute("user", user);
+        }
     }
 }

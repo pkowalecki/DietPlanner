@@ -13,10 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import pl.kowalecki.dietplanner.IWebPageService;
 import pl.kowalecki.dietplanner.model.Meal;
 import pl.kowalecki.dietplanner.model.page.FoodBoardPageData;
 import pl.kowalecki.dietplanner.repository.MealRepository;
@@ -31,6 +29,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 @Controller
+@RequestMapping("/app/auth")
 public class MealPageController {
 
     @Autowired
@@ -39,15 +38,19 @@ public class MealPageController {
     @Autowired
     MealServiceImpl mealRepositoryImpl;
 
+    @Autowired
+    IWebPageService webPageService;
+
     public MealPageController(MealRepository mealRepository) {
         this.mealRepository = mealRepository;
     }
 
     @GetMapping(value = "/generateMealBoard")
     public String mealPage(Model model){
+        webPageService.addCommonWebData(model);
         List<Meal> mealList = mealRepository.findAll();
         model.addAttribute("mealList", mealList);
-        return "pages/foodBoardPage";
+        return "pages/logged/foodBoardPage";
     }
 
     @PostMapping(value = "/generateMealBoard")

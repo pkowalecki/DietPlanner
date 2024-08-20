@@ -1,11 +1,10 @@
 package pl.kowalecki.dietplanner;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.ui.Model;
+import pl.kowalecki.dietplanner.model.DTO.User.UserDTO;
 
 public interface IWebPageService {
     boolean hasPermission();
@@ -20,6 +19,6 @@ public interface IWebPageService {
     <T> ResponseEntity<T> sendGetRequest(String url, Class<T> responseType);
     <T> ResponseEntity<T> sendPostRequest(String url, Object request, Class<T> responseType);
     boolean isUserLoggedIn();
-    String getLoggedUser();
+    UserDTO getLoggedUser();
     void addCommonWebData(Model model);
 }

@@ -1,4 +1,4 @@
-package pl.kowalecki.dietplanner.model.DTO;
+package pl.kowalecki.dietplanner.model.DTO.User;
 
 import lombok.*;
 

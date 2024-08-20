@@ -23,10 +23,6 @@ import java.io.IOException;
 @NoArgsConstructor
 public class AuthTokenFilter extends OncePerRequestFilter {
 
-//    @Autowired
-//    private AuthJwtUtils jwtUtils;
-//    @Autowired
-//    private UserDetailsServiceImpl userDetailsService;
     @Autowired
     private WebPageService webPageService;
 
@@ -41,7 +37,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                         userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                webPageService.refreshUserSession(request);
             }
         } catch (Exception e) {
             log.error("Cannot set user authentication: {}", e.getMessage());
