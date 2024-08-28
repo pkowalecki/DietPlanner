@@ -28,6 +28,7 @@ import pl.kowalecki.dietplanner.model.page.FoodBoardPageData;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
+import pl.kowalecki.dietplanner.utils.SerializationUtils;
 import pl.kowalecki.dietplanner.utils.UrlTools;
 
 import java.io.ByteArrayOutputStream;

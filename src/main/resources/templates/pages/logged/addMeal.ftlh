@@ -112,7 +112,6 @@
     $(document).ready(function () {
 
         const jsIngredientsList = [];
-
         $("#openIngredientModalBtn").click(function (e) {
             e.preventDefault();
             openModal();
@@ -128,21 +127,45 @@
             addIngredient();
         });
 
-        $("#submitButton").click(function (e) {
-            e.preventDefault();
-            submitMeal();
-        });
-
         function openModal() {
             $("#ingredientModal").show();
         }
 
         function closeModal() {
             $("#ingredientModal").hide();
+            resetModal();
+        }
+
+        $("#submitButton").click(function (e) {
+            e.preventDefault();
+            resetErrors();
+            submitMeal();
+        });
+
+        function resetModal() {
+            // $("#ingredientSelect").val('').selectpicker('refresh');
+            $("#ingredientAmount").val('');
+            // $("#ingredientUnitsSelect").val('').selectpicker('refresh');
+            $("#measurementValue").val('');
+            // $("#measurementTypesSelect").val('').selectpicker('refresh');
+            $("#addIngredientBtn").show();
+            $("#updateIngredientBtn").hide();
         }
 
         function addIngredient() {
-            const ingredient = {
+            const ingredient = getIngredientFromModal();
+
+            if (validateIngredient(ingredient)) {
+                jsIngredientsList.push(ingredient);
+                updateIngredientList();
+                closeModal();
+            } else {
+                alert("Please fill in all fields before adding an ingredient.");
+            }
+        }
+
+        function getIngredientFromModal() {
+            return {
                 jsIngredientId: $("#ingredientSelect").val(),
                 jsIngredientName: $("#ingredientSelect option:selected").text(),
                 jsIngredientAmount: $("#ingredientAmount").val(),
@@ -152,15 +175,51 @@
                 jsMeasurementType: $("#measurementTypesSelect").val(),
                 jsMeasurementTypeText: $("#measurementTypesSelect option:selected").text()
             };
+        }
 
-            if (ingredient.jsIngredientId && ingredient.jsIngredientAmount && ingredient.jsIngredientUnit &&
-                ingredient.jsMeasurementValue && ingredient.jsMeasurementType) {
+        function validateIngredient(ingredient) {
+            return ingredient.jsIngredientId && ingredient.jsIngredientAmount && ingredient.jsIngredientUnit &&
+                ingredient.jsMeasurementValue && ingredient.jsMeasurementType;
+        }
 
-                jsIngredientsList.push(ingredient);
+        function updateIngredient(index) {
+            const ingredient = getIngredientFromModal();
+
+            if (validateIngredient(ingredient)) {
+                jsIngredientsList[index] = ingredient;
                 updateIngredientList();
-
+                closeModal();
             } else {
-                alert("Please fill in all fields before adding an ingredient.");
+                alert("Please fill in all fields before updating an ingredient.");
+            }
+        }
+
+        function editIngredient(index) {
+            const ingredientEl = jsIngredientsList[index];
+
+            $("#ingredientSelect").val(ingredientEl.jsIngredientId).selectpicker('refresh');
+            $("#ingredientAmount").val(ingredientEl.jsIngredientAmount);
+            $("#ingredientUnitsSelect").val(ingredientEl.jsIngredientUnit).selectpicker('refresh');
+            $("#measurementValue").val(ingredientEl.jsMeasurementValue);
+            $("#measurementTypesSelect").val(ingredientEl.jsMeasurementType).selectpicker('refresh');
+
+            openModal();
+
+            $("#addIngredientBtn").hide();
+            const updateButton = $("#updateIngredientBtn");
+            if (updateButton.length === 0) {
+                $("<button>")
+                    .attr("id", "updateIngredientBtn")
+                    .addClass("btn btn-primary mt-3")
+                    .text("Update Ingredient")
+                    .insertAfter("#addIngredientBtn")
+                    .click(function () {
+                        updateIngredient(index);
+                    });
+            } else {
+                updateButton.off().click(function () {
+                    updateIngredient(index);
+                }).show();
             }
         }
 
@@ -183,23 +242,33 @@
                     ingredientEl.jsMeasurementTypeText
                 );
 
-                const removeIcon = $("<span>")
-                    .html("&times;")
-                    .addClass("remove-ingredient")
+                const editButton = $("<i>")
+                    .addClass("fa fa-edit edit-ingredient")
+                    .css("margin-right", "10px")
                     .attr("data-index", index)
-                    .css({
-                        color: "red",
-                        cursor: "pointer",
-                        fontWeight: "bold",
-                        marginLeft: "10px"
-                    })
+                    .click(function () {
+                        editIngredient(index);
+                    });
+
+                const removeButton = $("<i>")
+                    .addClass("fa fa-times remove-ingredient")
+                    .css("color", "red")
+                    .attr("data-index", index)
                     .click(function () {
                         removeIngredient(index);
                     });
 
-                ingredientDiv.append(ingredientDesc).append(removeIcon);
+                ingredientDesc.append(editButton, removeButton);
+
+                ingredientDiv.append(ingredientDesc);
                 ingredientList.append(ingredientDiv);
+
             });
+        }
+
+        function resetErrors() {
+            $(".error-message").text("");
+            $(".form-control").removeClass('is-invalid');
         }
 
         function submitMeal() {
@@ -209,15 +278,7 @@
                 recipe: $("#recipe").val(),
                 notes: $("#notes").val(),
                 mealTypes: $("#mealTypesSelect").val(),
-                ingredients: jsIngredientsList.map(function (ingredient) {
-                    return {
-                        ingredientAmount: parseFloat(ingredient.jsIngredientAmount),
-                        ingredientUnit: ingredient.jsIngredientUnit,
-                        measurementValue: parseFloat(ingredient.jsMeasurementValue),
-                        measurementType: ingredient.jsMeasurementType,
-                        ingredientNameId: parseInt(ingredient.jsIngredientId)
-                    };
-                })
+                ingredients: jsIngredientsList
             };
 
             $.ajax({
@@ -226,16 +287,21 @@
                 contentType: 'application/json',
                 data: JSON.stringify(mealData),
                 success: function (response) {
-                    alert("Meal added successfully!");
-                    // window.location.href = "/jakisRedir";
+                    if (response.status === 'BADDATA') {
+                        const errors = response.data;
+                        for (const field in errors) {
+                            $('#' + field + 'Error').text(errors[field]);
+                            $('#' + field).addClass('is-invalid');
+                        }
+                    } else if (response.status === 'OK') {
+                        console.log("Meal added successfully");
+                    }
                 },
-                error: function (xhr, status, error) {
-                    console.error("Error adding meal: ", error);
-                    alert("There was an error adding your meal. Please try again.");
+                error: function () {
+                    alert('An error occurred while processing your request.');
                 }
             });
         }
-
     });
 </script>
 <#include "../../webData/footer.ftlh">
