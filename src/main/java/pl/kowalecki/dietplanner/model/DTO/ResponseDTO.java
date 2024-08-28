@@ -20,7 +20,8 @@ public class ResponseDTO {
     public enum ResponseStatus {
         OK,
         BADDATA,
-        ERROR
+        ERROR,
+        UNAUTHORIZED,
         ;
     }
 

@@ -10,6 +10,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoginResponseDTO {
+    int id;
+    String name;
+    String surname;
     String email;
+    String nickName;
     List<String> roles;
 }

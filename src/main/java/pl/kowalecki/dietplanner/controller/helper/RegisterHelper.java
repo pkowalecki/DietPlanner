@@ -1,26 +1,20 @@
 package pl.kowalecki.dietplanner.controller.helper;
 
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pl.kowalecki.dietplanner.model.DTO.RegistrationRequestDTO;
-import pl.kowalecki.dietplanner.repository.RoleRepository;
 import pl.kowalecki.dietplanner.services.UserDetailsServiceImpl;
 import pl.kowalecki.dietplanner.utils.TextTools;
 
 import java.util.*;
 
 @Component
+@AllArgsConstructor
 public class RegisterHelper {
 
-
     private UserDetailsServiceImpl userService;
-    private RoleRepository roleRepository;
 
-    @Autowired
-    public RegisterHelper(UserDetailsServiceImpl userService, RoleRepository roleRepository) {
-        this.userService = userService;
-        this.roleRepository = roleRepository;
-    }
 
     static Map<String, String> errors;
 
@@ -57,7 +51,8 @@ public class RegisterHelper {
             errors.put(RegisterPole.EMAIL.getFieldName(), "Length must be between 5-50");
             return;
         }
-        if (userService.existsUserByEmail(email)) errors.put(RegisterPole.EMAIL.getFieldName(), "Email address already exists");
+        //TODO TO ROBI API
+//        if (userService.existsUserByEmail(email)) errors.put(RegisterPole.EMAIL.getFieldName(), "Email address already exists");
     }
 
     private void checkPassword(String password, String password2) {

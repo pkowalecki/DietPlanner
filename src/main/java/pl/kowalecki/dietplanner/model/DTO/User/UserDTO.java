@@ -1,9 +1,12 @@
 package pl.kowalecki.dietplanner.model.DTO.User;
 
 import lombok.*;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -13,9 +16,19 @@ import java.util.List;
 public class UserDTO {
 
     private Integer id;
-    private String name;
-    private String surname;
     private String email;
+    private String name;
     private String nickName;
-    private List<String> roles = new ArrayList<>();
+    private String surname;
+    private List<String> roles;
+
+
+    public UserDTO(UserDetails userDetails) {
+        this.email = userDetails.getUsername();
+        this.roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+    }
+
+
 }
