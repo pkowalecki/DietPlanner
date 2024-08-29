@@ -1,5 +1,6 @@
 package pl.kowalecki.dietplanner.controller.unlogged;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
@@ -31,16 +32,16 @@ public class LoginController{
     }
 
     @PostMapping("/login")
-    public String postLoginPage(@ModelAttribute("loginForm") LoginRequestDTO loginRequestDto, HttpSession session, Model model, HttpServletResponse response) {
+    public String postLoginPage(@ModelAttribute("loginForm") LoginRequestDTO loginRequestDto, HttpSession session, Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
         try {
             String url = "http://" + UrlTools.apiUrl + "/login";
-            ResponseEntity<ResponseDTO> apiResponse = webPageService.sendPostRequest(url, loginRequestDto, ResponseDTO.class);
+            ResponseEntity<ResponseDTO> apiResponse = webPageService.sendPostRequest(url, loginRequestDto, ResponseDTO.class, request, httpResponse);
             if (apiResponse.getStatusCode() == HttpStatus.OK) {
                 ResponseDTO responseDTO = apiResponse.getBody();
                 List<String> cookies = apiResponse.getHeaders().get(HttpHeaders.SET_COOKIE);
                 if (cookies != null) {
                     for (String cookieHeader : cookies) {
-                        response.addHeader(HttpHeaders.SET_COOKIE, cookieHeader);
+                        httpResponse.addHeader(HttpHeaders.SET_COOKIE, cookieHeader);
                     }
                 }
                 session.setAttribute("user", responseDTO.getData().get("user"));

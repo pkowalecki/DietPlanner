@@ -3,6 +3,7 @@ package pl.kowalecki.dietplanner;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,21 +11,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.ui.Model;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import pl.kowalecki.dietplanner.model.DTO.User.LoginResponseDTO;
 import pl.kowalecki.dietplanner.model.DTO.User.UserDTO;
 import pl.kowalecki.dietplanner.security.jwt.AuthJwtUtils;
-import pl.kowalecki.dietplanner.services.UserDetailsImpl;
-import pl.kowalecki.dietplanner.services.UserDetailsServiceImpl;
+import pl.kowalecki.dietplanner.utils.ClassMapper;
 
-import java.util.LinkedHashMap;
+import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Configuration
 @Slf4j
@@ -35,9 +32,6 @@ public class WebPageService implements IWebPageService {
     private AuthJwtUtils jwtUtils;
 
     @Autowired
-    private UserDetailsServiceImpl userDetailsService;
-
-    @Autowired
     private HttpSession session;
 
     @Autowired
@@ -45,6 +39,9 @@ public class WebPageService implements IWebPageService {
 
     @Autowired
     private AuthJwtUtils authJwtUtils;
+
+    @Autowired
+    ClassMapper classMapper;
 
     @Override
     public boolean hasPermission() {
@@ -57,25 +54,15 @@ public class WebPageService implements IWebPageService {
         return token != null && jwtUtils.validateJwtToken(token);
     }
 
-    @Override
-    public UserDetails getUserDetailsFromToken(HttpServletRequest request) {
-        String token = jwtUtils.getJwtFromCookies(request);
-        if (token != null && jwtUtils.validateJwtToken(token)) {
-            String email = jwtUtils.getEmailFromJwtToken(token);
-            return userDetailsService.loadUserByUsername(email);
-        }
-        return null;
-    }
-
     //TODO REFRESH SESSION
     @Override
     public void refreshUserSession(HttpServletRequest request) {
-        UserDetails userDetails = getUserDetailsFromToken(request);
-        if (userDetails != null) {
-            log.info("Refreshed session for user: {}", ((UserDetailsImpl) userDetails).getEmail());
-//            return authJwtUtils.generateJwtCookie(userDetails);
-
-        }
+//        UserDetails userDetails = getUserDetailsFromToken(request);
+//        if (userDetails != null) {
+//            log.info("Refreshed session for user: {}", ((UserDetailsImpl) userDetails).getEmail());
+////            return authJwtUtils.generateJwtCookie(userDetails);
+//
+//        }
     }
 
     @Override
@@ -109,10 +96,45 @@ public class WebPageService implements IWebPageService {
 
     }
 
-    @Override
-    public <T> ResponseEntity<T> sendGetRequest(String url, Class<T> responseType) {
+    public <T> ResponseEntity<T> sendGetRequest(String url, Class<T> responseType, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+        return sendRequest(url, HttpMethod.GET, null, responseType, httpRequest, httpResponse);
+    }
+
+    public <T> ResponseEntity<T> sendPostRequest(String url, Object request, Class<T> responseType, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+        return sendRequest(url, HttpMethod.POST, request, responseType, httpRequest, httpResponse);
+    }
+
+    private <T> ResponseEntity<T> sendRequest(String url, HttpMethod method, Object request, Class<T> responseType, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
         try {
-            return restTemplate.getForEntity(url, responseType);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            String token = jwtUtils.getJwtFromCookies(httpRequest);
+            if (token != null) {
+                headers.add(HttpHeaders.COOKIE, "dietapp=" + token);
+            }
+
+            HttpEntity<Object> entity = new HttpEntity<>(request, headers);
+            ResponseEntity<String> response = restTemplate.exchange(url, method, entity, String.class);
+
+            List<String> cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
+            if (cookies != null) {
+                for (String cookieHeader : cookies) {
+                    httpResponse.addHeader(HttpHeaders.SET_COOKIE, cookieHeader);
+                }
+            }
+
+            log.info("Received response from {}: {}", url, response.getBody());
+            if (response.getHeaders().getContentType().includes(MediaType.APPLICATION_JSON)) {
+                T body = new ObjectMapper().readValue(response.getBody(), responseType);
+                return new ResponseEntity<>(body, response.getStatusCode());
+            } else if (response.getHeaders().getContentType().includes(MediaType.TEXT_PLAIN)) {
+                T body = (T) response.getBody();
+                return new ResponseEntity<>(body, response.getStatusCode());
+            } else {
+                log.error("Unexpected content type: {}", response.getHeaders().getContentType());
+                throw new HttpClientErrorException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Unsupported Media Type");
+            }
         } catch (HttpClientErrorException e) {
             HttpStatusCode status = e.getStatusCode();
             T body = null;
@@ -121,26 +143,14 @@ public class WebPageService implements IWebPageService {
             } catch (JsonProcessingException ex) {
                 log.error("Error parsing error response: {}", ex.getMessage());
             }
-            log.error("Error during GET request to {}: {}", url, e.getMessage());
+            log.error("Error during request to {}: {}", url, e.getMessage());
             return new ResponseEntity<>(body, status);
+        } catch (IOException e) {
+            log.error("Error processing response: {}", e.getMessage());
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Override
-    public <T> ResponseEntity<T> sendPostRequest(String url, Object request, Class<T> responseType) {
-        try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<Object> entity = new HttpEntity<>(request, headers);
-            return restTemplate.exchange(url, HttpMethod.POST, entity, responseType);
-        }catch (Exception e){
-            log.error("url: {}", url);
-            log.error("request: {}", request);
-            log.error("responseType: {}", responseType);
-            log.error("message: {}", e.getMessage());
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
 
     @Override
     public boolean isUserLoggedIn() {
@@ -149,34 +159,24 @@ public class WebPageService implements IWebPageService {
 
     @Override
     public UserDTO getLoggedUser() {
-//        UserDTO user = (UserDTO) session.getAttribute("user");
-        LinkedHashMap<String, Object> userMap = (LinkedHashMap<String, Object>) session.getAttribute("user");
-        if (userMap != null) {
-            return buildUser(userMap);
+       LoginResponseDTO loginResponseDTO = classMapper.convertToDTO(session.getAttribute("user"), LoginResponseDTO.class);
+        if (loginResponseDTO != null) {
+            return UserDTO.builder()
+                    .id(loginResponseDTO.getId())
+                    .surname(loginResponseDTO.getSurname())
+                    .nickName(loginResponseDTO.getNickName())
+                    .name(loginResponseDTO.getName())
+                    .email(loginResponseDTO.getEmail())
+                    .roles(loginResponseDTO.getRoles())
+                    .build();
         }
         return null;
-    }
-
-    private UserDTO buildUser(LinkedHashMap<String, Object> userMap) {
-        LoginResponseDTO userRespo = new LoginResponseDTO();
-        userRespo.setEmail((String) userMap.get("email"));
-        UserDetailsImpl userDetails = (UserDetailsImpl)userDetailsService.loadUserByUsername(userRespo.getEmail());
-       return UserDTO.builder()
-                .id(userDetails.getId())
-                .name(userDetails.getName())
-                .surname(userDetails.getSurname())
-                .email(userDetails.getEmail())
-                .nickName(userDetails.getNickName())
-                .roles(userDetails.getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .collect(Collectors.toList())).build();
     }
 
     @Override
     public void addCommonWebData(Model model) {
         UserDTO user = getLoggedUser();
         if (user != null) {
-//            session.setAttribute("user", user);
             model.addAttribute("user", user);
         }
     }

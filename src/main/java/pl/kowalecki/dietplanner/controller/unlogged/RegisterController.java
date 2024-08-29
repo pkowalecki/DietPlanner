@@ -1,6 +1,7 @@
 package pl.kowalecki.dietplanner.controller.unlogged;
 
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,26 +16,17 @@ import pl.kowalecki.dietplanner.exception.RegistrationException;
 import pl.kowalecki.dietplanner.mailService.MailerService;
 import pl.kowalecki.dietplanner.model.DTO.ResponseDTO;
 import pl.kowalecki.dietplanner.model.DTO.RegistrationRequestDTO;
-import pl.kowalecki.dietplanner.model.User;
-import pl.kowalecki.dietplanner.services.UserServiceImpl;
 
 import java.util.*;
 
 @RequestMapping("/app")
 @CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 @Controller
+@AllArgsConstructor
 public class RegisterController {
 
-    UserServiceImpl userServiceImpl;
     RegisterHelper registerHelper;
-    MailerService mailerService;
 
-    @Autowired
-    public RegisterController(UserServiceImpl userServiceImpl, RegisterHelper registerHelper, MailerService mailerService) {
-        this.userServiceImpl = userServiceImpl;
-        this.registerHelper = registerHelper;
-        this.mailerService = mailerService;
-    }
 
 
     @PostMapping("/register")
@@ -51,22 +43,23 @@ public class RegisterController {
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(MediaType.APPLICATION_JSON);
-        User user = userServiceImpl.createUser(registrationRequest);
-        try {
-            user.setRoles(userServiceImpl.setUserRoles(Collections.singletonList("ROLE_USER")));
-        }catch (RegistrationException e){
-            errors.put(RegisterPole.ROLE.getFieldName(), "Role error, contact administration");
-             response = ResponseDTO.builder()
-                    .status(ResponseDTO.ResponseStatus.BADDATA)
-                    .data(errors)
-                    .build();
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        }
-
-        userServiceImpl.registerUser(user);
-        //Jedziemy z mailerem gmail nie czyta html
-        boolean isHtml = !user.getEmail().contains("@gmail.com");
-        mailerService.sendRegistrationEmail(user.getEmail(), user.getHash(), isHtml);
+        //FIXME to API tworzy nam usera i śle maila
+//        User user = userServiceImpl.createUser(registrationRequest);
+//        try {
+//            user.setRoles(userServiceImpl.setUserRoles(Collections.singletonList("ROLE_USER")));
+//        }catch (RegistrationException e){
+//            errors.put(RegisterPole.ROLE.getFieldName(), "Role error, contact administration");
+//             response = ResponseDTO.builder()
+//                    .status(ResponseDTO.ResponseStatus.BADDATA)
+//                    .data(errors)
+//                    .build();
+//            return new ResponseEntity<>(response, HttpStatus.OK);
+//        }
+//
+//        userServiceImpl.registerUser(user);
+//        //Jedziemy z mailerem gmail nie czyta html
+//        boolean isHtml = !user.getEmail().contains("@gmail.com");
+//        mailerService.sendRegistrationEmail(user.getEmail(), user.getHash(), isHtml);
 
         response = ResponseDTO.builder()
                 .status(ResponseDTO.ResponseStatus.OK)

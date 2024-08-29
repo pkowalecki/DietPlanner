@@ -1,54 +1,69 @@
-header {
-    min-height: 100px;
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,700&family=Work+Sans:wght@600&display=swap");
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
 }
 
-header a {
-    color: white;
-    text-decoration: none;
+body {
+    display: flex;
+    flex-direction: column;
 }
-nav,
+
 header {
     background: #005da2;
     color: white;
-}
-
-footer {
     min-height: 100px;
-    bottom: 0;
-    width: 100%;
-    position: absolute;
-    height: 2.5rem;
 }
 
-footer a {
-    color: white;
-    text-decoration: none;
-}
-nav,
 footer {
     background: #005da2;
     color: white;
-
-}
-
-.goRight {
-    text-align: right;
-}
-.goCenter {
-    text-align: center;
-}
-.floatLeft {
-    float: left;
-}
-.floatRight {
-    float: right;
+    min-height: 100px;
+    margin-top: auto;
 }
 
 #page-container {
-    position: relative;
-    min-height: 100vh;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 #content-wrap {
-    padding-bottom: 2.5rem;    /* Footer height */
+    flex: 1;
+    padding: 5px 5px 5px 5px;
+}
+
+input {
+    border-radius: 0 !important;
+}
+
+h1:after {
+    content: "";
+    display: block;
+    width: 82px;
+    height: 3px;
+    margin: 10px 0 40px;
+}
+
+.hover-text:hover .tooltip-text {
+    visibility: visible;
+}
+
+.hover-text {
+    position: relative;
+    display: inline-block;
+    font-family: Arial, serif;
+    text-align: center;
+}
+
+
+.error-message{
+    color: red;
+    padding: 5px 5px 5px 0px;
+    font-weight: bold;
+}
+.is-invalid {
+    border-color: #dc3545;
 }

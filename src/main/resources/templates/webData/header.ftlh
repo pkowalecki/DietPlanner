@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=0.9">
     <#include "starter.ftlh">
+    <link rel="icon" type="image/x-icon" href="../../favicon.ico" />
     <link rel="stylesheet" href="../../static/css/headerNavbar.css">
 </head>
 <body>
@@ -15,7 +16,7 @@
             <div class="dropdown">
                 <button class="dropbtn">Posiłek</button>
                 <div class="dropdown-content">
-                    <a href="#">Dodaj posiłek</a>
+                    <a href="addMeal">Dodaj posiłek</a>
                     <a href="#">Dodaj składnik</a>
                     <a href="generateMealBoard">Wygeneruj plan żywienia</a>
                 </div>
@@ -23,5 +24,4 @@
         </div>
     </#if>
 </header>
-</body>
-</html>
+<div id="page-container">

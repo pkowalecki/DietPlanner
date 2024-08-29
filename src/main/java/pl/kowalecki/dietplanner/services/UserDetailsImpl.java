@@ -1,6 +1,7 @@
 package pl.kowalecki.dietplanner.services;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,14 +14,19 @@ import java.util.stream.Collectors;
 
 public class UserDetailsImpl implements UserDetails {
 
+    @Getter
     private Integer id;
 
+    @Getter
     private String email;
 
+    @Getter
     private String name;
 
+    @Getter
     private String nickName;
 
+    @Getter
     private String surname;
 
     @JsonIgnore
@@ -58,24 +64,6 @@ public class UserDetailsImpl implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getName() {
-        return name;
-    }
-    public String getNickName() {
-        return nickName;
-    }
-    public String getSurname() {
-        return surname;
     }
 
     @Override

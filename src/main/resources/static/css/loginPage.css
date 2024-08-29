@@ -16,18 +16,6 @@ body {
     flex: 1;
 }
 
-input {
-    border-radius: 0 !important;
-}
-
-h1:after {
-    content: "";
-    display: block;
-    width: 82px;
-    height: 3px;
-    margin: 10px 0 40px;
-}
-
 .login-form{
     width: 400px;
     border-radius: 4px;
@@ -110,16 +98,6 @@ img{
     transition: 0.5s;
 }
 
-.error-message{
-    color: red;
-    padding: 5px 5px 5px 0px;
-    font-weight: bold;
-}
-.is-invalid {
-    border-color: #dc3545;
-}
-
-
 .tooltip-text {
     visibility: hidden;
     position: absolute;
@@ -133,16 +111,7 @@ img{
     text-align: left;
 }
 
-.hover-text:hover .tooltip-text {
-    visibility: visible;
-}
 #bottom {
     top: 25px;
     left: -50%;
-}
-.hover-text {
-    position: relative;
-    display: inline-block;
-    font-family: Arial, serif;
-    text-align: center;
 }

@@ -16,7 +16,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import pl.kowalecki.dietplanner.security.jwt.ApiAuthEntryPoint;
 import pl.kowalecki.dietplanner.security.jwt.AuthTokenFilter;
 import pl.kowalecki.dietplanner.security.jwt.PageAuthEntryPoint;
 import pl.kowalecki.dietplanner.services.UserDetailsServiceImpl;
@@ -29,7 +28,6 @@ import pl.kowalecki.dietplanner.services.UserDetailsServiceImpl;
 public class WebSecurityConfig{
 
     private UserDetailsServiceImpl userDetailsService;
-    private ApiAuthEntryPoint apiAuthEntryPoint;
     private PageAuthEntryPoint pageAuthEntryPoint;
 
     @Bean
@@ -58,7 +56,6 @@ public class WebSecurityConfig{
         http.csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exception ->
                         exception.defaultAuthenticationEntryPointFor(pageAuthEntryPoint, new AntPathRequestMatcher("/app/auth/**"))
-                                .defaultAuthenticationEntryPointFor(apiAuthEntryPoint, new AntPathRequestMatcher("/api/auth/**"))
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
@@ -69,7 +66,6 @@ public class WebSecurityConfig{
                                 .requestMatchers("/static/**").permitAll()
                                 .requestMatchers("/app/error").permitAll()
                                 .requestMatchers("/app/auth/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
-                                .requestMatchers("/api/auth/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
                                 .anyRequest().authenticated())
                 ;
 

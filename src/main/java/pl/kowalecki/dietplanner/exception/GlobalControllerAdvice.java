@@ -1,17 +1,21 @@
 package pl.kowalecki.dietplanner.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import pl.kowalecki.dietplanner.IWebPageService;
 
 import java.util.Map;
 
 @ControllerAdvice
 @Slf4j
+@AllArgsConstructor
 public class GlobalControllerAdvice {
+
+    IWebPageService webPageService;
 
     @ExceptionHandler(Exception.class)
     public String handleGenericException(Exception e, Model model, HttpServletRequest request) {
@@ -24,6 +28,7 @@ public class GlobalControllerAdvice {
         log.error(e.getMessage(), e);
         log.error(errorMessage);
         model.addAttribute("error", "Wystąpił nieoczekiwany błąd.");
+        webPageService.addCommonWebData(model);
         return "pages/unlogged/errorPage";
     }
 }

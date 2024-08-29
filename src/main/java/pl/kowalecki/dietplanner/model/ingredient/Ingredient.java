@@ -17,31 +17,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 @Getter
 @Setter
-@Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "ingredients")
 public class Ingredient {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long ingredientId;
-
     private Double ingredientAmount;
-
     @Enumerated(EnumType.STRING)
     private IngredientUnit ingredientUnit;
-
     private Double measurementValue;
-
     @Enumerated(EnumType.STRING)
     private MeasurementType measurementType;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="id_ingredient_name")
     private IngredientName ingredientNameId;
-
-    @ManyToOne
-    @JoinColumn(name = "meal_id")
     @JsonBackReference
     private Meal meal;
 
