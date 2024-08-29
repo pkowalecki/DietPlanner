@@ -1,25 +1,28 @@
 package pl.kowalecki.dietplanner.controller.logged;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
+import org.apache.http.protocol.HTTP;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBody;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSectPr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import pl.kowalecki.dietplanner.IWebPageService;
+import pl.kowalecki.dietplanner.controller.helper.AddMealHelper;
 import pl.kowalecki.dietplanner.model.DTO.ResponseDTO;
 import pl.kowalecki.dietplanner.model.DTO.meal.AddMealRequestDTO;
-import pl.kowalecki.dietplanner.model.Meal;
 import pl.kowalecki.dietplanner.model.enums.MealType;
 import pl.kowalecki.dietplanner.model.ingredient.IngredientName;
 import pl.kowalecki.dietplanner.model.ingredient.ingredientAmount.IngredientUnit;
@@ -28,31 +31,25 @@ import pl.kowalecki.dietplanner.model.page.FoodBoardPageData;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
+import pl.kowalecki.dietplanner.utils.SerializationUtils;
 import pl.kowalecki.dietplanner.utils.UrlTools;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Controller
 @AllArgsConstructor
 @RequestMapping("/app/auth")
 public class MealPageController {
 
-    @Autowired
     IWebPageService webPageService;
-    @Autowired
     HttpSession session;
-    @Autowired
     private HttpSession httpSession;
-
+    AddMealHelper addMealHelper;
 
     @GetMapping(value = "/addMeal")
     public String getListMeal(Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
-        webPageService.addCommonWebData(model);
-        if (webPageService.isUserLoggedIn()) {
             String url = "http://" + UrlTools.apiUrl + "/auth/meal/getMealStarterPack";
             ResponseEntity<ResponseDTO> apiResponse = webPageService.sendGetRequest(url, ResponseDTO.class, request, httpResponse);
             if (apiResponse.getBody() != null && apiResponse.getBody().getStatus() == ResponseDTO.ResponseStatus.OK) {
@@ -64,14 +61,38 @@ public class MealPageController {
                     return "pages/logged/addMeal";
                 }
             }
-        }
+        webPageService.setErrorMsg("Wystąpił błąd podczas wczytywania zakładki");
         return "redirect:/app/auth/loggedUserBoard";
     }
 
     @PostMapping(value = "/addMeal")
-    public void addMeal(@RequestBody AddMealRequestDTO addMealRequestDTO, Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
+    public ResponseEntity<ResponseDTO> addMeal(@RequestBody AddMealRequestDTO addMealRequestDTO, Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
+        Map<String, String> errors = new HashMap<>();
+        errors = addMealHelper.checkData(addMealRequestDTO);
+        ResponseDTO responseDTO;
+        if (!errors.isEmpty()){
+            responseDTO = ResponseDTO.builder()
+                    .status(ResponseDTO.ResponseStatus.BADDATA)
+                    .data(errors)
+                    .build();
+            return new ResponseEntity<>( responseDTO, HttpStatus.OK);
+        }
+        String url = "http://" + UrlTools.apiUrl + "/auth/meal/addMeal";
+        ResponseEntity<ResponseDTO> apiResponse = webPageService.sendPostRequest(url, addMealRequestDTO, ResponseDTO.class, request, httpResponse);
 
+        if (apiResponse.getBody() != null && apiResponse.getBody().getStatus() == ResponseDTO.ResponseStatus.OK) {
+                responseDTO = ResponseDTO.builder()
+                        .status(ResponseDTO.ResponseStatus.OK)
+                        .message(apiResponse.getBody().getMessage()!=null?apiResponse.getBody().getMessage():"Meal created")
+                        .build();
+                return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        }
+        responseDTO = ResponseDTO.builder()
+                .status(ResponseDTO.ResponseStatus.ERROR)
+                .message("There was an error during API communication")
+                .build();
 
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
     private List<IngredientName> serializeAndReturnIngredientList(Object ingredientsNames) {

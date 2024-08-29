@@ -5,8 +5,23 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=0.9">
     <#include "starter.ftlh">
-    <link rel="icon" type="image/x-icon" href="../../favicon.ico" />
-    <link rel="stylesheet" href="../../static/css/headerNavbar.css">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="stylesheet" href="/static/css/headerNavbar.css">
+
+    <#if errorMsg?? && errorMsg != "">
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var swalContent = {};
+                swalContent = {
+                    title: "Error",
+                    text: '${errorMsg}',
+                    icon: "error",
+                    confirmButtonColor: "#052d73"
+                };
+                Swal.fire(swalContent);
+            });
+        </script>
+    </#if>
 </head>
 <body>
 <header>

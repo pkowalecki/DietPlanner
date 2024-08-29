@@ -176,3 +176,6 @@
     text-decoration: none;
     cursor: pointer;
 }
+.edit-ingredient, .remove-ingredient {
+    cursor: pointer;
+}

@@ -1,7 +1,6 @@
 package pl.kowalecki.dietplanner.model.ingredient;
 
 import com.fasterxml.jackson.annotation.*;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +11,6 @@ import pl.kowalecki.dietplanner.model.ingredient.ingredientMeasurement.Ingredien
 import pl.kowalecki.dietplanner.model.ingredient.ingredientMeasurement.MeasurementType;
 import pl.kowalecki.dietplanner.model.Meal;
 
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 @Getter
@@ -22,21 +20,17 @@ import java.util.regex.Pattern;
 public class Ingredient {
     private Long ingredientId;
     private Double ingredientAmount;
-    @Enumerated(EnumType.STRING)
     private IngredientUnit ingredientUnit;
     private Double measurementValue;
-    @Enumerated(EnumType.STRING)
     private MeasurementType measurementType;
     private IngredientName ingredientNameId;
     @JsonBackReference
     private Meal meal;
 
-
-    @Transient
     public Double sumTotalAmount(double d1, double d2){
         return (d1+d2);
     }
-    @Transient
+
     public static IngredientAmount getOnlyDoubleFromAmount(String totalAmount){
         totalAmount = totalAmount.replaceAll("\\s", "");
         String regex = "([0-9]+([,.][0-9]+)?)([a-zA-Z]+)";
@@ -55,7 +49,6 @@ public class Ingredient {
         return new IngredientAmount();
     }
 
-    @Transient
     public static IngredientMeasurement getOnlyDoubleFromMeasurement(String totalAmount){
         if(totalAmount == null){
             return new IngredientMeasurement();

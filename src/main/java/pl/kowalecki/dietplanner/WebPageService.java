@@ -2,11 +2,13 @@ package pl.kowalecki.dietplanner;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.formula.atp.Switch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.*;
@@ -15,13 +17,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import pl.kowalecki.dietplanner.model.DTO.ResponseDTO;
 import pl.kowalecki.dietplanner.model.DTO.User.LoginResponseDTO;
 import pl.kowalecki.dietplanner.model.DTO.User.UserDTO;
 import pl.kowalecki.dietplanner.security.jwt.AuthJwtUtils;
 import pl.kowalecki.dietplanner.utils.ClassMapper;
 
 import java.io.IOException;
+import java.util.Enumeration;
+import java.util.IllegalFormatCodePointException;
 import java.util.List;
+import java.util.Map;
 
 @Configuration
 @Slf4j
@@ -77,8 +83,35 @@ public class WebPageService implements IWebPageService {
 
 
     @Override
-    public void logUserAction(String username, String action) {
-
+    public void logUserAction(HttpServletRequest request) {
+        try {
+            HttpSession session = request.getSession(false);
+            String method = request.getMethod();
+            String uri = request.getRequestURI();
+            String remoteAddr = request.getRemoteAddr();
+            if (session != null) {
+                System.out.println("Remote address: " + remoteAddr);
+                UserDTO user = getLoggedUser();
+                if (user != null) {
+                    String username = user.getEmail();
+                    System.out.println("action: " + method + " on " + uri + " username: " + username);
+                    Enumeration<String> parameterNames = request.getParameterNames();
+                    while (parameterNames.hasMoreElements()) {
+                        String paramName = parameterNames.nextElement();
+                        String[] paramValues = request.getParameterValues(paramName);
+                        for (String value : paramValues) {
+                            System.out.println(paramName + ": " + value);
+                        }
+                    }
+                } else {
+                    System.out.println("No user in session. action: " + method + " on " + uri);
+                }
+            } else {
+                System.out.println("No session.action: " + method + " on " + uri);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -151,12 +184,6 @@ public class WebPageService implements IWebPageService {
         }
     }
 
-
-    @Override
-    public boolean isUserLoggedIn() {
-        return session.getAttribute("user") != null;
-    }
-
     @Override
     public UserDTO getLoggedUser() {
        LoginResponseDTO loginResponseDTO = classMapper.convertToDTO(session.getAttribute("user"), LoginResponseDTO.class);
@@ -175,9 +202,29 @@ public class WebPageService implements IWebPageService {
 
     @Override
     public void addCommonWebData(Model model) {
+        System.out.println("addCommonWebData");
         UserDTO user = getLoggedUser();
         if (user != null) {
             model.addAttribute("user", user);
         }
+        getErrorMsg(model);
     }
+
+    @Override
+    public void setErrorMsg(String errorMsg) {
+        session.setAttribute("errorMsg", errorMsg);
+    }
+
+    private void removeErrorMsg(){
+        session.removeAttribute("errorMsg");
+    }
+
+    private void getErrorMsg(Model model) {
+        String errorMsg = (String) session.getAttribute("errorMsg");
+        if (errorMsg != null) {
+            model.addAttribute("errorMsg", errorMsg);
+            removeErrorMsg();
+        }
+    }
+
 }

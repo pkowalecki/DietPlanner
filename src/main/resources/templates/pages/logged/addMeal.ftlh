@@ -38,7 +38,7 @@
                             id="mealTypesSelect" multiple>
                         <#list mealTypes as mealType>
                             <#if mealType??>
-                                <option value="${mealType}">${mealType.getMealTypePl()}</option>
+                                <option value="${mealType.getMealTypePl()}">${mealType.getMealTypePl()}</option>
                             </#if>
                         </#list>
                     </select>
@@ -49,6 +49,7 @@
             </div>
             <div class="mb-3 goCenter">
                 <a id="openIngredientModalBtn" href="#">Add Ingredient</a>
+                <div class="error-message" id="ingredientError"></div>
             </div>
             <button type="submit" id="submitButton" class="btn btn-primary mt-3">Submit</button>
     </div>
@@ -62,9 +63,9 @@
                 <button id="closeIngredientModal" type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             <div class="ingredientPackage">
-                <div class="ingredient">
+                <div class="ingredient" id="ingredient">
                     <label for="ingredientSelect" class="label">Ingredient</label>
-                    <select class="selectpicker" data-width="100%" data-live-search="true" name="ingredientNames" id="ingredientSelect">
+                    <select class="selectpicker" data-width="100%" data-live-search="true" name="ingredientNameId" id="ingredientSelect">
                         <#list ingredientsNames as ingredient>
                             <#if ingredient??>
                                 <option value="${ingredient.getId()}">${ingredient.getName()}</option>
@@ -78,10 +79,10 @@
                         <div class="inputs-container">
                             <input type="text" class="input shorten" id="ingredientAmount" name="ingredientAmount"
                                    required>
-                            <select class="selectpicker" data-width="55%" data-live-search="true"name="ingredientUnits" id="ingredientUnitsSelect">
+                            <select class="selectpicker" data-width="55%" data-live-search="true" name="ingredientUnits" id="ingredientUnitsSelect">
                                 <#list ingredientUnits as ingredientUnit>
                                     <#if ingredientUnit??>
-                                        <option value="${ingredientUnit}">${ingredientUnit.getShortName()}</option>
+                                        <option value="${ingredientUnit.getShortName()}">${ingredientUnit.getShortName()}</option>
                                     </#if>
                                 </#list>
                             </select>
@@ -95,7 +96,7 @@
                             <select class="selectpicker" data-width="70%" data-live-search="true" name="measurementTypes" id="measurementTypesSelect">
                                 <#list measurementTypes as measurementType>
                                     <#if measurementType??>
-                                        <option value="${measurementType}">${measurementType.getMeasurementName()}</option>
+                                        <option value="${measurementType.getMeasurementName()}">${measurementType.getMeasurementName()}</option>
                                     </#if>
                                 </#list>
                             </select>
@@ -112,7 +113,6 @@
     $(document).ready(function () {
 
         const jsIngredientsList = [];
-
         $("#openIngredientModalBtn").click(function (e) {
             e.preventDefault();
             openModal();
@@ -128,39 +128,100 @@
             addIngredient();
         });
 
-        $("#submitButton").click(function (e) {
-            e.preventDefault();
-            submitMeal();
-        });
-
         function openModal() {
             $("#ingredientModal").show();
         }
 
         function closeModal() {
             $("#ingredientModal").hide();
+            resetModal();
+        }
+
+        $("#submitButton").click(function (e) {
+            e.preventDefault();
+            resetErrors();
+            submitMeal();
+        });
+
+        function resetModal() {
+            // $("#ingredientSelect").val('').selectpicker('refresh');
+            $("#ingredientAmount").val('');
+            // $("#ingredientUnitsSelect").val('').selectpicker('refresh');
+            $("#measurementValue").val('');
+            // $("#measurementTypesSelect").val('').selectpicker('refresh');
+            $("#addIngredientBtn").show();
+            $("#updateIngredientBtn").hide();
         }
 
         function addIngredient() {
-            const ingredient = {
-                jsIngredientId: $("#ingredientSelect").val(),
-                jsIngredientName: $("#ingredientSelect option:selected").text(),
-                jsIngredientAmount: $("#ingredientAmount").val(),
-                jsIngredientUnit: $("#ingredientUnitsSelect").val(),
-                jsIngredientUnitText: $("#ingredientUnitsSelect option:selected").text(),
-                jsMeasurementValue: $("#measurementValue").val(),
-                jsMeasurementType: $("#measurementTypesSelect").val(),
-                jsMeasurementTypeText: $("#measurementTypesSelect option:selected").text()
-            };
+            const ingredient = getIngredientFromModal();
 
-            if (ingredient.jsIngredientId && ingredient.jsIngredientAmount && ingredient.jsIngredientUnit &&
-                ingredient.jsMeasurementValue && ingredient.jsMeasurementType) {
-
+            if (validateIngredient(ingredient)) {
                 jsIngredientsList.push(ingredient);
                 updateIngredientList();
-
+                closeModal();
             } else {
                 alert("Please fill in all fields before adding an ingredient.");
+            }
+        }
+
+        function getIngredientFromModal() {
+            const ingredient = {
+                ingredientNameId: $("#ingredientSelect").val(),
+                ingredientName: $("#ingredientSelect option:selected").text(),
+                ingredientAmount: $("#ingredientAmount").val(),
+                ingredientUnit: $("#ingredientUnitsSelect").val(),
+                ingredientUnitText: $("#ingredientUnitsSelect option:selected").text(),
+                measurementValue: $("#measurementValue").val(),
+                measurementType: $("#measurementTypesSelect").val(),
+                measurementTypeText: $("#measurementTypesSelect option:selected").text()
+            };
+            return ingredient;
+        }
+
+        function validateIngredient(ingredient) {
+            return ingredient.ingredientNameId && ingredient.ingredientAmount && ingredient.ingredientUnit &&
+                ingredient.measurementValue && ingredient.measurementType;
+        }
+
+        function updateIngredient(index) {
+            const ingredient = getIngredientFromModal();
+
+            if (validateIngredient(ingredient)) {
+                jsIngredientsList[index] = ingredient;
+                updateIngredientList();
+                closeModal();
+            } else {
+                alert("Please fill in all fields before updating an ingredient.");
+            }
+        }
+
+        function editIngredient(index) {
+            const ingredientEl = jsIngredientsList[index];
+
+            $("#ingredientSelect").val(ingredientEl.ingredientNameId).selectpicker('refresh');
+            $("#ingredientAmount").val(ingredientEl.ingredientAmount);
+            $("#ingredientUnitsSelect").val(ingredientEl.ingredientUnit).selectpicker('refresh');
+            $("#measurementValue").val(ingredientEl.measurementValue);
+            $("#measurementTypesSelect").val(ingredientEl.measurementType).selectpicker('refresh');
+
+            openModal();
+
+            $("#addIngredientBtn").hide();
+            const updateButton = $("#updateIngredientBtn");
+            if (updateButton.length === 0) {
+                $("<button>")
+                    .attr("id", "updateIngredientBtn")
+                    .addClass("btn btn-primary mt-3")
+                    .text("Update Ingredient")
+                    .insertAfter("#addIngredientBtn")
+                    .click(function () {
+                        updateIngredient(index);
+                    });
+            } else {
+                updateButton.off().click(function () {
+                    updateIngredient(index);
+                }).show();
             }
         }
 
@@ -176,30 +237,40 @@
             jsIngredientsList.forEach(function (ingredientEl, index) {
                 const ingredientDiv = $("<div>").addClass("ingredient-item").attr("id", "ingredient-" + index);
                 const ingredientDesc = $("<p>").html(
-                    "<strong>" + ingredientEl.jsIngredientName + "</strong>: " +
-                    ingredientEl.jsIngredientAmount +
-                    ingredientEl.jsIngredientUnitText + ", " +
-                    ingredientEl.jsMeasurementValue + " " +
-                    ingredientEl.jsMeasurementTypeText
+                    "<strong>" + ingredientEl.ingredientName + "</strong>: " +
+                    ingredientEl.ingredientAmount +
+                    ingredientEl.ingredientUnitText + ", " +
+                    ingredientEl.measurementValue + " " +
+                    ingredientEl.measurementTypeText
                 );
 
-                const removeIcon = $("<span>")
-                    .html("&times;")
-                    .addClass("remove-ingredient")
+                const editButton = $("<i>")
+                    .addClass("fa fa-edit edit-ingredient")
+                    .css("padding", "0px 5px")
                     .attr("data-index", index)
-                    .css({
-                        color: "red",
-                        cursor: "pointer",
-                        fontWeight: "bold",
-                        marginLeft: "10px"
-                    })
+                    .click(function () {
+                        editIngredient(index);
+                    });
+
+                const removeButton = $("<i>")
+                    .addClass("fa fa-times remove-ingredient")
+                    .css("color", "red")
+                    .attr("data-index", index)
                     .click(function () {
                         removeIngredient(index);
                     });
 
-                ingredientDiv.append(ingredientDesc).append(removeIcon);
+                ingredientDesc.append(editButton, removeButton);
+
+                ingredientDiv.append(ingredientDesc);
                 ingredientList.append(ingredientDiv);
+
             });
+        }
+
+        function resetErrors() {
+            $(".error-message").text("");
+            $(".form-control").removeClass('is-invalid');
         }
 
         function submitMeal() {
@@ -209,15 +280,7 @@
                 recipe: $("#recipe").val(),
                 notes: $("#notes").val(),
                 mealTypes: $("#mealTypesSelect").val(),
-                ingredients: jsIngredientsList.map(function (ingredient) {
-                    return {
-                        ingredientAmount: parseFloat(ingredient.jsIngredientAmount),
-                        ingredientUnit: ingredient.jsIngredientUnit,
-                        measurementValue: parseFloat(ingredient.jsMeasurementValue),
-                        measurementType: ingredient.jsMeasurementType,
-                        ingredientNameId: parseInt(ingredient.jsIngredientId)
-                    };
-                })
+                ingredients: jsIngredientsList
             };
 
             $.ajax({
@@ -226,16 +289,21 @@
                 contentType: 'application/json',
                 data: JSON.stringify(mealData),
                 success: function (response) {
-                    alert("Meal added successfully!");
-                    // window.location.href = "/jakisRedir";
+                    if (response.status === 'BADDATA') {
+                        const errors = response.data;
+                        for (const field in errors) {
+                            $('#' + field + 'Error').text(errors[field]);
+                            $('#' + field).addClass('is-invalid');
+                        }
+                    } else if (response.status === 'OK') {
+                        console.log("Meal added successfully");
+                    }
                 },
-                error: function (xhr, status, error) {
-                    console.error("Error adding meal: ", error);
-                    alert("There was an error adding your meal. Please try again.");
+                error: function () {
+                    alert('An error occurred while processing your request.');
                 }
             });
         }
-
     });
 </script>
 <#include "../../webData/footer.ftlh">

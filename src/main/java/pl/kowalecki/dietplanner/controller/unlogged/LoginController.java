@@ -44,8 +44,6 @@ public class LoginController{
                         httpResponse.addHeader(HttpHeaders.SET_COOKIE, cookieHeader);
                     }
                 }
-                session.setAttribute("user", responseDTO.getData().get("user"));
-                webPageService.addCommonWebData(model);
                 return "redirect:/app/auth/loggedUserBoard";
             } else {
                 model.addAttribute("error", "Invalid email or password");

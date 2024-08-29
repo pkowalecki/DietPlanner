@@ -6,7 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import pl.kowalecki.dietplanner.IWebPageService;
+import pl.kowalecki.dietplanner.model.DTO.User.UserDTO;
 
 import java.util.Map;
 
@@ -16,6 +18,11 @@ import java.util.Map;
 public class GlobalControllerAdvice {
 
     IWebPageService webPageService;
+
+    @ModelAttribute
+    public void addCommonWebData(Model model) {
+        webPageService.addCommonWebData(model);
+    }
 
     @ExceptionHandler(Exception.class)
     public String handleGenericException(Exception e, Model model, HttpServletRequest request) {

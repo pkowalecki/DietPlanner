@@ -1,7 +1,5 @@
 package pl.kowalecki.dietplanner.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
 import lombok.*;
 import pl.kowalecki.dietplanner.model.enums.MealType;
 import pl.kowalecki.dietplanner.model.ingredient.Ingredient;
