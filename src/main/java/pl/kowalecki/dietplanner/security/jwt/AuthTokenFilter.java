@@ -73,6 +73,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            //TODO logowanie później
+//            webPageService.logUserAction(request);
         }
         filterChain.doFilter(request, response);
     }

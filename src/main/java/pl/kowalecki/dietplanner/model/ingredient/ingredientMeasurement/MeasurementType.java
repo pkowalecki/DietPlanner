@@ -1,5 +1,6 @@
 package pl.kowalecki.dietplanner.model.ingredient.ingredientMeasurement;
 
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +46,13 @@ public enum MeasurementType {
             measurementTypeListHashMap.put(measurementType, measurementTypes);
         }
         return measurementTypeListHashMap;
+    }
+
+    public static MeasurementType getByName(String name) {
+        for (MeasurementType measurementType : values()) {
+            if (measurementType.getMeasurementName().equals(name)) return measurementType;
+        }
+        return null;
     }
 
 

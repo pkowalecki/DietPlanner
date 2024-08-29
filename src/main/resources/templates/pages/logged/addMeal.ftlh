@@ -38,7 +38,7 @@
                             id="mealTypesSelect" multiple>
                         <#list mealTypes as mealType>
                             <#if mealType??>
-                                <option value="${mealType}">${mealType.getMealTypePl()}</option>
+                                <option value="${mealType.getMealTypePl()}">${mealType.getMealTypePl()}</option>
                             </#if>
                         </#list>
                     </select>
@@ -49,6 +49,7 @@
             </div>
             <div class="mb-3 goCenter">
                 <a id="openIngredientModalBtn" href="#">Add Ingredient</a>
+                <div class="error-message" id="ingredientError"></div>
             </div>
             <button type="submit" id="submitButton" class="btn btn-primary mt-3">Submit</button>
     </div>
@@ -62,9 +63,9 @@
                 <button id="closeIngredientModal" type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             <div class="ingredientPackage">
-                <div class="ingredient">
+                <div class="ingredient" id="ingredient">
                     <label for="ingredientSelect" class="label">Ingredient</label>
-                    <select class="selectpicker" data-width="100%" data-live-search="true" name="ingredientNames" id="ingredientSelect">
+                    <select class="selectpicker" data-width="100%" data-live-search="true" name="ingredientNameId" id="ingredientSelect">
                         <#list ingredientsNames as ingredient>
                             <#if ingredient??>
                                 <option value="${ingredient.getId()}">${ingredient.getName()}</option>
@@ -78,10 +79,10 @@
                         <div class="inputs-container">
                             <input type="text" class="input shorten" id="ingredientAmount" name="ingredientAmount"
                                    required>
-                            <select class="selectpicker" data-width="55%" data-live-search="true"name="ingredientUnits" id="ingredientUnitsSelect">
+                            <select class="selectpicker" data-width="55%" data-live-search="true" name="ingredientUnits" id="ingredientUnitsSelect">
                                 <#list ingredientUnits as ingredientUnit>
                                     <#if ingredientUnit??>
-                                        <option value="${ingredientUnit}">${ingredientUnit.getShortName()}</option>
+                                        <option value="${ingredientUnit.getShortName()}">${ingredientUnit.getShortName()}</option>
                                     </#if>
                                 </#list>
                             </select>
@@ -95,7 +96,7 @@
                             <select class="selectpicker" data-width="70%" data-live-search="true" name="measurementTypes" id="measurementTypesSelect">
                                 <#list measurementTypes as measurementType>
                                     <#if measurementType??>
-                                        <option value="${measurementType}">${measurementType.getMeasurementName()}</option>
+                                        <option value="${measurementType.getMeasurementName()}">${measurementType.getMeasurementName()}</option>
                                     </#if>
                                 </#list>
                             </select>
@@ -165,21 +166,22 @@
         }
 
         function getIngredientFromModal() {
-            return {
-                jsIngredientId: $("#ingredientSelect").val(),
-                jsIngredientName: $("#ingredientSelect option:selected").text(),
-                jsIngredientAmount: $("#ingredientAmount").val(),
-                jsIngredientUnit: $("#ingredientUnitsSelect").val(),
-                jsIngredientUnitText: $("#ingredientUnitsSelect option:selected").text(),
-                jsMeasurementValue: $("#measurementValue").val(),
-                jsMeasurementType: $("#measurementTypesSelect").val(),
-                jsMeasurementTypeText: $("#measurementTypesSelect option:selected").text()
+            const ingredient = {
+                ingredientNameId: $("#ingredientSelect").val(),
+                ingredientName: $("#ingredientSelect option:selected").text(),
+                ingredientAmount: $("#ingredientAmount").val(),
+                ingredientUnit: $("#ingredientUnitsSelect").val(),
+                ingredientUnitText: $("#ingredientUnitsSelect option:selected").text(),
+                measurementValue: $("#measurementValue").val(),
+                measurementType: $("#measurementTypesSelect").val(),
+                measurementTypeText: $("#measurementTypesSelect option:selected").text()
             };
+            return ingredient;
         }
 
         function validateIngredient(ingredient) {
-            return ingredient.jsIngredientId && ingredient.jsIngredientAmount && ingredient.jsIngredientUnit &&
-                ingredient.jsMeasurementValue && ingredient.jsMeasurementType;
+            return ingredient.ingredientNameId && ingredient.ingredientAmount && ingredient.ingredientUnit &&
+                ingredient.measurementValue && ingredient.measurementType;
         }
 
         function updateIngredient(index) {
@@ -197,11 +199,11 @@
         function editIngredient(index) {
             const ingredientEl = jsIngredientsList[index];
 
-            $("#ingredientSelect").val(ingredientEl.jsIngredientId).selectpicker('refresh');
-            $("#ingredientAmount").val(ingredientEl.jsIngredientAmount);
-            $("#ingredientUnitsSelect").val(ingredientEl.jsIngredientUnit).selectpicker('refresh');
-            $("#measurementValue").val(ingredientEl.jsMeasurementValue);
-            $("#measurementTypesSelect").val(ingredientEl.jsMeasurementType).selectpicker('refresh');
+            $("#ingredientSelect").val(ingredientEl.ingredientNameId).selectpicker('refresh');
+            $("#ingredientAmount").val(ingredientEl.ingredientAmount);
+            $("#ingredientUnitsSelect").val(ingredientEl.ingredientUnit).selectpicker('refresh');
+            $("#measurementValue").val(ingredientEl.measurementValue);
+            $("#measurementTypesSelect").val(ingredientEl.measurementType).selectpicker('refresh');
 
             openModal();
 
@@ -235,16 +237,16 @@
             jsIngredientsList.forEach(function (ingredientEl, index) {
                 const ingredientDiv = $("<div>").addClass("ingredient-item").attr("id", "ingredient-" + index);
                 const ingredientDesc = $("<p>").html(
-                    "<strong>" + ingredientEl.jsIngredientName + "</strong>: " +
-                    ingredientEl.jsIngredientAmount +
-                    ingredientEl.jsIngredientUnitText + ", " +
-                    ingredientEl.jsMeasurementValue + " " +
-                    ingredientEl.jsMeasurementTypeText
+                    "<strong>" + ingredientEl.ingredientName + "</strong>: " +
+                    ingredientEl.ingredientAmount +
+                    ingredientEl.ingredientUnitText + ", " +
+                    ingredientEl.measurementValue + " " +
+                    ingredientEl.measurementTypeText
                 );
 
                 const editButton = $("<i>")
                     .addClass("fa fa-edit edit-ingredient")
-                    .css("margin-right", "10px")
+                    .css("padding", "0px 5px")
                     .attr("data-index", index)
                     .click(function () {
                         editIngredient(index);

@@ -8,6 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class IngredientDTO {
+    private String ingredientName;
     private Double ingredientAmount;
     private String ingredientUnit;
     private Double measurementValue;

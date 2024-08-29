@@ -1,7 +1,10 @@
 package pl.kowalecki.dietplanner.model.ingredient.ingredientAmount;
 
+import lombok.Getter;
+
 import java.util.*;
 
+@Getter
 public enum IngredientUnit {
     GRAM("gram", "g"),
     MILILITR("mililitrów", "ml"),
@@ -15,16 +18,8 @@ public enum IngredientUnit {
         this.shortName = shortName;
     }
 
-    public String getFullName() {
-        return fullName;
-    }
-
     public void setFullName(String fullName) {
         this.fullName = fullName;
-    }
-
-    public String getShortName() {
-        return shortName;
     }
 
     public void setShortName(String shortName) {

@@ -48,8 +48,7 @@ public class RegisterHelper {
 
     private void checkEmail(String email) {
         if (!TextTools.isTextLengthOk(email, 5, 50)) {
-            errors.put(RegisterPole.EMAIL.getFieldName(), "Length must be between 5-50");
-            return;
+            errors.put(RegisterPole.EMAIL.getFieldName(), "Length must be between 5-50");;
         }
         //TODO TO ROBI API
 //        if (userService.existsUserByEmail(email)) errors.put(RegisterPole.EMAIL.getFieldName(), "Email address already exists");

@@ -65,6 +65,7 @@ public class WebSecurityConfig{
                                 .requestMatchers("/", "/app/").permitAll()
                                 .requestMatchers("/static/**").permitAll()
                                 .requestMatchers("/app/error").permitAll()
+                                .requestMatchers("/favicon.ico").permitAll()
                                 .requestMatchers("/app/auth/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
                                 .anyRequest().authenticated())
                 ;
