@@ -5,6 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 public class ClassMapper {
 
@@ -13,5 +16,10 @@ public class ClassMapper {
 
     public <T> T convertToDTO(Object o, Class<T> klaseu){
         return objectMapper.convertValue(o, klaseu);
+    }
+    public <T> List<T> convertToDTOList(List<?> list, Class<T> klaseu){
+        return list.stream()
+                .map(element -> objectMapper.convertValue(element, klaseu))
+                .collect(Collectors.toList());
     }
 }
