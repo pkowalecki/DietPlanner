@@ -35,7 +35,6 @@ public class GlobalControllerAdvice {
         log.error(e.getMessage(), e);
         log.error(errorMessage);
         model.addAttribute("error", "Wystąpił nieoczekiwany błąd.");
-        webPageService.addCommonWebData(model);
         return "pages/unlogged/errorPage";
     }
 }

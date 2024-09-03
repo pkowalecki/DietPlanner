@@ -23,6 +23,7 @@ import pl.kowalecki.dietplanner.IWebPageService;
 import pl.kowalecki.dietplanner.controller.helper.AddMealHelper;
 import pl.kowalecki.dietplanner.model.DTO.ResponseDTO;
 import pl.kowalecki.dietplanner.model.DTO.meal.AddMealRequestDTO;
+import pl.kowalecki.dietplanner.model.Meal;
 import pl.kowalecki.dietplanner.model.enums.MealType;
 import pl.kowalecki.dietplanner.model.ingredient.IngredientName;
 import pl.kowalecki.dietplanner.model.ingredient.ingredientAmount.IngredientUnit;
@@ -31,6 +32,7 @@ import pl.kowalecki.dietplanner.model.page.FoodBoardPageData;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
+import pl.kowalecki.dietplanner.utils.ClassMapper;
 import pl.kowalecki.dietplanner.utils.SerializationUtils;
 import pl.kowalecki.dietplanner.utils.UrlTools;
 
@@ -43,6 +45,7 @@ import java.util.*;
 @RequestMapping("/app/auth")
 public class MealPageController {
 
+    private final ClassMapper classMapper;
     IWebPageService webPageService;
     HttpSession session;
     private HttpSession httpSession;
@@ -136,8 +139,17 @@ public class MealPageController {
     }
 
     @GetMapping(value = "/generateMealBoard")
-    public String mealPage(Model model) {
+    public String mealPage(Model model, HttpServletRequest request, HttpServletResponse response) {
         webPageService.addCommonWebData(model);
+        String url = "http://" + UrlTools.apiUrl + "/auth/meal/allMeal";
+        ResponseEntity<ResponseDTO> apiResponse = webPageService.sendGetRequest(url, ResponseDTO.class, request, response);
+        if (apiResponse.getBody() != null && apiResponse.getBody().getStatus() == ResponseDTO.ResponseStatus.OK) {
+            if (!apiResponse.getBody().getData().isEmpty()) {
+                List<?> mealMapList = (List<?>) apiResponse.getBody().getData().get("mealList");
+                List<Meal> mealList = classMapper.convertToDTOList(mealMapList, Meal.class);
+                model.addAttribute("mealList", mealList);
+            }
+        }
         //FIXME TO ROBI API
 //        List<Meal> mealList = mealRepository.findAll();
 //        model.addAttribute("mealList", mealList);

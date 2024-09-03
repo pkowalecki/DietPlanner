@@ -54,28 +54,28 @@
                                     <#if row == 1>
                                         <#list meal.getMealTypes() as type>
                                             <#if type.getMealTypenEn() == "breakfast" || type.getMealTypenEn() == "supper">
-                                                <option value="${meal.getId()}">${meal.getName()}</option>
+                                                <option value="${meal.getMealId()}">${meal.getName()}</option>
                                             </#if>
                                         </#list>
                                     </#if>
                                     <#if row == 2>
                                         <#list meal.getMealTypes() as type>
                                             <#if type.getMealTypenEn() == "snack">
-                                                <option value="${meal.getId()}">${meal.getName()}</option>
+                                                <option value="${meal.getMealId()}">${meal.getName()}</option>
                                             </#if>
                                         </#list>
                                     </#if>
                                     <#if row == 3>
                                         <#list meal.getMealTypes() as type>
                                             <#if type.getMealTypenEn() == "lunch">
-                                                <option value="${meal.getId()}">${meal.getName()}</option>
+                                                <option value="${meal.getMealId()}">${meal.getName()}</option>
                                             </#if>
                                         </#list>
                                     </#if>
                                     <#if row == 4>
                                         <#list meal.getMealTypes() as type>
                                             <#if type.getMealTypenEn() == "breakfast" || type.getMealTypenEn() == "supper">
-                                                <option value="${meal.getId()}">${meal.getName()}</option>
+                                                <option value="${meal.getMealId()}">${meal.getName()}</option>
                                             </#if>
                                         </#list>
                                     </#if>
