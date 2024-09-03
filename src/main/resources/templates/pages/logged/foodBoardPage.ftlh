@@ -21,7 +21,7 @@
 </style>
 
 <div class="">
-    <form name="form" action="/generateMealBoard" method="POST">
+    <form name="form" action="/app/auth/generateMealBoard" method="POST">
         <table>
             <thead>
             <tr>
@@ -48,7 +48,7 @@
                         <#if row ==4 && column ==1>
                             <td class="foodType">Kolacja</td></#if>
                         <td>
-                            <select class="selectpicker" data-live-search="true" name="mealValues">
+                            <select class="selectpicker" data-live-search="true" name="mealIds">
                                 <option id="0" name="0" value="0">-</option>
                                 <#list mealList as meal>
                                     <#if row == 1>

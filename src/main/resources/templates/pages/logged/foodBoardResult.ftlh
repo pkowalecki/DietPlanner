@@ -1,4 +1,4 @@
-<#include "../webData/header.ftlh">
+<#include "../../webData/header.ftlh">
     <style>
         .container{
             padding: 5px 5px 5px 5px;
@@ -76,4 +76,4 @@
     }
 </script>
 
-<#include "../webData/footer.ftlh">
+<#include "../../webData/footer.ftlh">
