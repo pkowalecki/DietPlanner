@@ -34,8 +34,8 @@
     <br/>
     <div class="ingredients-owned">
     </div>
-    <form action="/downloadMealDocument" method="post">
-        <input type="hidden" name="ids" value="${idsList?join(',')}"/>
+    <form action="/app/auth/downloadMealDocument" method="post">
+        <input type="hidden" name="mealIds" value="${idsList?join(',')}"/>
         <button type="submit">Pobierz dokument</button>
     </form>
 </div>

@@ -151,9 +151,6 @@ public class MealPageController {
                 model.addAttribute("mealList", mealList);
             }
         }
-        //FIXME TO ROBI API
-//        List<Meal> mealList = mealRepository.findAll();
-//        model.addAttribute("mealList", mealList);
         return "pages/logged/foodBoardPage";
     }
 
