@@ -156,18 +156,28 @@ public class WebPageService implements IWebPageService {
                     httpResponse.addHeader(HttpHeaders.SET_COOKIE, cookieHeader);
                 }
             }
-
-//            log.info("Received response from {}: {}", url, response.getBody());
-            if (response.getHeaders().getContentType().includes(MediaType.APPLICATION_JSON)) {
-                T body = new ObjectMapper().readValue(response.getBody(), responseType);
-                return new ResponseEntity<>(body, response.getStatusCode());
-            } else if (response.getHeaders().getContentType().includes(MediaType.TEXT_PLAIN)) {
-                T body = (T) response.getBody();
-                return new ResponseEntity<>(body, response.getStatusCode());
-            } else {
-                log.error("Unexpected content type: {}", response.getHeaders().getContentType());
-                throw new HttpClientErrorException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Unsupported Media Type");
+            MediaType contentType = response.getHeaders().getContentType();
+            if (contentType != null) {
+                //            log.info("Received response from {}: {}", url, response.getBody());
+                if (contentType.includes(MediaType.APPLICATION_JSON)) {
+                    T body = new ObjectMapper().readValue(response.getBody(), responseType);
+                    return new ResponseEntity<>(body, response.getStatusCode());
+                } else if (contentType.includes(MediaType.TEXT_PLAIN)) {
+                    T body = (T) new String(response.getBody());
+                    return new ResponseEntity<>(body, response.getStatusCode());
+                } else if(contentType.includes(MediaType.APPLICATION_OCTET_STREAM)){
+                    //FIXME getBody(), czy getBody().getBytes() - sprawdzić
+                    T body = (T) response.getBody();
+                    return new ResponseEntity<>(body, response.getStatusCode());
+                }else {
+                    log.error("Unexpected content type: {}", response.getHeaders().getContentType());
+                    throw new HttpClientErrorException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Unsupported Media Type");
+                }
+            }else {
+                log.error("Response content type is null!");
+                throw new HttpClientErrorException(HttpStatus.NO_CONTENT, "No content");
             }
+
         } catch (HttpClientErrorException e) {
             HttpStatusCode status = e.getStatusCode();
             T body = null;

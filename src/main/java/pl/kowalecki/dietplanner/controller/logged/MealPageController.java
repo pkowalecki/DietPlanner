@@ -1,6 +1,7 @@
 package pl.kowalecki.dietplanner.controller.logged;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -37,6 +38,7 @@ import pl.kowalecki.dietplanner.utils.UrlTools;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Controller
@@ -52,17 +54,17 @@ public class MealPageController {
 
     @GetMapping(value = "/addMeal")
     public String getListMeal(Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
-            String url = "http://" + UrlTools.apiUrl + "/auth/meal/getMealStarterPack";
-            ResponseEntity<ResponseDTO> apiResponse = webPageService.sendGetRequest(url, ResponseDTO.class, request, httpResponse);
-            if (apiResponse.getBody() != null && apiResponse.getBody().getStatus() == ResponseDTO.ResponseStatus.OK) {
-                if (!apiResponse.getBody().getData().isEmpty()) {
-                    model.addAttribute("ingredientsNames", serializeAndReturnIngredientList(apiResponse.getBody().getData().get("ingredientsNames")));
-                    model.addAttribute("mealTypes", serializeAndReturnMealTypeList(apiResponse.getBody().getData().get("mealTypes")));
-                    model.addAttribute("ingredientUnits", serializeAndReturnIngredientUnitList(apiResponse.getBody().getData().get("ingredientUnits")));
-                    model.addAttribute("measurementTypes", serializeAndReturnMeasurementTypeList(apiResponse.getBody().getData().get("measurementTypes")));
-                    return "pages/logged/addMeal";
-                }
+        String url = "http://" + UrlTools.apiUrl + "/auth/meal/getMealStarterPack";
+        ResponseEntity<ResponseDTO> apiResponse = webPageService.sendGetRequest(url, ResponseDTO.class, request, httpResponse);
+        if (apiResponse.getBody() != null && apiResponse.getBody().getStatus() == ResponseDTO.ResponseStatus.OK) {
+            if (!apiResponse.getBody().getData().isEmpty()) {
+                model.addAttribute("ingredientsNames", serializeAndReturnIngredientList(apiResponse.getBody().getData().get("ingredientsNames")));
+                model.addAttribute("mealTypes", serializeAndReturnMealTypeList(apiResponse.getBody().getData().get("mealTypes")));
+                model.addAttribute("ingredientUnits", serializeAndReturnIngredientUnitList(apiResponse.getBody().getData().get("ingredientUnits")));
+                model.addAttribute("measurementTypes", serializeAndReturnMeasurementTypeList(apiResponse.getBody().getData().get("measurementTypes")));
+                return "pages/logged/addMeal";
             }
+        }
         webPageService.setErrorMsg("Wystąpił błąd podczas wczytywania zakładki");
         return "redirect:/app/auth/loggedUserBoard";
     }
@@ -72,22 +74,22 @@ public class MealPageController {
         Map<String, String> errors = new HashMap<>();
         errors = addMealHelper.checkData(addMealRequestDTO);
         ResponseDTO responseDTO;
-        if (!errors.isEmpty()){
+        if (!errors.isEmpty()) {
             responseDTO = ResponseDTO.builder()
                     .status(ResponseDTO.ResponseStatus.BADDATA)
                     .data(errors)
                     .build();
-            return new ResponseEntity<>( responseDTO, HttpStatus.OK);
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         }
         String url = "http://" + UrlTools.apiUrl + "/auth/meal/addMeal";
         ResponseEntity<ResponseDTO> apiResponse = webPageService.sendPostRequest(url, addMealRequestDTO, ResponseDTO.class, request, httpResponse);
 
         if (apiResponse.getBody() != null && apiResponse.getBody().getStatus() == ResponseDTO.ResponseStatus.OK) {
-                responseDTO = ResponseDTO.builder()
-                        .status(ResponseDTO.ResponseStatus.OK)
-                        .message(apiResponse.getBody().getMessage()!=null?apiResponse.getBody().getMessage():"Meal created")
-                        .build();
-                return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+            responseDTO = ResponseDTO.builder()
+                    .status(ResponseDTO.ResponseStatus.OK)
+                    .message(apiResponse.getBody().getMessage() != null ? apiResponse.getBody().getMessage() : "Meal created")
+                    .build();
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         }
         responseDTO = ResponseDTO.builder()
                 .status(ResponseDTO.ResponseStatus.ERROR)
@@ -179,150 +181,11 @@ public class MealPageController {
         }
         return "pages/logged/foodBoardResult";
     }
-    //FIXME ODDZIELIĆ WEB OD API
-//    @PostMapping(value = "/downloadMealDocument")
-//    public ResponseEntity<byte[]> downloadMealDocument(@RequestParam List<Long> ids) throws IOException {
-//        List<String> mealNames = mealRepositoryImpl.getMealNamesByIdList(ids);
-//
-//        try (XWPFDocument document = new XWPFDocument(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-//            setPageOrientationLandscape(document);
-//            XWPFTable table = createTableWithHeaders(document);
-//            fillTableWithMeals(table, mealNames);
-//
-//            document.write(out);
-//            HttpHeaders headers = createHttpHeaders();
-//
-//            return ResponseEntity
-//                    .ok()
-//                    .headers(headers)
-//                    .body(out.toByteArray());
-//        }
-//    }
 
-    private void fillTableWithMeals(XWPFTable table, List<String> mealNames) {
-        int mealIndex = 0;
-        String[] mealTypes = {"Śniadanie", "Przekąska", "Obiad", "Kolacja"};
-
-        for (int rowIndex = 1; rowIndex <= mealTypes.length; rowIndex++) {
-            XWPFTableRow row = table.getRow(rowIndex);
-            for (int colIndex = 1; colIndex <= 7; colIndex++) {
-                XWPFTableCell cell = row.getCell(colIndex);
-                if (cell == null) {
-                    cell = row.addNewTableCell();
-                }
-                if (mealIndex < mealNames.size()) {
-                    String mealName = mealNames.get(mealIndex);
-                    cell.setText(mealName.equals("-") || mealName.isEmpty() ? "" : mealName);
-                    mealIndex++;
-                } else {
-                    cell.setText("");
-                }
-            }
-        }
-    }
-
-    private HttpHeaders createHttpHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData("attachment", "jedzonko.docx");
-        return headers;
-    }
-
-    private XWPFTable createTableWithHeaders(XWPFDocument document) {
-        XWPFTable table = document.createTable(5, 8);
-
-        String[] daysOfWeek = {"", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"};
-        XWPFTableRow headerRow = table.getRow(0);
-        for (int colIndex = 0; colIndex < daysOfWeek.length; colIndex++) {
-            XWPFTableCell cell = headerRow.getCell(colIndex);
-            if (cell == null) {
-                cell = headerRow.addNewTableCell();
-            }
-            cell.setText(daysOfWeek[colIndex]);
-            centerCellContent(cell);
-            if (colIndex == 0) {
-                removeCellBorders(cell, true, true, true, true);
-            } else {
-                removeCellBorders(cell, true, true, false, true);
-            }
-        }
-
-        String[] mealTypes = {"Śniadanie", "Przekąska", "Obiad", "Kolacja"};
-        for (int rowIndex = 1; rowIndex <= mealTypes.length; rowIndex++) {
-            XWPFTableRow row = table.getRow(rowIndex);
-            XWPFTableCell cell = row.getCell(0);
-            if (cell == null) {
-                cell = row.addNewTableCell();
-            }
-            cell.setText(mealTypes[rowIndex - 1]);
-            centerCellContent(cell);
-            removeCellBorders(cell, true, false, true, true);
-        }
-
-        return table;
-    }
-
-
-    private void removeCellBorders(XWPFTableCell cell, boolean top, boolean right, boolean bottom, boolean left) {
-        CTTc ctTc = cell.getCTTc();
-        CTTcPr tcPr = ctTc.getTcPr();
-        if (tcPr == null) {
-            tcPr = ctTc.addNewTcPr();
-        }
-        CTTcBorders borders = tcPr.getTcBorders();
-        if (borders == null) {
-            borders = tcPr.addNewTcBorders();
-        }
-        if (top) {
-            CTBorder topBorder = borders.addNewTop();
-            topBorder.setVal(STBorder.NONE);
-            topBorder.setSz(BigInteger.valueOf(0));
-        }
-        if (right) {
-            CTBorder rightBorder = borders.addNewRight();
-            rightBorder.setVal(STBorder.NONE);
-            rightBorder.setSz(BigInteger.valueOf(0));
-        }
-        if (bottom) {
-            CTBorder bottomBorder = borders.addNewBottom();
-            bottomBorder.setVal(STBorder.NONE);
-            bottomBorder.setSz(BigInteger.valueOf(0));
-        }
-        if (left) {
-            CTBorder leftBorder = borders.addNewLeft();
-            leftBorder.setVal(STBorder.NONE);
-            leftBorder.setSz(BigInteger.valueOf(0));
-        }
-    }
-
-    private void setPageOrientationLandscape(XWPFDocument document) {
-        CTBody body = document.getDocument().getBody();
-        if (!body.isSetSectPr()) {
-            body.addNewSectPr();
-        }
-        CTSectPr section = body.getSectPr();
-        if (!section.isSetPgSz()) {
-            section.addNewPgSz();
-        }
-        CTPageSz pageSize = section.getPgSz();
-        pageSize.setOrient(STPageOrientation.LANDSCAPE);
-        pageSize.setW(BigInteger.valueOf(16840));
-        pageSize.setH(BigInteger.valueOf(11900));
-    }
-
-    private void centerCellContent(XWPFTableCell cell) {
-        for (XWPFParagraph paragraph : cell.getParagraphs()) {
-            paragraph.setAlignment(ParagraphAlignment.CENTER);
-        }
-
-        CTTc ctTc = cell.getCTTc();
-        CTTcPr tcPr = ctTc.getTcPr();
-        if (tcPr == null) {
-            tcPr = ctTc.addNewTcPr();
-        }
-        if (!tcPr.isSetVAlign()) {
-            tcPr.addNewVAlign();
-        }
-        tcPr.getVAlign().setVal(STVerticalJc.CENTER);
+    @PostMapping(value = "/downloadMealDocument")
+    public void downloadMealDocument(@RequestParam("mealIds") List<Long> ids, HttpServletRequest request, HttpServletResponse response) {
+        String url = "http://" + UrlTools.apiUrl + "/auth/meal/downloadMealDocument";
+        ResponseEntity<byte[]> apiResponse = webPageService.sendPostRequest(url, ids, byte[].class, request, response);
+        //Todo tu będzie blok obsługi dokumentu z api
     }
 }
