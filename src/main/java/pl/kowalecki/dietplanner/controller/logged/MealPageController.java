@@ -18,6 +18,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
 import pl.kowalecki.dietplanner.controller.helper.AddMealHelper;
+import pl.kowalecki.dietplanner.model.DTO.FoodBoardPageRequest;
+import pl.kowalecki.dietplanner.model.DTO.IngredientToBuyDTO;
 import pl.kowalecki.dietplanner.model.DTO.ResponseDTO;
 import pl.kowalecki.dietplanner.model.DTO.meal.AddMealRequestDTO;
 import pl.kowalecki.dietplanner.model.Meal;
@@ -153,17 +155,28 @@ public class MealPageController {
     }
 
     @PostMapping(value = "/generateMealBoard")
-    public String resultPage(Model model, HttpSession httpSession, HttpServletRequest req, HttpServletResponse resp, @ModelAttribute("form") FoodBoardPageData form) {
-        List<Long> idsList = form.getMealValues();
-        //FIXME TO ROBI API
-//        List<String> mealNames = mealRepositoryImpl.getMealNamesByIdList(idsList);
-//        List<Meal> meal = mealRepository.findMealsByMealIdIn(idsList);
-//
-//        model.addAttribute("result", mealRepositoryImpl.getMealIngredientsFinalList(idsList, form.getMultiplier()));
-//        model.addAttribute("meals", meal);
-//        model.addAttribute("idsList", idsList);
-//        model.addAttribute("mealNames", mealNames);
-        return "pages/foodBoardResult";
+    public String resultPage(Model model, HttpServletRequest request, HttpServletResponse response, @ModelAttribute("form") FoodBoardPageData form) {
+        FoodBoardPageRequest apiReq = new FoodBoardPageRequest();
+        apiReq.setMealIds(form.getMealIds());
+        apiReq.setMultiplier(form.getMultiplier());
+        String url = "http://" + UrlTools.apiUrl + "/auth/meal/generateFoodBoard";
+        ResponseEntity<ResponseDTO> apiResponse = webPageService.sendPostRequest(url, apiReq, ResponseDTO.class, request, response);
+        if (apiResponse.getBody() != null && apiResponse.getBody().getStatus() == ResponseDTO.ResponseStatus.OK) {
+            if (!apiResponse.getBody().getData().isEmpty()) {
+
+                List<?> mealMapList = (List<?>) apiResponse.getBody().getData().get("mealList");
+                List<Meal> mealList = classMapper.convertToDTOList(mealMapList, Meal.class);
+
+                List<?> ingredientToBuy = (List<?>) apiResponse.getBody().getData().get("ingredientToBuyDTOList");
+                List<IngredientToBuyDTO> ingredientsToBuyWeb = classMapper.convertToDTOList(ingredientToBuy, IngredientToBuyDTO.class);
+
+                model.addAttribute("meals", mealList);
+                model.addAttribute("result", ingredientsToBuyWeb);
+                model.addAttribute("idsList", form.getMealIds());
+
+            }
+        }
+        return "pages/logged/foodBoardResult";
     }
     //FIXME ODDZIELIĆ WEB OD API
 //    @PostMapping(value = "/downloadMealDocument")
