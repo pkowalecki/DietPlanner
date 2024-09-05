@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import pl.kowalecki.dietplanner.IWebPageService;
+import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
 import pl.kowalecki.dietplanner.controller.helper.AddMealHelper;
 import pl.kowalecki.dietplanner.model.DTO.FoodBoardPageRequest;
 import pl.kowalecki.dietplanner.model.DTO.IngredientToBuyDTO;
@@ -31,6 +31,7 @@ import pl.kowalecki.dietplanner.model.page.FoodBoardPageData;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
+import pl.kowalecki.dietplanner.services.WebPage.MessageType;
 import pl.kowalecki.dietplanner.utils.ClassMapper;
 import pl.kowalecki.dietplanner.utils.SerializationUtils;
 import pl.kowalecki.dietplanner.utils.UrlTools;
@@ -46,8 +47,6 @@ public class MealPageController {
 
     private final ClassMapper classMapper;
     IWebPageService webPageService;
-    HttpSession session;
-    private HttpSession httpSession;
     AddMealHelper addMealHelper;
 
     @GetMapping(value = "/addMeal")
@@ -63,7 +62,7 @@ public class MealPageController {
                     return "pages/logged/addMeal";
                 }
             }
-        webPageService.setErrorMsg("Wystąpił błąd podczas wczytywania zakładki");
+        webPageService.setMsg(MessageType.ERROR, "Wystąpił błąd podczas wczytywania zakładki");
         return "redirect:/app/auth/loggedUserBoard";
     }
 

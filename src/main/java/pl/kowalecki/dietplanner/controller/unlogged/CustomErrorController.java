@@ -8,7 +8,7 @@ import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import pl.kowalecki.dietplanner.IWebPageService;
+import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
 
 @Controller
 @RequestMapping("/app")
