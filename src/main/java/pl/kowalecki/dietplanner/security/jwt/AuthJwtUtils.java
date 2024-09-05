@@ -7,13 +7,10 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
-import pl.kowalecki.dietplanner.services.UserDetailsImpl;
 
 import java.security.Key;
-import java.util.Date;
 
 @Component
 @Slf4j
@@ -22,11 +19,11 @@ public class AuthJwtUtils {
     @Value("${dietplanner.app.jwtSecret}")
     private String jwtSecret;
 
-    @Value("${dietplanner.app.jwtExpiration}")
-    private int jwtExpiration;
-
     @Value("${dietplanner.app.jwtCookieName}")
     private String jwtCookie;
+
+    @Value("${dietplanner.app.jwtRefreshCookieName}")
+    private String jwtRefreshCookie;
 
     private Key key() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
@@ -37,31 +34,9 @@ public class AuthJwtUtils {
         return cookie != null ? cookie.getValue() : null;
     }
 
-    private String generateTokenFromEmail(String email) {
-        return Jwts.builder()
-                .setSubject(email)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpiration))
-                .signWith(key(), SignatureAlgorithm.HS256)
-                .compact();
-    }
-
-
-    public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal) {
-        String jwt = generateTokenFromEmail(userPrincipal.getEmail());
-        return ResponseCookie.from(jwtCookie, jwt)
-                .path("/")
-                .maxAge(12 * 60 * 60)
-                .httpOnly(true)
-                .build();
-    }
-
-    public ResponseCookie getCleanJwtCookie() {
-        return ResponseCookie
-                .from(jwtCookie, null)
-                .maxAge(0)
-                .path("/")
-                .build();
+    public String getJwtRefreshCookie(HttpServletRequest request) {
+        Cookie cookie = WebUtils.getCookie(request, jwtRefreshCookie);
+        return cookie != null ? cookie.getValue() : null;
     }
 
     public String getEmailFromJwtToken(String token) {
@@ -73,7 +48,9 @@ public class AuthJwtUtils {
                 .getSubject();
     }
 
-    public boolean validateJwtToken(String authToken) {
+
+
+        public boolean validateJwtToken(String authToken) {
         try {
             Jwts.parserBuilder().setSigningKey(key()).build().parse(authToken);
             return true;

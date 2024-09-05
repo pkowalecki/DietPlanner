@@ -8,14 +8,14 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="stylesheet" href="/static/css/headerNavbar.css">
 
-    <#if errorMsg?? && errorMsg != "">
+    <#if webMsg?? && webMsg?has_content>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 var swalContent = {};
                 swalContent = {
-                    title: "Error",
-                    text: '${errorMsg}',
-                    icon: "error",
+                    title: '${webMsg.type?capitalize}',
+                    text: '${webMsg.message}',
+                    icon: '${webMsg.type}',
                     confirmButtonColor: "#052d73"
                 };
                 Swal.fire(swalContent);

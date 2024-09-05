@@ -18,7 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import pl.kowalecki.dietplanner.security.jwt.AuthTokenFilter;
 import pl.kowalecki.dietplanner.security.jwt.PageAuthEntryPoint;
-import pl.kowalecki.dietplanner.services.UserDetailsServiceImpl;
+import pl.kowalecki.dietplanner.services.UserDetails.UserDetailsServiceImpl;
 
 
 
