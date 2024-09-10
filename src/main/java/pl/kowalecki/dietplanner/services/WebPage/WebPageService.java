@@ -1,14 +1,12 @@
-package pl.kowalecki.dietplanner;
+package pl.kowalecki.dietplanner.services.WebPage;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.formula.atp.Switch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.*;
@@ -17,15 +15,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import pl.kowalecki.dietplanner.model.DTO.ResponseDTO;
 import pl.kowalecki.dietplanner.model.DTO.User.LoginResponseDTO;
 import pl.kowalecki.dietplanner.model.DTO.User.UserDTO;
 import pl.kowalecki.dietplanner.security.jwt.AuthJwtUtils;
 import pl.kowalecki.dietplanner.utils.ClassMapper;
+import pl.kowalecki.dietplanner.utils.UrlTools;
 
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.IllegalFormatCodePointException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,8 +41,6 @@ public class WebPageService implements IWebPageService {
     @Autowired
     private final RestTemplate restTemplate;
 
-    @Autowired
-    private AuthJwtUtils authJwtUtils;
 
     @Autowired
     ClassMapper classMapper;
@@ -58,17 +54,6 @@ public class WebPageService implements IWebPageService {
     public boolean validateToken(HttpServletRequest request) {
         String token = jwtUtils.getJwtFromCookies(request);
         return token != null && jwtUtils.validateJwtToken(token);
-    }
-
-    //TODO REFRESH SESSION
-    @Override
-    public void refreshUserSession(HttpServletRequest request) {
-//        UserDetails userDetails = getUserDetailsFromToken(request);
-//        if (userDetails != null) {
-//            log.info("Refreshed session for user: {}", ((UserDetailsImpl) userDetails).getEmail());
-////            return authJwtUtils.generateJwtCookie(userDetails);
-//
-//        }
     }
 
     @Override
@@ -179,6 +164,17 @@ public class WebPageService implements IWebPageService {
             }
 
         } catch (HttpClientErrorException e) {
+            String refreshToken = jwtUtils.getJwtRefreshCookie(httpRequest);
+            if (refreshToken != null) {
+                ResponseEntity<String> refreshResponse = sendRefreshJwtRequest(refreshToken, httpRequest, httpResponse);
+                if (refreshResponse.getStatusCode() == HttpStatus.OK) {
+                    String newJwt = refreshResponse.getBody();
+                    if (newJwt != null) {
+                        return sendRequest(url, method, request, responseType, httpRequest, httpResponse);
+                    }
+                }
+            }
+
             HttpStatusCode status = e.getStatusCode();
             T body = null;
             try {
@@ -191,6 +187,30 @@ public class WebPageService implements IWebPageService {
         } catch (IOException e) {
             log.error("Error processing response: {}", e.getMessage());
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public ResponseEntity<String> sendRefreshJwtRequest(String refreshToken, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+        try {
+            String url = "http://" + UrlTools.apiUrl + "/auth/refresh";
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.add(HttpHeaders.COOKIE, "dietappRef=" + refreshToken);
+
+            HttpEntity<Object> entity = new HttpEntity<>(null, headers);
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+
+            List<String> cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
+            if (cookies != null) {
+                for (String cookieHeader : cookies) {
+                    httpResponse.addHeader(HttpHeaders.SET_COOKIE, cookieHeader);
+                }
+            }
+            return response;
+        } catch (Exception e) {
+            log.error("Error sending refresh request: {}", e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -217,24 +237,26 @@ public class WebPageService implements IWebPageService {
         if (user != null) {
             model.addAttribute("user", user);
         }
-        getErrorMsg(model);
+        getMsg(model);
     }
 
-    @Override
-    public void setErrorMsg(String errorMsg) {
-        session.setAttribute("errorMsg", errorMsg);
+    public void setMsg(MessageType type, String message) {
+        Map<String, String> messageData = new HashMap<>();
+        messageData.put("type", type.name());
+        messageData.put("message", message);
+        session.setAttribute("webMsg", messageData);
     }
 
-    private void removeErrorMsg(){
-        session.removeAttribute("errorMsg");
-    }
-
-    private void getErrorMsg(Model model) {
-        String errorMsg = (String) session.getAttribute("errorMsg");
-        if (errorMsg != null) {
-            model.addAttribute("errorMsg", errorMsg);
-            removeErrorMsg();
+    private void getMsg(Model model) {
+        Map<String, String> messageData = (Map<String, String>) session.getAttribute("webMsg");
+        if (messageData != null) {
+            model.addAttribute("webMsg", messageData);
+            removeMsg();
         }
+    }
+
+    private void removeMsg(){
+        session.removeAttribute("webMsg");
     }
 
 }

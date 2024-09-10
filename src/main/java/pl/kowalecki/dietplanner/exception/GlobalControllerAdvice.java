@@ -7,8 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import pl.kowalecki.dietplanner.IWebPageService;
-import pl.kowalecki.dietplanner.model.DTO.User.UserDTO;
+import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
 
 import java.util.Map;
 

@@ -17,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import pl.kowalecki.dietplanner.IWebPageService;
 import pl.kowalecki.dietplanner.controller.helper.AddMealHelper;
 import pl.kowalecki.dietplanner.model.DTO.FoodBoardPageRequest;
 import pl.kowalecki.dietplanner.model.DTO.IngredientToBuyDTO;
@@ -54,18 +53,18 @@ public class MealPageController {
 
     @GetMapping(value = "/addMeal")
     public String getListMeal(Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
-        String url = "http://" + UrlTools.apiUrl + "/auth/meal/getMealStarterPack";
-        ResponseEntity<ResponseDTO> apiResponse = webPageService.sendGetRequest(url, ResponseDTO.class, request, httpResponse);
-        if (apiResponse.getBody() != null && apiResponse.getBody().getStatus() == ResponseDTO.ResponseStatus.OK) {
-            if (!apiResponse.getBody().getData().isEmpty()) {
-                model.addAttribute("ingredientsNames", serializeAndReturnIngredientList(apiResponse.getBody().getData().get("ingredientsNames")));
-                model.addAttribute("mealTypes", serializeAndReturnMealTypeList(apiResponse.getBody().getData().get("mealTypes")));
-                model.addAttribute("ingredientUnits", serializeAndReturnIngredientUnitList(apiResponse.getBody().getData().get("ingredientUnits")));
-                model.addAttribute("measurementTypes", serializeAndReturnMeasurementTypeList(apiResponse.getBody().getData().get("measurementTypes")));
-                return "pages/logged/addMeal";
+            String url = "http://" + UrlTools.apiUrl + "/auth/meal/getMealStarterPack";
+            ResponseEntity<ResponseDTO> apiResponse = webPageService.sendGetRequest(url, ResponseDTO.class, request, httpResponse);
+            if (apiResponse.getBody() != null && apiResponse.getBody().getStatus() == ResponseDTO.ResponseStatus.OK) {
+                if (!apiResponse.getBody().getData().isEmpty()) {
+                    model.addAttribute("ingredientsNames", serializeAndReturnIngredientList(apiResponse.getBody().getData().get("ingredientsNames")));
+                    model.addAttribute("mealTypes", serializeAndReturnMealTypeList(apiResponse.getBody().getData().get("mealTypes")));
+                    model.addAttribute("ingredientUnits", serializeAndReturnIngredientUnitList(apiResponse.getBody().getData().get("ingredientUnits")));
+                    model.addAttribute("measurementTypes", serializeAndReturnMeasurementTypeList(apiResponse.getBody().getData().get("measurementTypes")));
+                    return "pages/logged/addMeal";
+                }
             }
-        }
-        webPageService.setErrorMsg("Wystąpił błąd podczas wczytywania zakładki");
+        webPageService.setMsg(MessageType.ERROR, "Wystąpił błąd podczas wczytywania zakładki");
         return "redirect:/app/auth/loggedUserBoard";
     }
 
@@ -74,22 +73,22 @@ public class MealPageController {
         Map<String, String> errors = new HashMap<>();
         errors = addMealHelper.checkData(addMealRequestDTO);
         ResponseDTO responseDTO;
-        if (!errors.isEmpty()) {
+        if (!errors.isEmpty()){
             responseDTO = ResponseDTO.builder()
                     .status(ResponseDTO.ResponseStatus.BADDATA)
                     .data(errors)
                     .build();
-            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+            return new ResponseEntity<>( responseDTO, HttpStatus.OK);
         }
         String url = "http://" + UrlTools.apiUrl + "/auth/meal/addMeal";
         ResponseEntity<ResponseDTO> apiResponse = webPageService.sendPostRequest(url, addMealRequestDTO, ResponseDTO.class, request, httpResponse);
 
         if (apiResponse.getBody() != null && apiResponse.getBody().getStatus() == ResponseDTO.ResponseStatus.OK) {
-            responseDTO = ResponseDTO.builder()
-                    .status(ResponseDTO.ResponseStatus.OK)
-                    .message(apiResponse.getBody().getMessage() != null ? apiResponse.getBody().getMessage() : "Meal created")
-                    .build();
-            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+                responseDTO = ResponseDTO.builder()
+                        .status(ResponseDTO.ResponseStatus.OK)
+                        .message(apiResponse.getBody().getMessage()!=null?apiResponse.getBody().getMessage():"Meal created")
+                        .build();
+                return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         }
         responseDTO = ResponseDTO.builder()
                 .status(ResponseDTO.ResponseStatus.ERROR)

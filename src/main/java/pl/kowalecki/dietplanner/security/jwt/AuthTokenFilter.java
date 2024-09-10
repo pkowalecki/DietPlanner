@@ -9,14 +9,13 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
-import pl.kowalecki.dietplanner.WebPageService;
+import pl.kowalecki.dietplanner.services.WebPage.WebPageService;
 import pl.kowalecki.dietplanner.model.DTO.User.UserDTO;
 import pl.kowalecki.dietplanner.utils.ClassMapper;
 import pl.kowalecki.dietplanner.utils.UrlTools;
@@ -42,28 +41,53 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String requestURI = request.getRequestURI();
-        System.out.println("Metoda: " + request.getMethod() + " na adres: " + request.getRequestURI());
         if (requestURI.startsWith("/static/") || requestURI.startsWith("/resources/")) {
             filterChain.doFilter(request, response);
             return;
         }
+        System.out.println("Metoda: " + request.getMethod() + " na adres: " + request.getRequestURI());
         String jwt = jwtUtils.getJwtFromCookies(request);
         if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-            String userEmail = jwtUtils.getEmailFromJwtToken(jwt);
+            handleAuthentication(request, response, jwt);
+        } else {
+            String refreshToken = jwtUtils.getJwtRefreshCookie(request);
+            if (refreshToken != null && jwtUtils.validateJwtToken(refreshToken)) {
+                ResponseEntity<String> refreshResponse = webPageService.sendRefreshJwtRequest(refreshToken, request, response);
+                String newJwt = refreshResponse.getBody();
+                if (newJwt != null) {
+                    response.addHeader(HttpHeaders.SET_COOKIE, "dietapp=" + newJwt);
+                    UserDTO userDetails = fetchUserDetailsFromApi(jwtUtils.getEmailFromJwtToken(newJwt), request, response);
+                    List<GrantedAuthority> authorities = userDetails.getRoles().stream()
+                            .map(SimpleGrantedAuthority::new)
+                            .collect(Collectors.toList());
 
-            HttpSession session = request.getSession(false);
-            UserDTO userDetails = null;
-            if (session != null) {
-                userDetails = classMapper.convertToDTO(session.getAttribute("user"), UserDTO.class);
-            }
-
-            if (userDetails == null) {
-                userDetails = fetchUserDetailsFromApi(userEmail, request, response);
-
-                if (session != null && userDetails != null) {
-                    session.setAttribute("user", userDetails);
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
+        }
+        filterChain.doFilter(request, response);
+    }
+
+
+    private void handleAuthentication(HttpServletRequest request, HttpServletResponse response, String jwt) {
+        String userEmail = jwtUtils.getEmailFromJwtToken(jwt);
+        HttpSession session = request.getSession(false);
+        UserDTO userDetails = null;
+
+        if (session != null) {
+            userDetails = classMapper.convertToDTO(session.getAttribute("user"), UserDTO.class);
+        }
+
+        if (userDetails == null) {
+            userDetails = fetchUserDetailsFromApi(userEmail, request, response);
+            if (session != null && userDetails != null) {
+                session.setAttribute("user", userDetails);
+            }
+        }
+        if (userDetails != null) {
             List<GrantedAuthority> authorities = userDetails.getRoles().stream()
                     .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toList());
@@ -73,14 +97,15 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            //TODO logowanie później
-//            webPageService.logUserAction(request);
+        } else {
+            log.warn("User details could not be fetched or are invalid.");
         }
-        filterChain.doFilter(request, response);
+        //TODO logowanie później
+//            webPageService.logUserAction(request);
     }
 
     public UserDTO fetchUserDetailsFromApi(String userEmail, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
-        String url = "http://"+ UrlTools.apiUrl+"/users/" + userEmail;
+        String url = "http://" + UrlTools.apiUrl + "/users/" + userEmail;
         ResponseEntity<UserDTO> response = webPageService.sendGetRequest(url, UserDTO.class, httpRequest, httpResponse);
 
         if (response.getStatusCode() == HttpStatus.OK) {

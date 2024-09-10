@@ -1,4 +1,4 @@
-package pl.kowalecki.dietplanner.services;
+package pl.kowalecki.dietplanner.services.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
