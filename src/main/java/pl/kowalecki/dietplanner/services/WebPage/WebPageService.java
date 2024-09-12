@@ -135,6 +135,7 @@ public class WebPageService implements IWebPageService {
             HttpEntity<Object> entity = new HttpEntity<>(request, headers);
             ResponseEntity<String> response = restTemplate.exchange(url, method, entity, String.class);
 
+
             List<String> cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
             if (cookies != null) {
                 for (String cookieHeader : cookies) {
@@ -142,17 +143,27 @@ public class WebPageService implements IWebPageService {
                 }
             }
 
-//            log.info("Received response from {}: {}", url, response.getBody());
-            if (response.getHeaders().getContentType().includes(MediaType.APPLICATION_JSON)) {
-                T body = new ObjectMapper().readValue(response.getBody(), responseType);
-                return new ResponseEntity<>(body, response.getStatusCode());
-            } else if (response.getHeaders().getContentType().includes(MediaType.TEXT_PLAIN)) {
-                T body = (T) response.getBody();
-                return new ResponseEntity<>(body, response.getStatusCode());
-            } else {
-                log.error("Unexpected content type: {}", response.getHeaders().getContentType());
-                throw new HttpClientErrorException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Unsupported Media Type");
+            MediaType contentType = response.getHeaders().getContentType();
+            if (contentType != null) {
+                //            log.info("Received response from {}: {}", url, response.getBody());
+                if (contentType.includes(MediaType.APPLICATION_JSON)) {
+                    T body = new ObjectMapper().readValue(response.getBody(), responseType);
+                    return new ResponseEntity<>(body, response.getStatusCode());
+                } else if (contentType.includes(MediaType.TEXT_PLAIN)) {
+                    T body = (T) new String(response.getBody());
+                    return new ResponseEntity<>(body, response.getStatusCode());
+                } else if(contentType.includes(MediaType.APPLICATION_OCTET_STREAM)){
+                    byte[] body = response.getBody().getBytes();
+                    return new ResponseEntity<>((T) body, response.getHeaders(), response.getStatusCode());
+                }else {
+                    log.error("Unexpected content type: {}", response.getHeaders().getContentType());
+                    throw new HttpClientErrorException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Unsupported Media Type");
+                }
+            }else {
+                log.error("Response content type is null!");
+                throw new HttpClientErrorException(HttpStatus.NO_CONTENT, "No content");
             }
+
         } catch (HttpClientErrorException e) {
             String refreshToken = jwtUtils.getJwtRefreshCookie(httpRequest);
             if (refreshToken != null) {
@@ -234,6 +245,7 @@ public class WebPageService implements IWebPageService {
         Map<String, String> messageData = new HashMap<>();
         messageData.put("type", type.name());
         messageData.put("message", message);
+        messageData.put("icon", type.getPole());
         session.setAttribute("webMsg", messageData);
     }
 

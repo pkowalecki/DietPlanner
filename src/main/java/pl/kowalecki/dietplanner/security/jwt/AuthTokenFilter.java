@@ -55,6 +55,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 ResponseEntity<String> refreshResponse = webPageService.sendRefreshJwtRequest(refreshToken, request, response);
                 String newJwt = refreshResponse.getBody();
                 if (newJwt != null) {
+                    //fixme bezpieczniej polecieć z tokenem
                     response.addHeader(HttpHeaders.SET_COOKIE, "dietapp=" + newJwt);
                     UserDTO userDetails = fetchUserDetailsFromApi(jwtUtils.getEmailFromJwtToken(newJwt), request, response);
                     List<GrantedAuthority> authorities = userDetails.getRoles().stream()

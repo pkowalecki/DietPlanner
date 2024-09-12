@@ -289,7 +289,7 @@
                 contentType: 'application/json',
                 data: JSON.stringify(mealData),
                 success: function (response) {
-                    if (response.status === 'BADDATA') {
+                    if (response.status === 'BAD_DATA') {
                         const errors = response.data;
                         for (const field in errors) {
                             $('#' + field + 'Error').text(errors[field]);

@@ -10,7 +10,7 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ResponseDTO {
+public class ResponseBodyDTO {
 
     private ResponseStatus status;
     private String message;
@@ -19,13 +19,13 @@ public class ResponseDTO {
 
     public enum ResponseStatus {
         OK,
-        BADDATA,
+        BAD_DATA,
         ERROR,
         UNAUTHORIZED,
         ;
     }
 
-    public ResponseDTO(ResponseStatus status){
+    public ResponseBodyDTO(ResponseStatus status){
         this.status=status;
     }
 

@@ -140,7 +140,7 @@
                     contentType: 'application/json',
                     data: JSON.stringify(formData),
                     success: function (response) {
-                        if (response.status === 'BADDATA') {
+                        if (response.status === 'BAD_DATA') {
                             var errors = response.data;
                             for (var field in errors) {
                                 $('#' + field + 'Error').text(errors[field]);

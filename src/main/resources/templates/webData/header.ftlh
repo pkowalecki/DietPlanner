@@ -15,7 +15,7 @@
                 swalContent = {
                     title: '${webMsg.type?capitalize}',
                     text: '${webMsg.message}',
-                    icon: '${webMsg.type}',
+                    icon: '${webMsg.icon}',
                     confirmButtonColor: "#052d73"
                 };
                 Swal.fire(swalContent);

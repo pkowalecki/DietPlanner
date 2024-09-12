@@ -18,6 +18,9 @@ public class LoggedBoardController {
 
     @GetMapping("/loggedUserBoard")
     public String getLoggedUserBoard(HttpSession session, HttpServletRequest request, Model model) {
-        return "pages/logged/loggedPage";
+        if (webPageService.getLoggedUser()!=null) {
+            return "pages/logged/loggedPage";
+        }
+        return "redirect:/";
     }
 }

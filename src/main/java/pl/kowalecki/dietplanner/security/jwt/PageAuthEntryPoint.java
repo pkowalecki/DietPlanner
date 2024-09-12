@@ -5,10 +5,13 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
+import pl.kowalecki.dietplanner.services.WebPage.MessageType;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -18,6 +21,8 @@ import java.util.Map;
 @Slf4j
 public class PageAuthEntryPoint implements AuthenticationEntryPoint {
 
+    @Autowired
+    IWebPageService webPageService;
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         log.error("Unauthorized " + authException.getMessage());
@@ -29,6 +34,9 @@ public class PageAuthEntryPoint implements AuthenticationEntryPoint {
         body.put("message", authException.getMessage());
         body.put("path", request.getServletPath());
         log.error("Exception body: " + body.toString());
-        response.sendRedirect("/app/error");
+        webPageService.setMsg(MessageType.ERROR, "Twoja sesja wygasła, zaloguj się ponownie");
+        response.sendRedirect("/");
+
+
     }
 }
