@@ -22,6 +22,14 @@ header {
     cursor: pointer;
     /*margin-left: 10px;*/
 }
+.dropbtn-child {
+    background-color: #0422aa00;
+    color: black !important;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+}
 
 .dropdown {
     position: relative;
@@ -35,7 +43,7 @@ header {
     min-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
-    right: 0; /* Align dropdown content to the right side of the button */
+    right: 0;
 }
 
 .dropdown-content a {
