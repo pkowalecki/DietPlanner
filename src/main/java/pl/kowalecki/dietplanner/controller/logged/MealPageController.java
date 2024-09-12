@@ -1,26 +1,17 @@
 package pl.kowalecki.dietplanner.controller.logged;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
-import org.apache.poi.xwpf.usermodel.XWPFDocument;
-import org.apache.poi.xwpf.usermodel.XWPFParagraph;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBody;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSectPr;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import pl.kowalecki.dietplanner.controller.helper.AddMealHelper;
 import pl.kowalecki.dietplanner.model.DTO.FoodBoardPageRequest;
 import pl.kowalecki.dietplanner.model.DTO.IngredientToBuyDTO;
-import pl.kowalecki.dietplanner.model.DTO.ResponseDTO;
+import pl.kowalecki.dietplanner.model.DTO.ResponseBodyDTO;
 import pl.kowalecki.dietplanner.model.DTO.meal.AddMealRequestDTO;
 import pl.kowalecki.dietplanner.model.Meal;
 import pl.kowalecki.dietplanner.model.enums.MealType;
@@ -28,16 +19,16 @@ import pl.kowalecki.dietplanner.model.ingredient.IngredientName;
 import pl.kowalecki.dietplanner.model.ingredient.ingredientAmount.IngredientUnit;
 import pl.kowalecki.dietplanner.model.ingredient.ingredientMeasurement.MeasurementType;
 import pl.kowalecki.dietplanner.model.page.FoodBoardPageData;
-import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.*;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
+import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
+import pl.kowalecki.dietplanner.services.WebPage.MessageType;
+import pl.kowalecki.dietplanner.services.document.DocumentService;
 import pl.kowalecki.dietplanner.utils.ClassMapper;
 import pl.kowalecki.dietplanner.utils.SerializationUtils;
 import pl.kowalecki.dietplanner.utils.UrlTools;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Controller
@@ -47,55 +38,53 @@ public class MealPageController {
 
     private final ClassMapper classMapper;
     IWebPageService webPageService;
-    HttpSession session;
-    private HttpSession httpSession;
     AddMealHelper addMealHelper;
 
     @GetMapping(value = "/addMeal")
     public String getListMeal(Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
-            String url = "http://" + UrlTools.apiUrl + "/auth/meal/getMealStarterPack";
-            ResponseEntity<ResponseDTO> apiResponse = webPageService.sendGetRequest(url, ResponseDTO.class, request, httpResponse);
-            if (apiResponse.getBody() != null && apiResponse.getBody().getStatus() == ResponseDTO.ResponseStatus.OK) {
-                if (!apiResponse.getBody().getData().isEmpty()) {
-                    model.addAttribute("ingredientsNames", serializeAndReturnIngredientList(apiResponse.getBody().getData().get("ingredientsNames")));
-                    model.addAttribute("mealTypes", serializeAndReturnMealTypeList(apiResponse.getBody().getData().get("mealTypes")));
-                    model.addAttribute("ingredientUnits", serializeAndReturnIngredientUnitList(apiResponse.getBody().getData().get("ingredientUnits")));
-                    model.addAttribute("measurementTypes", serializeAndReturnMeasurementTypeList(apiResponse.getBody().getData().get("measurementTypes")));
-                    return "pages/logged/addMeal";
-                }
+        String url = "http://" + UrlTools.apiUrl + "/auth/meal/getMealStarterPack";
+        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendGetRequest(url, ResponseBodyDTO.class, request, httpResponse);
+        if (apiResponse.getBody() != null && apiResponse.getBody().getStatus() == ResponseBodyDTO.ResponseStatus.OK) {
+            if (!apiResponse.getBody().getData().isEmpty()) {
+                model.addAttribute("ingredientsNames", serializeAndReturnIngredientList(apiResponse.getBody().getData().get("ingredientsNames")));
+                model.addAttribute("mealTypes", serializeAndReturnMealTypeList(apiResponse.getBody().getData().get("mealTypes")));
+                model.addAttribute("ingredientUnits", serializeAndReturnIngredientUnitList(apiResponse.getBody().getData().get("ingredientUnits")));
+                model.addAttribute("measurementTypes", serializeAndReturnMeasurementTypeList(apiResponse.getBody().getData().get("measurementTypes")));
+                return "pages/logged/addMeal";
             }
+        }
         webPageService.setMsg(MessageType.ERROR, "Wystąpił błąd podczas wczytywania zakładki");
         return "redirect:/app/auth/loggedUserBoard";
     }
 
     @PostMapping(value = "/addMeal")
-    public ResponseEntity<ResponseDTO> addMeal(@RequestBody AddMealRequestDTO addMealRequestDTO, Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
+    public ResponseEntity<ResponseBodyDTO> addMeal(@RequestBody AddMealRequestDTO addMealRequestDTO, Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
         Map<String, String> errors = new HashMap<>();
         errors = addMealHelper.checkData(addMealRequestDTO);
-        ResponseDTO responseDTO;
-        if (!errors.isEmpty()){
-            responseDTO = ResponseDTO.builder()
-                    .status(ResponseDTO.ResponseStatus.BADDATA)
+        ResponseBodyDTO responseBodyDTO;
+        if (!errors.isEmpty()) {
+            responseBodyDTO = ResponseBodyDTO.builder()
+                    .status(ResponseBodyDTO.ResponseStatus.BAD_DATA)
                     .data(errors)
                     .build();
-            return new ResponseEntity<>( responseDTO, HttpStatus.OK);
+            return new ResponseEntity<>(responseBodyDTO, HttpStatus.OK);
         }
         String url = "http://" + UrlTools.apiUrl + "/auth/meal/addMeal";
-        ResponseEntity<ResponseDTO> apiResponse = webPageService.sendPostRequest(url, addMealRequestDTO, ResponseDTO.class, request, httpResponse);
+        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendPostRequest(url, addMealRequestDTO, ResponseBodyDTO.class, request, httpResponse);
 
-        if (apiResponse.getBody() != null && apiResponse.getBody().getStatus() == ResponseDTO.ResponseStatus.OK) {
-                responseDTO = ResponseDTO.builder()
-                        .status(ResponseDTO.ResponseStatus.OK)
-                        .message(apiResponse.getBody().getMessage()!=null?apiResponse.getBody().getMessage():"Meal created")
-                        .build();
-                return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        if (apiResponse.getBody() != null && apiResponse.getBody().getStatus() == ResponseBodyDTO.ResponseStatus.OK) {
+            responseBodyDTO = ResponseBodyDTO.builder()
+                    .status(ResponseBodyDTO.ResponseStatus.OK)
+                    .message(apiResponse.getBody().getMessage() != null ? apiResponse.getBody().getMessage() : "Meal created")
+                    .build();
+            return new ResponseEntity<>(responseBodyDTO, HttpStatus.OK);
         }
-        responseDTO = ResponseDTO.builder()
-                .status(ResponseDTO.ResponseStatus.ERROR)
+        responseBodyDTO = ResponseBodyDTO.builder()
+                .status(ResponseBodyDTO.ResponseStatus.ERROR)
                 .message("There was an error during API communication")
                 .build();
 
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        return new ResponseEntity<>(responseBodyDTO, HttpStatus.OK);
     }
 
     private List<IngredientName> serializeAndReturnIngredientList(Object ingredientsNames) {
@@ -142,16 +131,18 @@ public class MealPageController {
     public String mealPage(Model model, HttpServletRequest request, HttpServletResponse response) {
         webPageService.addCommonWebData(model);
         String url = "http://" + UrlTools.apiUrl + "/auth/meal/allMeal";
-        ResponseEntity<ResponseDTO> apiResponse = webPageService.sendGetRequest(url, ResponseDTO.class, request, response);
-        if (apiResponse.getBody() != null && apiResponse.getBody().getStatus() == ResponseDTO.ResponseStatus.OK) {
+        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendGetRequest(url, ResponseBodyDTO.class, request, response);
+        if (apiResponse.getBody() != null && apiResponse.getBody().getStatus() == ResponseBodyDTO.ResponseStatus.OK) {
             if (!apiResponse.getBody().getData().isEmpty()) {
                 List<?> mealMapList = (List<?>) apiResponse.getBody().getData().get("mealList");
                 List<Meal> mealList = classMapper.convertToDTOList(mealMapList, Meal.class);
                 model.addAttribute("mealList", mealList);
             }
         }
+        webPageService.setMsg(MessageType.ERROR, "Twoja sesja wygasła, zaloguj się ponownie");
         return "pages/logged/foodBoardPage";
     }
+
 
     @PostMapping(value = "/generateMealBoard")
     public String resultPage(Model model, HttpServletRequest request, HttpServletResponse response, @ModelAttribute("form") FoodBoardPageData form) {
@@ -159,8 +150,8 @@ public class MealPageController {
         apiReq.setMealIds(form.getMealIds());
         apiReq.setMultiplier(form.getMultiplier());
         String url = "http://" + UrlTools.apiUrl + "/auth/meal/generateFoodBoard";
-        ResponseEntity<ResponseDTO> apiResponse = webPageService.sendPostRequest(url, apiReq, ResponseDTO.class, request, response);
-        if (apiResponse.getBody() != null && apiResponse.getBody().getStatus() == ResponseDTO.ResponseStatus.OK) {
+        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendPostRequest(url, apiReq, ResponseBodyDTO.class, request, response);
+        if (apiResponse.getBody() != null && apiResponse.getBody().getStatus() == ResponseBodyDTO.ResponseStatus.OK) {
             if (!apiResponse.getBody().getData().isEmpty()) {
 
                 List<?> mealMapList = (List<?>) apiResponse.getBody().getData().get("mealList");
@@ -178,10 +169,25 @@ public class MealPageController {
         return "pages/logged/foodBoardResult";
     }
 
-    @PostMapping(value = "/downloadMealDocument")
-    public void downloadMealDocument(@RequestParam("mealIds") List<Long> ids, HttpServletRequest request, HttpServletResponse response) {
-        String url = "http://" + UrlTools.apiUrl + "/auth/meal/downloadMealDocument";
-        ResponseEntity<byte[]> apiResponse = webPageService.sendPostRequest(url, ids, byte[].class, request, response);
-        //Todo tu będzie blok obsługi dokumentu z api
+    @PostMapping(value = "/downloadMealDocument", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public void downloadMealDocument(@RequestParam("mealIds") List<Long> ids, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String url = "http://" + UrlTools.apiUrl + "/auth/meal/getMealNamesById";
+        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendPostRequest(url, ids, ResponseBodyDTO.class, request, response);
+        if (apiResponse.getStatusCode() == HttpStatus.OK && apiResponse.getBody() != null) {
+            List<String> mealMapList = (List<String>) apiResponse.getBody().getData().get("mealNames");
+            System.out.println(mealMapList);
+            try (XWPFDocument document = new XWPFDocument(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+
+                byte[] documentBytes = DocumentService.createMealDocument(document, out, mealMapList);
+                response.setContentType("application/octet-stream");
+                response.setHeader("Content-Disposition", "attachment; filename=\"jedzonko.docx\"");
+                response.getOutputStream().write(documentBytes);
+                response.getOutputStream().flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+                webPageService.setMsg(MessageType.ERROR, "There was error during file generation");
+            }
+        }
     }
+
 }

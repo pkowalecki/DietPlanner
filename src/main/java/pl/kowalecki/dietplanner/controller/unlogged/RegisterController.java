@@ -1,20 +1,15 @@
 package pl.kowalecki.dietplanner.controller.unlogged;
 
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import pl.kowalecki.dietplanner.controller.helper.RegisterHelper;
-import pl.kowalecki.dietplanner.controller.helper.RegisterPole;
 import pl.kowalecki.dietplanner.exception.RegistrationException;
-import pl.kowalecki.dietplanner.mailService.MailerService;
-import pl.kowalecki.dietplanner.model.DTO.ResponseDTO;
+import pl.kowalecki.dietplanner.model.DTO.ResponseBodyDTO;
 import pl.kowalecki.dietplanner.model.DTO.RegistrationRequestDTO;
 
 import java.util.*;
@@ -30,12 +25,12 @@ public class RegisterController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<ResponseDTO> registerUser(@RequestBody RegistrationRequestDTO registrationRequest) {
+    public ResponseEntity<ResponseBodyDTO> registerUser(@RequestBody RegistrationRequestDTO registrationRequest) {
         Map<String, String> errors = registerHelper.checkRegistrationData(registrationRequest);
-        ResponseDTO response;
+        ResponseBodyDTO response;
         if (!errors.isEmpty()) {
-            response = ResponseDTO.builder()
-                    .status(ResponseDTO.ResponseStatus.BADDATA)
+            response = ResponseBodyDTO.builder()
+                    .status(ResponseBodyDTO.ResponseStatus.BAD_DATA)
                     .data(errors)
                     .build();
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -61,8 +56,8 @@ public class RegisterController {
 //        boolean isHtml = !user.getEmail().contains("@gmail.com");
 //        mailerService.sendRegistrationEmail(user.getEmail(), user.getHash(), isHtml);
 
-        response = ResponseDTO.builder()
-                .status(ResponseDTO.ResponseStatus.OK)
+        response = ResponseBodyDTO.builder()
+                .status(ResponseBodyDTO.ResponseStatus.OK)
                 .message("Registration successful")
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);

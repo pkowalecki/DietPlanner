@@ -135,12 +135,14 @@ public class WebPageService implements IWebPageService {
             HttpEntity<Object> entity = new HttpEntity<>(request, headers);
             ResponseEntity<String> response = restTemplate.exchange(url, method, entity, String.class);
 
+
             List<String> cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
             if (cookies != null) {
                 for (String cookieHeader : cookies) {
                     httpResponse.addHeader(HttpHeaders.SET_COOKIE, cookieHeader);
                 }
             }
+
             MediaType contentType = response.getHeaders().getContentType();
             if (contentType != null) {
                 //            log.info("Received response from {}: {}", url, response.getBody());
@@ -151,9 +153,8 @@ public class WebPageService implements IWebPageService {
                     T body = (T) new String(response.getBody());
                     return new ResponseEntity<>(body, response.getStatusCode());
                 } else if(contentType.includes(MediaType.APPLICATION_OCTET_STREAM)){
-                    //FIXME getBody(), czy getBody().getBytes() - sprawdzić
-                    T body = (T) response.getBody();
-                    return new ResponseEntity<>(body, response.getStatusCode());
+                    byte[] body = response.getBody().getBytes();
+                    return new ResponseEntity<>((T) body, response.getHeaders(), response.getStatusCode());
                 }else {
                     log.error("Unexpected content type: {}", response.getHeaders().getContentType());
                     throw new HttpClientErrorException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Unsupported Media Type");
@@ -244,6 +245,7 @@ public class WebPageService implements IWebPageService {
         Map<String, String> messageData = new HashMap<>();
         messageData.put("type", type.name());
         messageData.put("message", message);
+        messageData.put("icon", type.getPole());
         session.setAttribute("webMsg", messageData);
     }
 
