@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import pl.kowalecki.dietplanner.model.DTO.ResponseBodyDTO;
+import pl.kowalecki.dietplanner.model.DTO.meal.IngredientNameDTO;
 import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
 import pl.kowalecki.dietplanner.utils.ClassMapper;
 import pl.kowalecki.dietplanner.utils.UrlTools;
@@ -27,11 +28,11 @@ public class AddIngredientNamesController {
     }
 
     @PostMapping(value = "/addIngredientName")
-    public String addIngredient(@RequestParam("newIngredientName") String newIngredientName, HttpServletRequest request, HttpServletResponse httpResponse){
-        System.out.println("dodaje nowego ingredienta: " + newIngredientName);
+    public String addIngredient(@ModelAttribute("addIngredientForm") IngredientNameDTO ingredientNameDTO, HttpServletRequest request, HttpServletResponse httpResponse){
+        System.out.println("dodaje nowego ingredienta: " + ingredientNameDTO);
         String url = "http://" + UrlTools.apiUrl + "/auth/ingredientNames/ingredient";
 
-        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendPostRequest(url, newIngredientName, ResponseBodyDTO.class, request, httpResponse);
+        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendPostRequest(url, ingredientNameDTO, ResponseBodyDTO.class, request, httpResponse);
         //TODO continue
         return ADD_INGREDIENT_VIEW;
     }

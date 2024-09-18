@@ -3,11 +3,18 @@
 <div id="content-wrap" class="container wrapper">
     <div class="ingredient-form-container">
         <h2>Dodaj nowy składnik</h2>
-        <form id="ingredientForm" method="POST" action="/app/auth/addIngredientName">
+        <form id="ingredientForm" method="POST" action="/app/auth/addIngredientName" name="addIngredientForm">
             <label for="ingredientName">Nazwa składnika:</label>
-            <input type="text" id="ingredientName" name="newIngredientName" placeholder="Wpisz nazwę składnika" autocomplete="off"
+            <input type="text" id="ingredientName" name="ingredientName" placeholder="Wpisz nazwę składnika"
+                   autocomplete="off"
                    required/>
             <ul id="suggestionsList" class="suggestions-list"></ul>
+            <input type="text" id="ingredientBrand" name="ingredientBrand" placeholder="Wpisz markę produktu"
+                   autocomplete="off"/>
+            <input type="number" id="protein" name="protein" placeholder="Białka" autocomplete="off"/>
+            <input type="number" id="carbohydrates" name="carbohydrates" placeholder="Węglowodany" autocomplete="off"/>
+            <input type="number" id="fat" name="fat" placeholder="Tłuszcze" autocomplete="off"/>
+            <input type="number" id="kcal" name="kcal" placeholder="Kcal" autocomplete="off"/>
 
             <button type="submit">Dodaj składnik</button>
         </form>
@@ -32,10 +39,15 @@
                     if (data.length > 0) {
                         data.forEach(ingredient => {
                             const listItem = document.createElement('li');
-                            listItem.textContent = ingredient.name;
+
+                            if (ingredient.ingredientBrand && ingredient.ingredientBrand.trim() !== "") {
+                                listItem.textContent = ingredient.ingredientName +", " + ingredient.ingredientBrand ;
+                            } else {
+                                listItem.textContent = ingredient.ingredientName;
+                            }
                             listItem.classList.add('suggestion-item');
                             listItem.addEventListener('click', () => {
-                                document.getElementById('ingredientName').value = ingredient.name;
+                                document.getElementById('ingredientName').value = ingredient.ingredientName;
                                 suggestionsList.innerHTML = '';
                             });
                             suggestionsList.appendChild(listItem);
