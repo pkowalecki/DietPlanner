@@ -188,4 +188,10 @@ public class MealPageController {
         }
     }
 
+    @GetMapping(value = "/mealHistory")
+    public String mealHistory(Model model, HttpServletRequest request, HttpServletResponse response) {
+        String url = "http://" + UrlTools.apiUrl + "/auth/meal/getMealHistory";
+        return "pages/logged/mealHistoryPage";
+    }
+
 }

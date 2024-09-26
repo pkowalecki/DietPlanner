@@ -35,6 +35,7 @@
                     <a class="dropbtn-child" onclick="location.href='/app/auth/addMeal'">Dodaj posiłek</a>
                     <a class="dropbtn-child" onclick="location.href='/app/auth/addIngredientName'">Dodaj składnik</a>
                     <a class="dropbtn-child" onclick="location.href='/app/auth/generateMealBoard'">Wygeneruj plan żywienia</a>
+                    <a class="dropbtn-child" onclick="location.href='/app/auth/mealHistory'">Historia posiłków</a>
                 </div>
             </div>
         </div>
