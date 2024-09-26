@@ -1,0 +1,47 @@
+.ingredient-form-container {
+    position: relative;
+    width: 600px;
+    margin: 0 auto;
+}
+
+#ingredientName {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.suggestions-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    position: absolute;
+    background-color: white;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 50%;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.suggestion-item:hover {
+    background-color: #f0f0f0;
+}
+
+.message {
+    margin-top: 10px;
+    color: red;
+}
+
+.flex-container {
+    display: flex;
+}
+
+.flex-child {
+    flex: 1;
+    padding: 5px 3px 5px 0;
+}

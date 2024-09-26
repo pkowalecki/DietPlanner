@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
+import pl.kowalecki.dietplanner.services.WebPage.MessageType;
 
 @Controller
 @RequestMapping("/app/auth")

@@ -70,3 +70,10 @@ h1:after {
 .is-invalid {
     border-color: #dc3545;
 }
+
+label {
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+    vertical-align: middle;
+}

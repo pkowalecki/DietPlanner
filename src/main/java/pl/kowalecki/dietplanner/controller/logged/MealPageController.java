@@ -129,7 +129,6 @@ public class MealPageController {
 
     @GetMapping(value = "/generateMealBoard")
     public String mealPage(Model model, HttpServletRequest request, HttpServletResponse response) {
-        webPageService.addCommonWebData(model);
         String url = "http://" + UrlTools.apiUrl + "/auth/meal/allMeal";
         ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendGetRequest(url, ResponseBodyDTO.class, request, response);
         if (apiResponse.getBody() != null && apiResponse.getBody().getStatus() == ResponseBodyDTO.ResponseStatus.OK) {
@@ -139,7 +138,6 @@ public class MealPageController {
                 model.addAttribute("mealList", mealList);
             }
         }
-        webPageService.setMsg(MessageType.ERROR, "Twoja sesja wygasła, zaloguj się ponownie");
         return "pages/logged/foodBoardPage";
     }
 

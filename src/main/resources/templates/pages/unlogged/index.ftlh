@@ -45,6 +45,20 @@
             });
         </script>
     </#if>
+    <#if sessionExpired?? && sessionExpired == true>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var swalContent = {};
+                swalContent = {
+                    title: "Error",
+                    text: 'Twoja sesja wygasła. Proszę zaloguj się ponownie',
+                    icon: "error",
+                    confirmButtonColor: "#052d73"
+                };
+                Swal.fire(swalContent);
+            });
+        </script>
+    </#if>
 
     <script>
         function setupPasswordStrengthIndicator() {

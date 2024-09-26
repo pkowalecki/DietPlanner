@@ -26,14 +26,15 @@
 <body>
 <header>
     <#if user??>
+        XD ${user}
         <div class="nav-container">
             <button class="dropbtn" onclick="location.href='/app/auth/loggedUserBoard'">Strona główna</button>
             <div class="dropdown">
                 <button class="dropbtn">Posiłek</button>
                 <div class="dropdown-content">
-                    <a href="addMeal">Dodaj posiłek</a>
-                    <a href="#">Dodaj składnik</a>
-                    <a href="generateMealBoard">Wygeneruj plan żywienia</a>
+                    <a class="dropbtn-child" onclick="location.href='/app/auth/addMeal'">Dodaj posiłek</a>
+                    <a class="dropbtn-child" onclick="location.href='/app/auth/addIngredientName'">Dodaj składnik</a>
+                    <a class="dropbtn-child" onclick="location.href='/app/auth/generateMealBoard'">Wygeneruj plan żywienia</a>
                 </div>
             </div>
         </div>
