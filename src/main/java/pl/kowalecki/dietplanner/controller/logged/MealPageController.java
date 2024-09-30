@@ -191,6 +191,7 @@ public class MealPageController {
     @GetMapping(value = "/mealHistory")
     public String mealHistory(Model model, HttpServletRequest request, HttpServletResponse response) {
         String url = "http://" + UrlTools.apiUrl + "/auth/meal/getMealHistory";
+        ResponseEntity<HttpStatus> apiResponse = webPageService.sendGetRequest(url, HttpStatus.class, request, response);
         return "pages/logged/mealHistoryPage";
     }
 
