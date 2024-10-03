@@ -32,6 +32,7 @@ import pl.kowalecki.dietplanner.utils.UrlTools;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 @Controller
@@ -214,12 +215,12 @@ public class MealPageController {
     }
 
     @PostMapping(value = "/mealHistory")
-    public String getMealHistoryPage(@RequestParam("id")String param,  Model model, HttpServletRequest request, HttpServletResponse response) {
+    public String getMealHistoryPage(@RequestParam("id")String param, Model model, HttpServletRequest request, HttpServletResponse response, InputStream inputStream) {
         String url = "http://" + UrlTools.apiUrl + "/auth/meal/getMealHistory";
         ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendPostRequest(url, param, ResponseBodyDTO.class, request, response);
         if (apiResponse.getStatusCode() == HttpStatus.OK && apiResponse.getBody() != null) {
             MealHistoryDetailsDTO mealHistory = classMapper.convertToDTO(apiResponse.getBody().getData().get("mealHistory"), MealHistoryDetailsDTO.class);
-            System.out.println(mealHistory);
+            model.addAttribute("mealHistory", mealHistory);
         }
         return "pages/logged/mealHistoryPage";
     }
