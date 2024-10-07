@@ -233,7 +233,6 @@ public class WebPageService implements IWebPageService {
 
     @Override
     public void addCommonWebData(Model model) {
-        System.out.println("addCommonWebData");
         UserDTO user = getLoggedUser();
         if (user != null) {
             model.addAttribute("user", user);
