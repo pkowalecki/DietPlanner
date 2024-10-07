@@ -38,8 +38,8 @@ public class WebPageService implements IWebPageService {
     @Autowired
     private HttpSession session;
 
-    @Autowired
-    private final RestTemplate restTemplate;
+//    @Autowired
+//    private final RestTemplate restTemplate;
 
 
     @Autowired
@@ -114,106 +114,106 @@ public class WebPageService implements IWebPageService {
 
     }
 
-    public <T> ResponseEntity<T> sendGetRequest(String url, Class<T> responseType, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
-        return sendRequest(url, HttpMethod.GET, null, responseType, httpRequest, httpResponse);
-    }
+//    public <T> ResponseEntity<T> sendGetRequest(String url, Class<T> responseType, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+//        return sendRequest(url, HttpMethod.GET, null, responseType, httpRequest, httpResponse);
+//    }
+//
+//    public <T> ResponseEntity<T> sendPostRequest(String url, Object request, Class<T> responseType, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+//        return sendRequest(url, HttpMethod.POST, request, responseType, httpRequest, httpResponse);
+//    }
 
-    public <T> ResponseEntity<T> sendPostRequest(String url, Object request, Class<T> responseType, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
-        return sendRequest(url, HttpMethod.POST, request, responseType, httpRequest, httpResponse);
-    }
+//    private <T> ResponseEntity<T> sendRequest(String url, HttpMethod method, Object request, Class<T> responseType, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+//        try {
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.setContentType(MediaType.APPLICATION_JSON);
+//
+//            String token = jwtUtils.getJwtFromCookies(httpRequest);
+//            if (token != null) {
+//                headers.add(HttpHeaders.COOKIE, "dietapp=" + token);
+//            }
+//
+//            HttpEntity<Object> entity = new HttpEntity<>(request, headers);
+//            ResponseEntity<String> response = restTemplate.exchange(url, method, entity, String.class);
+//
+//
+//            List<String> cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
+//            if (cookies != null) {
+//                for (String cookieHeader : cookies) {
+//                    httpResponse.addHeader(HttpHeaders.SET_COOKIE, cookieHeader);
+//                }
+//            }
+//
+//            MediaType contentType = response.getHeaders().getContentType();
+//            if (contentType != null) {
+//                //            log.info("Received response from {}: {}", url, response.getBody());
+//                if (contentType.includes(MediaType.APPLICATION_JSON)) {
+//                    T body = new ObjectMapper().readValue(response.getBody(), responseType);
+//                    return new ResponseEntity<>(body, response.getStatusCode());
+//                } else if (contentType.includes(MediaType.TEXT_PLAIN)) {
+//                    T body = (T) new String(response.getBody());
+//                    return new ResponseEntity<>(body, response.getStatusCode());
+//                } else if(contentType.includes(MediaType.APPLICATION_OCTET_STREAM)){
+//                    byte[] body = response.getBody().getBytes();
+//                    return new ResponseEntity<>((T) body, response.getHeaders(), response.getStatusCode());
+//                }else {
+//                    log.error("Unexpected content type: {}", response.getHeaders().getContentType());
+//                    throw new HttpClientErrorException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Unsupported Media Type");
+//                }
+//            }else {
+//                log.error("Response content type is null!");
+//                throw new HttpClientErrorException(HttpStatus.NO_CONTENT, "No content");
+//            }
+//
+//        } catch (HttpClientErrorException e) {
+//            String refreshToken = jwtUtils.getJwtRefreshCookie(httpRequest);
+//            if (refreshToken != null) {
+//                ResponseEntity<String> refreshResponse = sendRefreshJwtRequest(refreshToken, httpRequest, httpResponse);
+//                if (refreshResponse.getStatusCode() == HttpStatus.OK) {
+//                    String newJwt = refreshResponse.getBody();
+//                    if (newJwt != null) {
+//                        return sendRequest(url, method, request, responseType, httpRequest, httpResponse);
+//                    }
+//                }
+//            }
+//
+//            HttpStatusCode status = e.getStatusCode();
+//            T body = null;
+//            try {
+//                body = new ObjectMapper().readValue(e.getResponseBodyAsString(), responseType);
+//            } catch (JsonProcessingException ex) {
+//                log.error("Error parsing error response: {}", ex.getMessage());
+//            }
+//            log.error("Error during request to {}: {}", url, e.getMessage());
+//            return new ResponseEntity<>(body, status);
+//        } catch (IOException e) {
+//            log.error("Error processing response: {}", e.getMessage());
+//            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
 
-    private <T> ResponseEntity<T> sendRequest(String url, HttpMethod method, Object request, Class<T> responseType, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
-        try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
-            String token = jwtUtils.getJwtFromCookies(httpRequest);
-            if (token != null) {
-                headers.add(HttpHeaders.COOKIE, "dietapp=" + token);
-            }
-
-            HttpEntity<Object> entity = new HttpEntity<>(request, headers);
-            ResponseEntity<String> response = restTemplate.exchange(url, method, entity, String.class);
-
-
-            List<String> cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
-            if (cookies != null) {
-                for (String cookieHeader : cookies) {
-                    httpResponse.addHeader(HttpHeaders.SET_COOKIE, cookieHeader);
-                }
-            }
-
-            MediaType contentType = response.getHeaders().getContentType();
-            if (contentType != null) {
-                //            log.info("Received response from {}: {}", url, response.getBody());
-                if (contentType.includes(MediaType.APPLICATION_JSON)) {
-                    T body = new ObjectMapper().readValue(response.getBody(), responseType);
-                    return new ResponseEntity<>(body, response.getStatusCode());
-                } else if (contentType.includes(MediaType.TEXT_PLAIN)) {
-                    T body = (T) new String(response.getBody());
-                    return new ResponseEntity<>(body, response.getStatusCode());
-                } else if(contentType.includes(MediaType.APPLICATION_OCTET_STREAM)){
-                    byte[] body = response.getBody().getBytes();
-                    return new ResponseEntity<>((T) body, response.getHeaders(), response.getStatusCode());
-                }else {
-                    log.error("Unexpected content type: {}", response.getHeaders().getContentType());
-                    throw new HttpClientErrorException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Unsupported Media Type");
-                }
-            }else {
-                log.error("Response content type is null!");
-                throw new HttpClientErrorException(HttpStatus.NO_CONTENT, "No content");
-            }
-
-        } catch (HttpClientErrorException e) {
-            String refreshToken = jwtUtils.getJwtRefreshCookie(httpRequest);
-            if (refreshToken != null) {
-                ResponseEntity<String> refreshResponse = sendRefreshJwtRequest(refreshToken, httpRequest, httpResponse);
-                if (refreshResponse.getStatusCode() == HttpStatus.OK) {
-                    String newJwt = refreshResponse.getBody();
-                    if (newJwt != null) {
-                        return sendRequest(url, method, request, responseType, httpRequest, httpResponse);
-                    }
-                }
-            }
-
-            HttpStatusCode status = e.getStatusCode();
-            T body = null;
-            try {
-                body = new ObjectMapper().readValue(e.getResponseBodyAsString(), responseType);
-            } catch (JsonProcessingException ex) {
-                log.error("Error parsing error response: {}", ex.getMessage());
-            }
-            log.error("Error during request to {}: {}", url, e.getMessage());
-            return new ResponseEntity<>(body, status);
-        } catch (IOException e) {
-            log.error("Error processing response: {}", e.getMessage());
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @Override
-    public ResponseEntity<String> sendRefreshJwtRequest(String refreshToken, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
-        try {
-            String url = "http://" + UrlTools.apiUrl + "/auth/refresh";
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.add(HttpHeaders.COOKIE, "dietappRef=" + refreshToken);
-
-            HttpEntity<Object> entity = new HttpEntity<>(null, headers);
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-
-            List<String> cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
-            if (cookies != null) {
-                for (String cookieHeader : cookies) {
-                    httpResponse.addHeader(HttpHeaders.SET_COOKIE, cookieHeader);
-                }
-            }
-            return response;
-        } catch (Exception e) {
-            log.error("Error sending refresh request: {}", e.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+//    @Override
+//    public ResponseEntity<String> sendRefreshJwtRequest(String refreshToken, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+//        try {
+//            String url = "http://" + UrlTools.apiUrl + "/auth/refresh";
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.setContentType(MediaType.APPLICATION_JSON);
+//            headers.add(HttpHeaders.COOKIE, "dietappRef=" + refreshToken);
+//
+//            HttpEntity<Object> entity = new HttpEntity<>(null, headers);
+//            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+//
+//            List<String> cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
+//            if (cookies != null) {
+//                for (String cookieHeader : cookies) {
+//                    httpResponse.addHeader(HttpHeaders.SET_COOKIE, cookieHeader);
+//                }
+//            }
+//            return response;
+//        } catch (Exception e) {
+//            log.error("Error sending refresh request: {}", e.getMessage());
+//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
 
     @Override
     public UserDTO getLoggedUser() {

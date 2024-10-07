@@ -47,28 +47,28 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         }
         System.out.println("Metoda: " + request.getMethod() + " na adres: " + request.getRequestURI());
         String jwt = jwtUtils.getJwtFromCookies(request);
-        if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-            handleAuthentication(request, response, jwt);
-        } else {
-            String refreshToken = jwtUtils.getJwtRefreshCookie(request);
-            if (refreshToken != null && jwtUtils.validateJwtToken(refreshToken)) {
-                ResponseEntity<String> refreshResponse = webPageService.sendRefreshJwtRequest(refreshToken, request, response);
-                String newJwt = refreshResponse.getBody();
-                if (newJwt != null) {
-                    //fixme bezpieczniej polecieć z tokenem
-                    response.addHeader(HttpHeaders.SET_COOKIE, "dietapp=" + newJwt);
-                    UserDTO userDetails = fetchUserDetailsFromApi(jwtUtils.getEmailFromJwtToken(newJwt), request, response);
-                    List<GrantedAuthority> authorities = userDetails.getRoles().stream()
-                            .map(SimpleGrantedAuthority::new)
-                            .collect(Collectors.toList());
-
-                    UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
-            }
-        }
+//        if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
+//            handleAuthentication(request, response, jwt);
+//        } else {
+//            String refreshToken = jwtUtils.getJwtRefreshCookie(request);
+//            if (refreshToken != null && jwtUtils.validateJwtToken(refreshToken)) {
+//                ResponseEntity<String> refreshResponse = webPageService.sendRefreshJwtRequest(refreshToken, request, response);
+//                String newJwt = refreshResponse.getBody();
+//                if (newJwt != null) {
+//                    //fixme bezpieczniej polecieć z tokenem
+//                    response.addHeader(HttpHeaders.SET_COOKIE, "dietapp=" + newJwt);
+//                    UserDTO userDetails = fetchUserDetailsFromApi(jwtUtils.getEmailFromJwtToken(newJwt), request, response);
+//                    List<GrantedAuthority> authorities = userDetails.getRoles().stream()
+//                            .map(SimpleGrantedAuthority::new)
+//                            .collect(Collectors.toList());
+//
+//                    UsernamePasswordAuthenticationToken authentication =
+//                            new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
+//                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+//                    SecurityContextHolder.getContext().setAuthentication(authentication);
+//                }
+//            }
+//        }
         filterChain.doFilter(request, response);
     }
 
@@ -82,12 +82,12 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             userDetails = classMapper.convertToDTO(session.getAttribute("user"), UserDTO.class);
         }
 
-        if (userDetails == null) {
-            userDetails = fetchUserDetailsFromApi(userEmail, request, response);
-            if (session != null && userDetails != null) {
-                session.setAttribute("user", userDetails);
-            }
-        }
+//        if (userDetails == null) {
+//            userDetails = fetchUserDetailsFromApi(userEmail, request, response);
+//            if (session != null && userDetails != null) {
+//                session.setAttribute("user", userDetails);
+//            }
+//        }
         if (userDetails != null) {
             List<GrantedAuthority> authorities = userDetails.getRoles().stream()
                     .map(SimpleGrantedAuthority::new)
@@ -105,15 +105,15 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 //            webPageService.logUserAction(request);
     }
 
-    public UserDTO fetchUserDetailsFromApi(String userEmail, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
-        String url = "http://" + UrlTools.apiUrl + "/users/" + userEmail;
-        ResponseEntity<UserDTO> response = webPageService.sendGetRequest(url, UserDTO.class, httpRequest, httpResponse);
-
-        if (response.getStatusCode() == HttpStatus.OK) {
-            return response.getBody();
-        } else {
-            log.error("Failed to fetch user details for {}. Status: {}", userEmail, response.getStatusCode());
-            return null;
-        }
-    }
+//    public UserDTO fetchUserDetailsFromApi(String userEmail, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+//        String url = "http://" + UrlTools.apiUrl + "/users/" + userEmail;
+//        ResponseEntity<UserDTO> response = webPageService.sendGetRequest(url, UserDTO.class, httpRequest, httpResponse);
+//
+//        if (response.getStatusCode() == HttpStatus.OK) {
+//            return response.getBody();
+//        } else {
+//            log.error("Failed to fetch user details for {}. Status: {}", userEmail, response.getStatusCode());
+//            return null;
+//        }
+//    }
 }

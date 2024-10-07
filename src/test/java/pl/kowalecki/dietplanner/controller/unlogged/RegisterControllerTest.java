@@ -1,4 +1,4 @@
-package pl.kowalecki.dietplanner.controller.unlogged;
-
-public class RegisterControllerTest {
-}
+//package pl.kowalecki.dietplanner.controller.unlogged;
+//
+//public class RegisterControllerTest {
+//}

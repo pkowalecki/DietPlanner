@@ -8,11 +8,14 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import pl.kowalecki.dietplanner.controller.DietplannerApiClient;
 import pl.kowalecki.dietplanner.controller.helper.AddMealHelper;
 import pl.kowalecki.dietplanner.model.DTO.FoodBoardPageRequest;
 import pl.kowalecki.dietplanner.model.DTO.IngredientToBuyDTO;
+import pl.kowalecki.dietplanner.model.DTO.MealStarterPackDTO;
 import pl.kowalecki.dietplanner.model.DTO.ResponseBodyDTO;
 import pl.kowalecki.dietplanner.model.DTO.meal.AddMealRequestDTO;
+import pl.kowalecki.dietplanner.model.DTO.meal.MealBoardDTO;
 import pl.kowalecki.dietplanner.model.Meal;
 import pl.kowalecki.dietplanner.model.enums.MealType;
 import pl.kowalecki.dietplanner.model.ingredient.IngredientName;
@@ -37,25 +40,29 @@ import java.util.*;
 public class MealPageController {
 
     private final ClassMapper classMapper;
-    IWebPageService webPageService;
+//    IWebPageService webPageService;
+    DietplannerApiClient apiClient;
     AddMealHelper addMealHelper;
 
     @GetMapping(value = "/addMeal")
     public String getListMeal(Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
         String url = "http://" + UrlTools.apiUrl + "/auth/meal/getMealStarterPack";
-        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendGetRequest(url, ResponseBodyDTO.class, request, httpResponse);
-        if (apiResponse.getBody() != null && apiResponse.getBody().getStatus() == ResponseBodyDTO.ResponseStatus.OK) {
-            if (!apiResponse.getBody().getData().isEmpty()) {
-                model.addAttribute("ingredientsNames", serializeAndReturnIngredientList(apiResponse.getBody().getData().get("ingredientsNames")));
-                model.addAttribute("mealTypes", serializeAndReturnMealTypeList(apiResponse.getBody().getData().get("mealTypes")));
-                model.addAttribute("ingredientUnits", serializeAndReturnIngredientUnitList(apiResponse.getBody().getData().get("ingredientUnits")));
-                model.addAttribute("measurementTypes", serializeAndReturnMeasurementTypeList(apiResponse.getBody().getData().get("measurementTypes")));
-                return "pages/logged/addMeal";
-            }
+        ResponseEntity<MealStarterPackDTO> apiResponse = apiClient.getMealStarterPack();
+
+//        if (apiResponse.getBody() != null && apiResponse.getBody().getStatus() == ResponseBodyDTO.ResponseStatus.OK) {
+//            //TODO NAPISAĆ DTO KTÓRE BĘDZIE MIAŁO List<IngredientsNames>, List<MealTypes>, List<IngredientUnits>, List<MeasurementTypes>
+//            if (!apiResponse.getBody().getData().isEmpty()) {
+//                model.addAttribute("ingredientsNames", serializeAndReturnIngredientList(apiResponse.getBody().getData().get("ingredientsNames")));
+//                model.addAttribute("mealTypes", serializeAndReturnMealTypeList(apiResponse.getBody().getData().get("mealTypes")));
+//                model.addAttribute("ingredientUnits", serializeAndReturnIngredientUnitList(apiResponse.getBody().getData().get("ingredientUnits")));
+//                model.addAttribute("measurementTypes", serializeAndReturnMeasurementTypeList(apiResponse.getBody().getData().get("measurementTypes")));
+//                return "pages/logged/addMeal";
+//            }
+        return "pages/logged/addMeal";
         }
-        webPageService.setMsg(MessageType.ERROR, "Wystąpił błąd podczas wczytywania zakładki");
-        return "redirect:/app/auth/loggedUserBoard";
-    }
+//        webPageService.setMsg(MessageType.ERROR, "Wystąpił błąd podczas wczytywania zakładki");
+//        return "redirect:/app/auth/loggedUserBoard";
+
 
     @PostMapping(value = "/addMeal")
     public ResponseEntity<ResponseBodyDTO> addMeal(@RequestBody AddMealRequestDTO addMealRequestDTO, Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
@@ -69,13 +76,14 @@ public class MealPageController {
                     .build();
             return new ResponseEntity<>(responseBodyDTO, HttpStatus.OK);
         }
-        String url = "http://" + UrlTools.apiUrl + "/auth/meal/addMeal";
-        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendPostRequest(url, addMealRequestDTO, ResponseBodyDTO.class, request, httpResponse);
+//        String url = "http://" + UrlTools.apiUrl + "/auth/meal/addMeal";
+//        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendPostRequest(url, addMealRequestDTO, ResponseBodyDTO.class, request, httpResponse);
+        ResponseEntity<String> apiRespo = apiClient.addMeal(addMealRequestDTO);
 
-        if (apiResponse.getBody() != null && apiResponse.getBody().getStatus() == ResponseBodyDTO.ResponseStatus.OK) {
+        if (apiRespo.getBody() != null && apiRespo.getStatusCode() == HttpStatus.OK) {
             responseBodyDTO = ResponseBodyDTO.builder()
                     .status(ResponseBodyDTO.ResponseStatus.OK)
-                    .message(apiResponse.getBody().getMessage() != null ? apiResponse.getBody().getMessage() : "Meal created")
+                    .message(apiRespo.getBody() != null ? apiRespo.getBody() : "Meal created")
                     .build();
             return new ResponseEntity<>(responseBodyDTO, HttpStatus.OK);
         }
@@ -130,14 +138,15 @@ public class MealPageController {
     @GetMapping(value = "/generateMealBoard")
     public String mealPage(Model model, HttpServletRequest request, HttpServletResponse response) {
         String url = "http://" + UrlTools.apiUrl + "/auth/meal/allMeal";
-        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendGetRequest(url, ResponseBodyDTO.class, request, response);
-        if (apiResponse.getBody() != null && apiResponse.getBody().getStatus() == ResponseBodyDTO.ResponseStatus.OK) {
-            if (!apiResponse.getBody().getData().isEmpty()) {
-                List<?> mealMapList = (List<?>) apiResponse.getBody().getData().get("mealList");
-                List<Meal> mealList = classMapper.convertToDTOList(mealMapList, Meal.class);
-                model.addAttribute("mealList", mealList);
-            }
-        }
+        ResponseEntity<List<Meal>> mealList = apiClient.getAllMeals();
+//        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendGetRequest(url, ResponseBodyDTO.class, request, response);
+//        if (apiResponse.getBody() != null && apiResponse.getBody().getStatus() == ResponseBodyDTO.ResponseStatus.OK) {
+//            if (!apiResponse.getBody().getData().isEmpty()) {
+//                List<?> mealMapList = (List<?>) apiResponse.getBody().getData().get("mealList");
+//                List<Meal> mealList = classMapper.convertToDTOList(mealMapList, Meal.class);
+//                model.addAttribute("mealList", mealList);
+//            }
+//        }
         return "pages/logged/foodBoardPage";
     }
 
@@ -148,50 +157,53 @@ public class MealPageController {
         apiReq.setMealIds(form.getMealIds());
         apiReq.setMultiplier(form.getMultiplier());
         String url = "http://" + UrlTools.apiUrl + "/auth/meal/generateFoodBoard";
-        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendPostRequest(url, apiReq, ResponseBodyDTO.class, request, response);
-        if (apiResponse.getBody() != null && apiResponse.getBody().getStatus() == ResponseBodyDTO.ResponseStatus.OK) {
-            if (!apiResponse.getBody().getData().isEmpty()) {
-
-                List<?> mealMapList = (List<?>) apiResponse.getBody().getData().get("mealList");
-                List<Meal> mealList = classMapper.convertToDTOList(mealMapList, Meal.class);
-
-                List<?> ingredientToBuy = (List<?>) apiResponse.getBody().getData().get("ingredientToBuyDTOList");
-                List<IngredientToBuyDTO> ingredientsToBuyWeb = classMapper.convertToDTOList(ingredientToBuy, IngredientToBuyDTO.class);
-
-                model.addAttribute("meals", mealList);
-                model.addAttribute("result", ingredientsToBuyWeb);
-                model.addAttribute("idsList", form.getMealIds());
-
-            }
-        }
+        ResponseEntity<MealBoardDTO> mealBoardDTO = apiClient.generateFoodBoard(apiReq);
+//        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendPostRequest(url, apiReq, ResponseBodyDTO.class, request, response);
+//        if (apiResponse.getBody() != null && apiResponse.getBody().getStatus() == ResponseBodyDTO.ResponseStatus.OK) {
+//            if (!apiResponse.getBody().getData().isEmpty()) {
+//
+//                List<?> mealMapList = (List<?>) apiResponse.getBody().getData().get("mealList");
+//                List<Meal> mealList = classMapper.convertToDTOList(mealMapList, Meal.class);
+//
+//                List<?> ingredientToBuy = (List<?>) apiResponse.getBody().getData().get("ingredientToBuyDTOList");
+//                List<IngredientToBuyDTO> ingredientsToBuyWeb = classMapper.convertToDTOList(ingredientToBuy, IngredientToBuyDTO.class);
+//
+//                model.addAttribute("meals", mealList);
+//                model.addAttribute("result", ingredientsToBuyWeb);
+//                model.addAttribute("idsList", form.getMealIds());
+//
+//            }
+//        }
         return "pages/logged/foodBoardResult";
     }
 
     @PostMapping(value = "/downloadMealDocument", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public void downloadMealDocument(@RequestParam("mealIds") List<Long> ids, HttpServletRequest request, HttpServletResponse response) throws IOException {
         String url = "http://" + UrlTools.apiUrl + "/auth/meal/getMealNamesById";
-        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendPostRequest(url, ids, ResponseBodyDTO.class, request, response);
-        if (apiResponse.getStatusCode() == HttpStatus.OK && apiResponse.getBody() != null) {
-            List<String> mealMapList = (List<String>) apiResponse.getBody().getData().get("mealNames");
-            System.out.println(mealMapList);
-            try (XWPFDocument document = new XWPFDocument(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-
-                byte[] documentBytes = DocumentService.createMealDocument(document, out, mealMapList);
-                response.setContentType("application/octet-stream");
-                response.setHeader("Content-Disposition", "attachment; filename=\"jedzonko.docx\"");
-                response.getOutputStream().write(documentBytes);
-                response.getOutputStream().flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-                webPageService.setMsg(MessageType.ERROR, "There was error during file generation");
-            }
-        }
+        ResponseEntity<List<String>> mealMapList = apiClient.getMealNamesById(ids);
+//        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendPostRequest(url, ids, ResponseBodyDTO.class, request, response);
+//        if (apiResponse.getStatusCode() == HttpStatus.OK && apiResponse.getBody() != null) {
+//            List<String> mealMapList = (List<String>) apiResponse.getBody().getData().get("mealNames");
+//            System.out.println(mealMapList);
+//            try (XWPFDocument document = new XWPFDocument(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+//
+//                byte[] documentBytes = DocumentService.createMealDocument(document, out, mealMapList);
+//                response.setContentType("application/octet-stream");
+//                response.setHeader("Content-Disposition", "attachment; filename=\"jedzonko.docx\"");
+//                response.getOutputStream().write(documentBytes);
+//                response.getOutputStream().flush();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                webPageService.setMsg(MessageType.ERROR, "There was error during file generation");
+//            }
+//        }
     }
 
     @GetMapping(value = "/mealHistory")
     public String mealHistory(Model model, HttpServletRequest request, HttpServletResponse response) {
         String url = "http://" + UrlTools.apiUrl + "/auth/meal/getMealHistory";
-        ResponseEntity<HttpStatus> apiResponse = webPageService.sendGetRequest(url, HttpStatus.class, request, response);
+        ResponseEntity<HttpStatus> mealHistory = apiClient.getMealHistory();
+//        ResponseEntity<HttpStatus> apiResponse = webPageService.sendGetRequest(url, HttpStatus.class, request, response);
         return "pages/logged/mealHistoryPage";
     }
 

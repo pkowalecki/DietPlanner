@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import pl.kowalecki.dietplanner.controller.DietplannerApiClient;
 import pl.kowalecki.dietplanner.model.DTO.ResponseBodyDTO;
 import pl.kowalecki.dietplanner.model.DTO.meal.IngredientNameDTO;
 import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
@@ -21,19 +22,15 @@ import java.util.List;
 @RequestMapping("/app/auth")
 public class IngredientsController {
 
-    IWebPageService webPageService;
+//    IWebPageService webPageService;
     ClassMapper classMapper;
+    DietplannerApiClient apiClient;
 
     @GetMapping("/ingredientNames/search")
-    public ResponseEntity<List<IngredientNameDTO>> searchIngredients(@RequestParam("query") String query, HttpServletRequest request, HttpServletResponse response) {
+    public List<IngredientNameDTO> searchIngredients(@RequestParam("query") String query, HttpServletRequest request, HttpServletResponse response) {
         String url = "http://" + UrlTools.apiUrl + "/auth/ingredientNames/search?query=" + query;
-        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendGetRequest(url, ResponseBodyDTO.class, request, response);
-        if (apiResponse.getBody() != null) {
-            List<?> ingredientNamesList = (List<?>) apiResponse.getBody().getData().get("ingredientNames");
-            List<IngredientNameDTO> ingredientNames = classMapper.convertToDTOList(ingredientNamesList, IngredientNameDTO.class);
-            return ResponseEntity.ok(ingredientNames);
-        }else{
-            return ResponseEntity.notFound().build();
-        }
+        ResponseEntity<List<IngredientNameDTO>> apiResponse = apiClient.getIngredientNames(query);
+        return apiResponse.getBody();
+
     }
 }

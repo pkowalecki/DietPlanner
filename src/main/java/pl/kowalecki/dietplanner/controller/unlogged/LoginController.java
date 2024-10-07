@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import pl.kowalecki.dietplanner.controller.DietplannerApiClient;
 import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
 import pl.kowalecki.dietplanner.model.DTO.ResponseBodyDTO;
 import pl.kowalecki.dietplanner.model.DTO.User.LoginRequestDTO;
@@ -25,6 +26,7 @@ import java.util.List;
 @AllArgsConstructor
 public class LoginController{
     private final IWebPageService webPageService;
+    private final DietplannerApiClient apiClient;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String index(@RequestParam(value = "sessionExpired", required = false) String sessionExpired, Model model) {
@@ -38,10 +40,10 @@ public class LoginController{
     public String postLoginPage(@ModelAttribute("loginForm") LoginRequestDTO loginRequestDto, HttpSession session, Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
         try {
             String url = "http://" + UrlTools.apiUrl + "/login";
-            ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendPostRequest(url, loginRequestDto, ResponseBodyDTO.class, request, httpResponse);
-            if (apiResponse.getStatusCode() == HttpStatus.OK) {
-                ResponseBodyDTO responseBodyDTO = apiResponse.getBody();
-                List<String> cookies = apiResponse.getHeaders().get(HttpHeaders.SET_COOKIE);
+            ResponseEntity<HttpStatus> loginRequest = apiClient.postLoginRequest(loginRequestDto);
+//            ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendPostRequest(url, loginRequestDto, ResponseBodyDTO.class, request, httpResponse);
+            if (loginRequest.getStatusCode() == HttpStatus.OK) {
+                List<String> cookies = loginRequest.getHeaders().get(HttpHeaders.SET_COOKIE);
                 if (cookies != null) {
                     for (String cookieHeader : cookies) {
                         httpResponse.addHeader(HttpHeaders.SET_COOKIE, cookieHeader);
