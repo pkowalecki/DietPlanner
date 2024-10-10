@@ -207,32 +207,32 @@ public class MealPageController {
     public String mealsHistory(Model model, HttpServletRequest request, HttpServletResponse response) {
         ArrayList<Map<String, Object>> dane = new ArrayList<Map<String,Object>>();
         String url = "http://" + UrlTools.apiUrl + "/auth/meal/getMealHistory";
-        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendGetRequest(url, ResponseBodyDTO.class, request, response);
-        if (apiResponse.getStatusCode() == HttpStatus.OK && apiResponse.getBody() != null) {
-            List<?> mealHistoryList = (List<?>) apiResponse.getBody().getData().get("mealHistoryList");
-            List<MealHistoryDTO> mealHistory = classMapper.convertToDTOList(mealHistoryList, MealHistoryDTO.class);
-            for (MealHistoryDTO historyDTO : mealHistory) {
-                Map<String, Object> meal = new HashMap<>();
-                meal.put("id", historyDTO.getPublic_id());
-                meal.put("userId", historyDTO.getUserId());
-                meal.put("mealsId", historyDTO.getMealsIds());
-                meal.put("created", DateUtils.parseDateToddmmyy(historyDTO.getCreated()));
-                meal.put("multiplier", historyDTO.getMultiplier());
-                dane.add(meal);
-            }
-            model.addAttribute("mealHistory", dane);
-        }
+//        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendGetRequest(url, ResponseBodyDTO.class, request, response);
+//        if (apiResponse.getStatusCode() == HttpStatus.OK && apiResponse.getBody() != null) {
+//            List<?> mealHistoryList = (List<?>) apiResponse.getBody().getData().get("mealHistoryList");
+//            List<MealHistoryDTO> mealHistory = classMapper.convertToDTOList(mealHistoryList, MealHistoryDTO.class);
+//            for (MealHistoryDTO historyDTO : mealHistory) {
+//                Map<String, Object> meal = new HashMap<>();
+//                meal.put("id", historyDTO.getPublic_id());
+//                meal.put("userId", historyDTO.getUserId());
+//                meal.put("mealsId", historyDTO.getMealsIds());
+//                meal.put("created", DateUtils.parseDateToddmmyy(historyDTO.getCreated()));
+//                meal.put("multiplier", historyDTO.getMultiplier());
+//                dane.add(meal);
+//            }
+//            model.addAttribute("mealHistory", dane);
+//        }
         return "pages/logged/mealsHistoryPage";
     }
 
     @PostMapping(value = "/mealHistory")
     public String getMealHistoryPage(@RequestParam("id")String param, Model model, HttpServletRequest request, HttpServletResponse response, InputStream inputStream) {
         String url = "http://" + UrlTools.apiUrl + "/auth/meal/getMealHistory";
-        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendPostRequest(url, param, ResponseBodyDTO.class, request, response);
-        if (apiResponse.getStatusCode() == HttpStatus.OK && apiResponse.getBody() != null) {
-            MealHistoryDetailsDTO mealHistory = classMapper.convertToDTO(apiResponse.getBody().getData().get("mealHistory"), MealHistoryDetailsDTO.class);
-            model.addAttribute("mealHistory", mealHistory);
-        }
+//        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendPostRequest(url, param, ResponseBodyDTO.class, request, response);
+//        if (apiResponse.getStatusCode() == HttpStatus.OK && apiResponse.getBody() != null) {
+//            MealHistoryDetailsDTO mealHistory = classMapper.convertToDTO(apiResponse.getBody().getData().get("mealHistory"), MealHistoryDetailsDTO.class);
+//            model.addAttribute("mealHistory", mealHistory);
+//        }
         return "pages/logged/mealHistoryPage";
     }
 

@@ -14,7 +14,6 @@ import pl.kowalecki.dietplanner.model.Meal;
 
 import java.util.List;
 
-//@FeignClient(name = "diet-planner-api", path = "${diet.planner.api.prefix}", url = "localhost:8082")
 @FeignClient(name = "diet-planner-api")
 public interface DietplannerApiClient {
 
@@ -42,7 +41,8 @@ public interface DietplannerApiClient {
     @GetMapping("/meal/getMealHistory")
     ResponseEntity<HttpStatus> getMealHistory();
 
-    @RequestMapping(method = RequestMethod.POST, value= "/api/v1/login")
+    @PostMapping("/api/v1/dpa/login")
+//    @RequestMapping(method = RequestMethod.POST, value= "/api/v1/login")
     ResponseEntity<HttpStatus> postLoginRequest(@RequestBody LoginRequestDTO loginRequestDto);
 
     @GetMapping("/")
