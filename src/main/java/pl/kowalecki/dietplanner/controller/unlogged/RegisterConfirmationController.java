@@ -11,8 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
-import pl.kowalecki.dietplanner.controller.DietplannerApiClient;
-import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
+
 import pl.kowalecki.dietplanner.model.DTO.ResponseBodyDTO;
 import pl.kowalecki.dietplanner.utils.UrlTools;
 
@@ -21,14 +20,13 @@ import pl.kowalecki.dietplanner.utils.UrlTools;
 @AllArgsConstructor
 public class RegisterConfirmationController {
 
-    private final IWebPageService webPageService;
-    private final DietplannerApiClient apiClient;
+//    private final IWebPageService webPageService;
 
 
     @GetMapping("/confirm")
     public String confirmUser(Model model, @RequestParam("token") String confirmationToken, HttpServletRequest request, HttpServletResponse servletResponse) {
         String url = "http://" + UrlTools.apiUrl + "/confirm?token=" + confirmationToken;
-        ResponseEntity<HttpStatus> responseBody = apiClient.userConfirmation(confirmationToken);
+
 //        ResponseEntity<ResponseBodyDTO> response = webPageService.sendGetRequest(url, ResponseBodyDTO.class, request, servletResponse);
 //        ResponseBodyDTO responseBodyDTO = response.getBody();
 //        if (responseBodyDTO != null) {

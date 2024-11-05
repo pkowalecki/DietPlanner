@@ -7,7 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
+//import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
 
 import java.util.Map;
 
@@ -16,12 +16,12 @@ import java.util.Map;
 @AllArgsConstructor
 public class GlobalControllerAdvice {
 
-    IWebPageService webPageService;
-
-    @ModelAttribute
-    public void addCommonWebData(Model model) {
-        webPageService.addCommonWebData(model);
-    }
+//    IWebPageService webPageService;
+//
+//    @ModelAttribute
+//    public void addCommonWebData(Model model) {
+//        webPageService.addCommonWebData(model);
+//    }
 
     @ExceptionHandler(Exception.class)
     public String handleGenericException(Exception e, Model model, HttpServletRequest request) {

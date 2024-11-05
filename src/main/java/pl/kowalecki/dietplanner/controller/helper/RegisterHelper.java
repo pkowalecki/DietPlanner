@@ -3,7 +3,7 @@ package pl.kowalecki.dietplanner.controller.helper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import pl.kowalecki.dietplanner.model.DTO.RegistrationRequestDTO;
-import pl.kowalecki.dietplanner.services.UserDetails.UserDetailsServiceImpl;
+
 import pl.kowalecki.dietplanner.utils.TextTools;
 
 import java.util.*;
@@ -12,7 +12,6 @@ import java.util.*;
 @AllArgsConstructor
 public class RegisterHelper {
 
-    private UserDetailsServiceImpl userService;
 
 
     static Map<String, String> errors;
