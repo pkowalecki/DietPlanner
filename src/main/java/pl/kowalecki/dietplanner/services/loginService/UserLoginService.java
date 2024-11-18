@@ -7,13 +7,15 @@ import pl.kowalecki.dietplanner.model.DTO.User.LoginRequestDTO;
 import pl.kowalecki.dietplanner.model.DTO.User.LoginResponseDTO;
 import reactor.core.publisher.Mono;
 
+import static pl.kowalecki.dietplanner.utils.UrlTools.AUTH_SERVICE_URL;
+
 @Service
 public class UserLoginService {
 
     private final WebClient webClient;
 
     public UserLoginService(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl("http://localhost:8080/api/v1/auth").build();
+        this.webClient = webClientBuilder.baseUrl(AUTH_SERVICE_URL).build();
     }
 
     public Mono<ResponseEntity<LoginResponseDTO>> postUserLogin(LoginRequestDTO loginRequestDto) {

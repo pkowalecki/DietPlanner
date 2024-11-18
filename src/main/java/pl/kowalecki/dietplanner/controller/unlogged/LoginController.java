@@ -15,7 +15,6 @@ import pl.kowalecki.dietplanner.services.loginService.UserLoginService;
 import reactor.core.publisher.Mono;
 
 
-@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 @RequestMapping("/app")
 @Controller
 @AllArgsConstructor

@@ -25,7 +25,7 @@ public class RegisterConfirmationController {
 
     @GetMapping("/confirm")
     public String confirmUser(Model model, @RequestParam("token") String confirmationToken, HttpServletRequest request, HttpServletResponse servletResponse) {
-        String url = "http://" + UrlTools.apiUrl + "/confirm?token=" + confirmationToken;
+        String url = "http://" + UrlTools.AUTH_SERVICE_URL + "/confirm?token=" + confirmationToken;
 
 //        ResponseEntity<ResponseBodyDTO> response = webPageService.sendGetRequest(url, ResponseBodyDTO.class, request, servletResponse);
 //        ResponseBodyDTO responseBodyDTO = response.getBody();

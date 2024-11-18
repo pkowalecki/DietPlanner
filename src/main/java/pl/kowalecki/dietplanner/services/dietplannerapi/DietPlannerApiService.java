@@ -11,6 +11,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
+import static pl.kowalecki.dietplanner.utils.UrlTools.MEAL_SERVICE_URL;
+
 
 @Service
 public class DietPlannerApiService {
@@ -18,15 +20,10 @@ public class DietPlannerApiService {
     private final WebClient webClient;
 
     public DietPlannerApiService(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl("http://localhost:8080/api/v1/dpa").build();
+        this.webClient = webClientBuilder.baseUrl(MEAL_SERVICE_URL).build();
     }
 
-    public Mono<MealStarterPackDTO> getMealStarterPack(){
-        return webClient.get()
-                .uri("/getMealStarterPack")
-                .retrieve()
-                .bodyToMono(MealStarterPackDTO.class);
-    }
+
 
     public Mono<ResponseEntity<LoginResponseDTO>> postUserLogin(LoginRequestDTO loginRequestDto) {
         return webClient.post()

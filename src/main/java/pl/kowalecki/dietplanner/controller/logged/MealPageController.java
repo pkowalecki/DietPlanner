@@ -38,7 +38,7 @@ public class MealPageController {
 
     @GetMapping(value = "/addMeal")
     public Mono<String> getListMeal(Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
-        return apiService.getMealStarterPack()
+        return apiMealService.getMealStarterPack()
                 .map(mealList -> {
                     model.addAttribute("mealList", mealList);
                     return "pages/logged/addMeal";
@@ -101,7 +101,7 @@ public class MealPageController {
 
     @PostMapping(value = "/downloadMealDocument", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public void downloadMealDocument(@RequestParam("mealIds") List<Long> ids, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String url = "http://" + UrlTools.apiUrl + "/auth/meal/getMealNamesById";
+//        String url = "http://" + UrlTools.MEAL_SERVICE_URL + "/meal/getMealNamesById";
 //        ResponseEntity<List<String>> mealMapList = apiClient.getMealNamesById(ids);
 //        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendPostRequest(url, ids, ResponseBodyDTO.class, request, response);
 //        if (apiResponse.getStatusCode() == HttpStatus.OK && apiResponse.getBody() != null) {
@@ -124,7 +124,7 @@ public class MealPageController {
     @GetMapping(value = "/mealsHistory")
     public String mealsHistory(Model model, HttpServletRequest request, HttpServletResponse response) {
         ArrayList<Map<String, Object>> dane = new ArrayList<Map<String,Object>>();
-        String url = "http://" + UrlTools.apiUrl + "/auth/meal/getMealHistory";
+//        String url = "http://" + UrlTools.MEAL_SERVICE_URL + "/meal/getMealHistory";
 //        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendGetRequest(url, ResponseBodyDTO.class, request, response);
 //        if (apiResponse.getStatusCode() == HttpStatus.OK && apiResponse.getBody() != null) {
 //            List<?> mealHistoryList = (List<?>) apiResponse.getBody().getData().get("mealHistoryList");
@@ -145,7 +145,7 @@ public class MealPageController {
 
     @PostMapping(value = "/mealHistory")
     public String getMealHistoryPage(@RequestParam("id")String param, Model model, HttpServletRequest request, HttpServletResponse response, InputStream inputStream) {
-        String url = "http://" + UrlTools.apiUrl + "/auth/meal/getMealHistory";
+//        String url = "http://" + UrlTools.MEAL_SERVICE_URL + "/meal/getMealHistory";
 //        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendPostRequest(url, param, ResponseBodyDTO.class, request, response);
 //        if (apiResponse.getStatusCode() == HttpStatus.OK && apiResponse.getBody() != null) {
 //            MealHistoryDetailsDTO mealHistory = classMapper.convertToDTO(apiResponse.getBody().getData().get("mealHistory"), MealHistoryDetailsDTO.class);
