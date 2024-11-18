@@ -26,7 +26,6 @@
 <body>
 <header>
     <#if user??>
-        XD ${user}
         <div class="nav-container">
             <button class="dropbtn" onclick="location.href='/app/auth/loggedUserBoard'">Strona główna</button>
             <div class="dropdown">
@@ -35,6 +34,7 @@
                     <a class="dropbtn-child" onclick="location.href='/app/auth/addMeal'">Dodaj posiłek</a>
                     <a class="dropbtn-child" onclick="location.href='/app/auth/addIngredientName'">Dodaj składnik</a>
                     <a class="dropbtn-child" onclick="location.href='/app/auth/generateMealBoard'">Wygeneruj plan żywienia</a>
+                    <a class="dropbtn-child" onclick="location.href='/app/auth/mealsHistory'">Historia posiłków</a>
                 </div>
             </div>
         </div>
