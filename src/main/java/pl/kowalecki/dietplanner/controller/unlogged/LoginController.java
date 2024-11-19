@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import pl.kowalecki.dietplanner.model.DTO.User.LoginRequestDTO;
 import pl.kowalecki.dietplanner.services.loginService.UserLoginService;
 import reactor.core.publisher.Mono;
@@ -43,9 +44,16 @@ public class LoginController{
                         return Mono.just("pages/unlogged/index");
                     }
                 })
-                .onErrorResume(e -> {
+                .onErrorResume(WebClientResponseException.class, e -> {
                     System.out.println("Próbowałem się zalogować: " + loginRequestDto.getEmail());
-                    model.addAttribute("error", "Bad data, try again");
+                    System.out.println(e.getStatusCode());
+                    if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+                        model.addAttribute("error", "Invalid email or password");
+                    } else if (e.getStatusCode() == HttpStatus.BAD_REQUEST) {
+                        model.addAttribute("error", "Bad request data. Check your input.");
+                    } else {
+                        model.addAttribute("error", "Unexpected error occurred. Please try again.");
+                    }
                     return Mono.just("pages/unlogged/index");
                 });
     }

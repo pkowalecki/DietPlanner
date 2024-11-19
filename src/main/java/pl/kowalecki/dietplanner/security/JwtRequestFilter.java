@@ -16,6 +16,8 @@ import pl.kowalecki.dietplanner.utils.JwtUtil;
 import java.io.IOException;
 import java.util.List;
 
+import static pl.kowalecki.dietplanner.utils.UrlTools.AUTH_SERVICE_URL;
+
 @Slf4j
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -25,7 +27,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     public JwtRequestFilter(JwtUtil jwtUtils, WebClient.Builder webClientBuilder) {
         this.jwtUtils = jwtUtils;
-        this.authorizationWebClient = webClientBuilder.baseUrl("localhost:8080/api/v1/auth/refresh").build();
+        this.authorizationWebClient = webClientBuilder.baseUrl(AUTH_SERVICE_URL+"/refresh").build();
     }
 
     @Override
