@@ -4,7 +4,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import pl.kowalecki.dietplanner.model.DTO.User.LoginRequestDTO;
-import pl.kowalecki.dietplanner.model.DTO.User.LoginResponseDTO;
 import reactor.core.publisher.Mono;
 
 import static pl.kowalecki.dietplanner.utils.UrlTools.AUTH_SERVICE_URL;
@@ -18,11 +17,11 @@ public class UserLoginService {
         this.webClient = webClientBuilder.baseUrl(AUTH_SERVICE_URL).build();
     }
 
-    public Mono<ResponseEntity<LoginResponseDTO>> postUserLogin(LoginRequestDTO loginRequestDto) {
+    public Mono<ResponseEntity<Object>> postUserLogin(LoginRequestDTO loginRequestDto) {
         return webClient.post()
                 .uri("/login")
                 .bodyValue(loginRequestDto)
                 .retrieve()
-                .toEntity(LoginResponseDTO.class);
+                .toEntity(Object.class);
     }
 }

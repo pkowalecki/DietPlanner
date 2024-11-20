@@ -25,7 +25,7 @@
 </head>
 <body>
 <header>
-    <#if user??>
+    <#if isLoggedIn??>
         <div class="nav-container">
             <button class="dropbtn" onclick="location.href='/app/auth/loggedUserBoard'">Strona główna</button>
             <div class="dropdown">

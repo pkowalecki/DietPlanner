@@ -40,22 +40,21 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String accessToken = jwtUtils.extractTokenFromRequest(request, jwtName);
+
 
         List<String> openPaths = List.of(
                 "/",
                 "/app/",
                 "/app/login",
-                "/app/registerModal",
-                "/css/",
-                "/js/",
-                "/images/"
+                "/app/registerModal"
         );
 
-        if (openPaths.stream().anyMatch(request.getRequestURI()::equals)) {
+        if (openPaths.stream().anyMatch(request.getRequestURI()::equals) || request.getRequestURI().startsWith("/static/")) {
             filterChain.doFilter(request, response);
             return;
         }
+
+        String accessToken = jwtUtils.extractTokenFromRequest(request, jwtName);
 
         if (accessToken != null) {
             try {

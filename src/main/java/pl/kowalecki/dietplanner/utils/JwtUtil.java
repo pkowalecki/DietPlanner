@@ -1,9 +1,6 @@
 package pl.kowalecki.dietplanner.utils;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
@@ -23,9 +20,10 @@ public class JwtUtil {
     @Value("${dietplanner.app.jwtSecret}")
     private String jwtSecret;
 
-    public void isTokenValid(final String token) {
+    public boolean isTokenValid(final String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key()).build().parse(token);
+            return true;
         } catch (MalformedJwtException e) {
             log.error("Invalid JWT token: {}", e.getMessage());
         } catch (ExpiredJwtException e) {
@@ -35,6 +33,7 @@ public class JwtUtil {
         } catch (IllegalArgumentException e) {
             log.error("JWT claims string is empty: {}", e.getMessage());
         }
+        return false;
     }
 
     private Key key() {
@@ -54,5 +53,18 @@ public class JwtUtil {
             }
         }
         return Optional.empty();
+    }
+
+    public Claims getClaims(String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (Exception e) {
+            log.error("Failed to parse JWT: {}", e.getMessage());
+            throw new IllegalArgumentException("Invalid token", e);
+        }
     }
 }
