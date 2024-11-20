@@ -41,6 +41,11 @@ public class JwtUtil {
     }
 
     public String extractTokenFromRequest(HttpServletRequest request, String token) {
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                log.info("Cookie: {} = {}", cookie.getName(), cookie.getValue());
+            }
+        }
         return Optional.ofNullable(request.getCookies())
                 .flatMap(cookies -> getTokenFromCookies(cookies, token))
                 .orElse(null);
