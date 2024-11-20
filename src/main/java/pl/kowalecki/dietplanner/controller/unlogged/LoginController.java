@@ -19,8 +19,8 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/app")
 @Controller
 @AllArgsConstructor
-public class LoginController{
-//    private final IWebPageService webPageService;
+public class LoginController {
+    //    private final IWebPageService webPageService;
     private UserLoginService loginService;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
@@ -44,16 +44,10 @@ public class LoginController{
                         return Mono.just("pages/unlogged/index");
                     }
                 })
-                .onErrorResume(WebClientResponseException.class, e -> {
+                .onErrorResume(Exception.class, e -> {
                     System.out.println("Próbowałem się zalogować: " + loginRequestDto.getEmail());
-                    System.out.println(e.getStatusCode());
-                    if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-                        model.addAttribute("error", "Invalid email or password");
-                    } else if (e.getStatusCode() == HttpStatus.BAD_REQUEST) {
-                        model.addAttribute("error", "Bad request data. Check your input.");
-                    } else {
-                        model.addAttribute("error", "Unexpected error occurred. Please try again.");
-                    }
+                    System.out.println(e.getMessage());
+                    model.addAttribute("error", "Unexpected error occurred. Please try again.");
                     return Mono.just("pages/unlogged/index");
                 });
     }

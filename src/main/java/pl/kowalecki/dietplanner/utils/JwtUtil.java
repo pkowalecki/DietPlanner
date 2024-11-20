@@ -41,9 +41,9 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 
-    public String extractTokenFromRequest(HttpServletRequest request) {
+    public String extractTokenFromRequest(HttpServletRequest request, String token) {
         return Optional.ofNullable(request.getCookies())
-                .flatMap(cookies -> getTokenFromCookies(cookies, "accessToken"))
+                .flatMap(cookies -> getTokenFromCookies(cookies, token))
                 .orElse(null);
     }
 

@@ -6,6 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
@@ -29,15 +30,21 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         this.jwtUtils = jwtUtils;
         this.authorizationWebClient = webClientBuilder.baseUrl(AUTH_SERVICE_URL+"/refresh").build();
     }
+    @Value("${dietplanner.app.jwtCookieName}")
+    String jwtName;
+    @Value("${dietplanner.app.jwtRefreshCookieName}")
+    String jwtRefName;
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String accessToken = jwtUtils.extractTokenFromRequest(request);
+        String accessToken = jwtUtils.extractTokenFromRequest(request, jwtName);
 
         List<String> openPaths = List.of(
                 "/",
+                "/app/",
                 "/app/login",
                 "/app/registerModal",
                 "/css/",
@@ -45,7 +52,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 "/images/"
         );
 
-        if (openPaths.stream().anyMatch(request.getRequestURI()::startsWith)) {
+        if (openPaths.stream().anyMatch(request.getRequestURI()::equals)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -56,7 +63,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             } catch (ExpiredJwtException e) {
                 log.info("Access token expired. Attempting to refresh...");
 
-                String refreshToken = jwtUtils.extractTokenFromRequest(request);
+                String refreshToken = jwtUtils.extractTokenFromRequest(request, jwtRefName);
 
                 if (refreshToken != null) {
                     try {
