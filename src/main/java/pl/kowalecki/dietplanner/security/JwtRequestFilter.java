@@ -107,8 +107,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 .uri("/refresh")
                 .cookie(jwtRefName, refreshToken)
                 .retrieve()
-                .bodyToMono(String.class)
-                .block();
+                .toEntity(String.class)
+                .block()
+                .getHeaders()
+                .getFirst(HttpHeaders.SET_COOKIE);
     }
 
 
