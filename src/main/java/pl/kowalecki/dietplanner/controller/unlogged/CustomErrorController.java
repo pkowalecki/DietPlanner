@@ -14,15 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @AllArgsConstructor
 public class CustomErrorController implements ErrorController {
 
-//    @Autowired
-//    IWebPageService webPageService;
-
     @RequestMapping("/error")
     public String handleError(HttpServletRequest request, Model model) {
         Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
         String errorMessage = "Wystąpił nieoczekiwany błąd";
         model.addAttribute("error", errorMessage);
-//        webPageService.addCommonWebData(model);
         return "pages/unlogged/errorPage";
     }
 

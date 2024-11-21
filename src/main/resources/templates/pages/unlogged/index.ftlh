@@ -1,5 +1,5 @@
 <#-- index.ftlh -->
-<#include "../../webData/header.ftlh">
+<#include "../../webData/starter.ftlh">
 <link rel="stylesheet" href="../../../static/css/loginPage.css"/>
 <div class="container wrapper">
     <div class="row col-12 col-md-6 mx-auto py-4 center-content">

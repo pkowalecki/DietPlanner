@@ -9,10 +9,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.reactive.function.client.WebClient;
+import pl.kowalecki.dietplanner.model.DTO.User.LoginRequestDTO;
 import pl.kowalecki.dietplanner.utils.JwtUtil;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,10 +31,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     public JwtRequestFilter(JwtUtil jwtUtils, WebClient.Builder webClientBuilder) {
         this.jwtUtils = jwtUtils;
-        this.authorizationWebClient = webClientBuilder.baseUrl(AUTH_SERVICE_URL+"/refresh").build();
+        this.authorizationWebClient = webClientBuilder.baseUrl(AUTH_SERVICE_URL).build();
     }
     @Value("${dietplanner.app.jwtCookieName}")
-    String jwtName;
+    String cookieWithJwtName;
     @Value("${dietplanner.app.jwtRefreshCookieName}")
     String jwtRefName;
 
@@ -39,8 +42,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-
-
 
         List<String> openPaths = List.of(
                 "/",
@@ -54,24 +55,23 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             return;
         }
 
-        String accessToken = jwtUtils.extractTokenFromRequest(request, jwtName);
+        String accessToken = jwtUtils.extractTokenFromRequest(request, cookieWithJwtName);
 
         if (accessToken != null) {
             try {
-                jwtUtils.isTokenValid(accessToken);
+                jwtUtils.validateToken(accessToken);
             } catch (ExpiredJwtException e) {
                 log.info("Access token expired. Attempting to refresh...");
-
                 String refreshToken = jwtUtils.extractTokenFromRequest(request, jwtRefName);
 
                 if (refreshToken != null) {
                     try {
                         String newAccessToken = refreshAccessToken(refreshToken);
 
-                        ResponseCookie newAccessTokenCookie = ResponseCookie.from("accessToken", newAccessToken)
+                        ResponseCookie newAccessTokenCookie = ResponseCookie.from(cookieWithJwtName, newAccessToken)
                                 .path("/")
                                 .httpOnly(true)
-                                .secure(true)
+//                                .secure(true) HTTPS
                                 .build();
                         response.addHeader(HttpHeaders.SET_COOKIE, newAccessTokenCookie.toString());
 
@@ -102,11 +102,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 
     private String refreshAccessToken(String refreshToken) {
+        log.info("Refresh access token: {}", refreshToken);
         return authorizationWebClient.post()
                 .uri("/refresh")
-                .header("Authorization", "Bearer " + refreshToken)
+                .cookie(jwtRefName, refreshToken)
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
     }
+
+
 }

@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.security.SignatureException;
 import java.util.Optional;
 
 @Slf4j
@@ -20,20 +19,8 @@ public class JwtUtil {
     @Value("${dietplanner.app.jwtSecret}")
     private String jwtSecret;
 
-    public boolean isTokenValid(final String token) {
-        try {
-            Jwts.parserBuilder().setSigningKey(key()).build().parse(token);
-            return true;
-        } catch (MalformedJwtException e) {
-            log.error("Invalid JWT token: {}", e.getMessage());
-        } catch (ExpiredJwtException e) {
-            log.error("JWT token is expired: {}", e.getMessage());
-        } catch (UnsupportedJwtException e) {
-            log.error("JWT token is unsupported: {}", e.getMessage());
-        } catch (IllegalArgumentException e) {
-            log.error("JWT claims string is empty: {}", e.getMessage());
-        }
-        return false;
+    public void validateToken(final String token) {
+        Jwts.parserBuilder().setSigningKey(key()).build().parse(token);
     }
 
     private Key key() {
@@ -41,11 +28,6 @@ public class JwtUtil {
     }
 
     public String extractTokenFromRequest(HttpServletRequest request, String token) {
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                log.info("Cookie: {} = {}", cookie.getName(), cookie.getValue());
-            }
-        }
         return Optional.ofNullable(request.getCookies())
                 .flatMap(cookies -> getTokenFromCookies(cookies, token))
                 .orElse(null);
@@ -72,4 +54,5 @@ public class JwtUtil {
             throw new IllegalArgumentException("Invalid token", e);
         }
     }
+
 }
