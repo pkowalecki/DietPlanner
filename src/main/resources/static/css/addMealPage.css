@@ -48,11 +48,11 @@
 .ingredientGroup, .measurementGroup {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 5%;
 }
 
 .ingredientGroup .input, .measurementGroup .input {
-    width: 60px;
+    /*width: 60px;*/
 }
 
 .ingredientGroup .select, .measurementGroup .select {
@@ -83,7 +83,7 @@
 }
 
 .amount .input.shorten {
-    max-width: 80px;
+    max-width: 100%;
 }
 
 
@@ -95,7 +95,7 @@
 }
 
 .measurement .input.shorten {
-    max-width: 80px;
+    max-width: 100%;
 }
 
 
@@ -160,7 +160,6 @@
     margin: 15% auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 80%;
 }
 
 .close {

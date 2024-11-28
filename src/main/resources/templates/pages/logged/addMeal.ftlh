@@ -36,7 +36,7 @@
                     <label for="mealTypesSelect" class="form-label">Meal Types</label>
                     <select class="selectpicker form-control" data-live-search="true" name="mealTypes"
                             id="mealTypesSelect" multiple>
-                        <#list mealTypes as mealType>
+                        <#list mealList.mealTypeList as mealType>
                             <#if mealType??>
                                 <option value="${mealType.getMealTypePl()}">${mealType.getMealTypePl()}</option>
                             </#if>
@@ -66,9 +66,9 @@
                 <div class="ingredient" id="ingredient">
                     <label for="ingredientSelect" class="label">Ingredient</label>
                     <select class="selectpicker" data-width="100%" data-live-search="true" name="ingredientNameId" id="ingredientSelect">
-                        <#list ingredientsNames as ingredient>
+                        <#list mealList.ingredientNameList as ingredient>
                             <#if ingredient??>
-                                <option value="${ingredient.getId()}">${ingredient.getName()}</option>
+                                <option value="${ingredient.getId()}">${ingredient.getIngredientName()}</option>
                             </#if>
                         </#list>
                     </select>
@@ -77,10 +77,10 @@
                     <div class="amount">
                         <label for="ingredientAmount" class="label">Amount</label>
                         <div class="inputs-container">
-                            <input type="text" class="input shorten" id="ingredientAmount" name="ingredientAmount"
-                                   required>
+                            <input type="number" class="input shorten" id="ingredientAmount" name="ingredientAmount"
+                                   step="0.25" value="1" min="0" max="2000" required>
                             <select class="selectpicker" data-width="55%" data-live-search="true" name="ingredientUnits" id="ingredientUnitsSelect">
-                                <#list ingredientUnits as ingredientUnit>
+                                <#list mealList.ingredientUnitList as ingredientUnit>
                                     <#if ingredientUnit??>
                                         <option value="${ingredientUnit.getShortName()}">${ingredientUnit.getShortName()}</option>
                                     </#if>
@@ -91,12 +91,12 @@
                     <div class="measurement">
                         <label for="measurementValue" class="label">Measurement</label>
                         <div class="inputs-container">
-                            <input type="text" class="input shorten" id="measurementValue" name="measurementValue"
-                                   required>
+                            <input type="number" class="input shorten" id="measurementValue" name="measurementValue"
+                                   step="0.25" value="1" min="0" max="2000" required>
                             <select class="selectpicker" data-width="70%" data-live-search="true" name="measurementTypes" id="measurementTypesSelect">
-                                <#list measurementTypes as measurementType>
+                                <#list mealList.measurementTypeList as measurementType>
                                     <#if measurementType??>
-                                        <option value="${measurementType.getMeasurementName()}">${measurementType.getMeasurementName()}</option>
+                                        <option value="${measurementType.getId()}">${measurementType.getNamePL()}</option>
                                     </#if>
                                 </#list>
                             </select>
@@ -288,19 +288,19 @@
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(mealData),
-                success: function (response) {
-                    if (response.status === 'BAD_DATA') {
-                        const errors = response.data;
+                success: function () {
+                    console.log("Meal added successfully");
+                },
+                error: function (xhr) {
+                    if (xhr.status === 400) {
+                        const errors = xhr.responseJSON;
                         for (const field in errors) {
                             $('#' + field + 'Error').text(errors[field]);
                             $('#' + field).addClass('is-invalid');
                         }
-                    } else if (response.status === 'OK') {
-                        console.log("Meal added successfully");
+                    } else {
+                        alert('An error occurred while processing your request.');
                     }
-                },
-                error: function () {
-                    alert('An error occurred while processing your request.');
                 }
             });
         }
