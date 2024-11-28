@@ -26,6 +26,19 @@ public class TextTools {
         int length = text.length();
         return length >= min && length<=max;
     }
+    public static boolean isNumberLengthOk(int number, int min, int max){
+        if (number == -1) return false;
+        return number >= min && number <= max;
+    }
+    public static boolean isValidDoubleValue(double value, double min, double max){
+        if (Double.isNaN(value) || Double.isInfinite(value)) return false;
+        if (value < min || value > max) return false;
+
+        //Max 2 miejsca po przecinku
+        String valueStr = String.valueOf(value);
+        int decimalPlaces = valueStr.contains(".") ? valueStr.split("\\.")[1].length() : 0;
+        return decimalPlaces <= 2;
+    }
 
     /*
     * At least 1 number [0-9]

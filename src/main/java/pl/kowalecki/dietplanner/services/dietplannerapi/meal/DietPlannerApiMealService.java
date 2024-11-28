@@ -1,5 +1,6 @@
 package pl.kowalecki.dietplanner.services.dietplannerapi.meal;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -21,20 +22,20 @@ public class DietPlannerApiMealService {
 
     private final WebClient webClient;
 
-    public DietPlannerApiMealService(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl(MEAL_SERVICE_URL).build();
+    public DietPlannerApiMealService(WebClient webClient) {
+        this.webClient = webClient;
     }
 
     public Mono<MealStarterPack> getMealStarterPack() {
         return webClient.get()
-                .uri("/meal/getMealStarterPack")
+                .uri(MEAL_SERVICE_URL+"/meal/getMealStarterPack")
                 .retrieve()
                 .bodyToMono(MealStarterPack.class);
     }
 
     public Mono<List<Meal>> getAllMeals() {
         return webClient.get()
-                .uri("/meal/allMeal")
+                .uri(MEAL_SERVICE_URL+"/meal/allMeal")
                 .retrieve()
                 .bodyToFlux(Meal.class)
                 .collectList();
@@ -42,7 +43,7 @@ public class DietPlannerApiMealService {
 
     public Mono<MealBoardDTO> generateMealBoard(FoodBoardPageRequest apiReq) {
         return webClient.post()
-                .uri("/meal/generateFoodBoard")
+                .uri(MEAL_SERVICE_URL+"/meal/generateFoodBoard")
                 .bodyValue(apiReq)
                 .retrieve()
                 .bodyToMono(MealBoardDTO.class);
@@ -50,7 +51,7 @@ public class DietPlannerApiMealService {
 
     public Mono<ResponseEntity<Void>> addMeal(AddMealRequestDTO addMealRequestDTO) {
         return webClient.post()
-                .uri("/meal/addMeal")
+                .uri(MEAL_SERVICE_URL+"/meal/addMeal")
                 .bodyValue(addMealRequestDTO)
                 .retrieve()
                 .toBodilessEntity();

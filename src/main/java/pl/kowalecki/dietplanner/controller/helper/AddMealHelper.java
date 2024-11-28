@@ -101,14 +101,7 @@ public class AddMealHelper {
     }
 
     private boolean checkIngredientUnit(String ingredientUnit) {
-        if (ingredientUnit == null || ingredientUnit.isEmpty()) {
-            return true;
-        }
-        try {
-            return false;
-        } catch (IllegalArgumentException e) {
-            return true;
-        }
+        return ingredientUnit == null || ingredientUnit.isEmpty();
     }
 
     private boolean checkIngredientAmount(Double ingredientAmount) {
@@ -116,14 +109,7 @@ public class AddMealHelper {
     }
 
     private boolean checkMeasurementType(String measurementType) {
-        if (measurementType == null || measurementType.isEmpty()) {
-            return true;
-        }
-        try {
-            return false;
-        } catch (IllegalArgumentException e) {
-            return true;
-        }
+        return measurementType == null || measurementType.isEmpty();
     }
 
     private boolean checkMeasurementValue(Double measurementValue) {

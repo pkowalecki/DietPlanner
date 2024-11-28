@@ -15,8 +15,6 @@ import pl.kowalecki.dietplanner.model.DTO.FoodBoardPageRequest;
 import pl.kowalecki.dietplanner.model.DTO.meal.AddMealRequestDTO;
 import pl.kowalecki.dietplanner.model.page.FoodBoardPageData;
 
-import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
-import pl.kowalecki.dietplanner.services.WebPage.MessageType;
 import pl.kowalecki.dietplanner.services.dietplannerapi.meal.DietPlannerApiMealService;
 
 import reactor.core.publisher.Mono;
@@ -33,7 +31,6 @@ public class MealPageController {
 
     DietPlannerApiMealService apiMealService;
     AddMealHelper addMealHelper;
-    IWebPageService iWebPageService;
 
     @GetMapping(value = "/addMeal")
     public Mono<String> getListMeal(Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
@@ -56,18 +53,18 @@ public class MealPageController {
         return apiMealService.addMeal(addMealRequestDTO).flatMap(
                         response -> {
                             if (response.getStatusCode().is2xxSuccessful()) {
-                                iWebPageService.setMsg(MessageType.SUCCESS, "Posiłek został dodany");
+//                                iWebPageService.setMsg(MessageType.SUCCESS, "Posiłek został dodany");
                                 return Mono.just(ResponseEntity.ok().build());
                             } else if (response.getStatusCode().is4xxClientError()) {
-                                iWebPageService.setMsg(MessageType.ERROR, "Nie udało się dodać posiłku.");
+//                                iWebPageService.setMsg(MessageType.ERROR, "Nie udało się dodać posiłku.");
                                 return Mono.just(ResponseEntity.status(response.getStatusCode()).build());
                             } else {
-                                iWebPageService.setMsg(MessageType.ERROR, "Wystąpił nieoczekiwany błąd serwera.");
+//                                iWebPageService.setMsg(MessageType.ERROR, "Wystąpił nieoczekiwany błąd serwera.");
                                 return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
                             }
                         })
                 .onErrorResume(error -> {
-                    iWebPageService.setMsg(MessageType.ERROR, "Błąd połączenia z API");
+//                    iWebPageService.setMsg(MessageType.ERROR, "Błąd połączenia z API");
                     return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to connect to API: " + error.getMessage()));
                 });
     }

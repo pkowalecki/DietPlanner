@@ -169,10 +169,10 @@
             const ingredient = {
                 ingredientNameId: $("#ingredientSelect").val(),
                 ingredientName: $("#ingredientSelect option:selected").text(),
-                ingredientAmount: $("#ingredientAmount").val(),
+                ingredientAmount: parseFloat(parseFloat($("#ingredientAmount").val()).toFixed(2)),
                 ingredientUnit: $("#ingredientUnitsSelect").val(),
                 ingredientUnitText: $("#ingredientUnitsSelect option:selected").text(),
-                measurementValue: $("#measurementValue").val(),
+                measurementValue: parseFloat(parseFloat($("#measurementValue").val()).toFixed(2)),
                 measurementType: $("#measurementTypesSelect").val(),
                 measurementTypeText: $("#measurementTypesSelect option:selected").text()
             };
