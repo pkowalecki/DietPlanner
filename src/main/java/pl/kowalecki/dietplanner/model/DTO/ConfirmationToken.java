@@ -7,6 +7,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class ConfirmationTokenDTO {
+public class ConfirmationToken {
     private String token;
 }

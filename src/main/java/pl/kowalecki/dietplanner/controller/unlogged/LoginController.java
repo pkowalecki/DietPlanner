@@ -11,7 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 
-import pl.kowalecki.dietplanner.model.DTO.User.LoginRequestDTO;
+import pl.kowalecki.dietplanner.model.DTO.User.LoginRequest;
 import pl.kowalecki.dietplanner.services.loginService.UserLoginService;
 import pl.kowalecki.dietplanner.utils.AuthUtils;
 import reactor.core.publisher.Mono;
@@ -38,8 +38,8 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public Mono<String> postLoginPage(@ModelAttribute("loginForm") LoginRequestDTO loginRequestDto, Model model, HttpServletResponse httpResponse) {
-        return loginService.postUserLogin(loginRequestDto)
+    public Mono<String> postLoginPage(@ModelAttribute("loginForm") LoginRequest loginRequest, Model model, HttpServletResponse httpResponse) {
+        return loginService.postUserLogin(loginRequest)
                 .flatMap(loginResponse -> {
                     if (loginResponse.getStatusCode() == HttpStatus.OK && loginResponse.getBody() != null) {
 
@@ -47,7 +47,7 @@ public class LoginController {
                         String accessToken = tokens.get("accessToken");
                         String refreshToken = tokens.get("refreshToken");
 
-                        log.info("Login successful for user: {}", loginRequestDto.getEmail());
+                        log.info("Login successful for user: {}", loginRequest.getEmail());
                         log.debug("Access Token: {}, Refresh Token: {}", accessToken, refreshToken);
 
                         authUtils.setAccessTokenCookie(httpResponse, accessToken, 15 * 60);
@@ -62,7 +62,7 @@ public class LoginController {
                     }
                 })
                 .onErrorResume(Exception.class, e -> {
-                    log.error("Login attempt failed for email: {}", loginRequestDto.getEmail(), e);
+                    log.error("Login attempt failed for email: {}", loginRequest.getEmail(), e);
                     model.addAttribute("error", "Unexpected error occurred. Please try again.");
                     return Mono.just("pages/unlogged/index");
                 });

@@ -3,6 +3,7 @@ package pl.kowalecki.dietplanner.controller.logged;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,16 +12,13 @@ import org.springframework.web.bind.annotation.*;
 import pl.kowalecki.dietplanner.controller.helper.AddMealHelper;
 import pl.kowalecki.dietplanner.model.DTO.FoodBoardPageRequest;
 
-import pl.kowalecki.dietplanner.model.DTO.MealStarterPackDTO;
-
-import pl.kowalecki.dietplanner.model.DTO.ResponseBodyDTO;
 import pl.kowalecki.dietplanner.model.DTO.meal.AddMealRequestDTO;
 import pl.kowalecki.dietplanner.model.page.FoodBoardPageData;
 
-import pl.kowalecki.dietplanner.services.dietplannerapi.DietPlannerApiService;
+import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
+import pl.kowalecki.dietplanner.services.WebPage.MessageType;
 import pl.kowalecki.dietplanner.services.dietplannerapi.meal.DietPlannerApiMealService;
 
-import pl.kowalecki.dietplanner.utils.UrlTools;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -29,12 +27,13 @@ import java.util.*;
 
 @Controller
 @AllArgsConstructor
+@Slf4j
 @RequestMapping("/app/auth")
 public class MealPageController {
 
-    DietPlannerApiService apiService;
     DietPlannerApiMealService apiMealService;
     AddMealHelper addMealHelper;
+    IWebPageService iWebPageService;
 
     @GetMapping(value = "/addMeal")
     public Mono<String> getListMeal(Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
@@ -44,33 +43,33 @@ public class MealPageController {
                     return "pages/logged/addMeal";
                 })
                 .defaultIfEmpty("pages/logged/addMeal");
-        }
-
+    }
 
 
     @PostMapping(value = "/addMeal")
-    public ResponseEntity<ResponseBodyDTO> addMeal(@RequestBody AddMealRequestDTO addMealRequestDTO, Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
+    public Mono<ResponseEntity<Object>> addMeal(@RequestBody AddMealRequestDTO addMealRequestDTO, Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
         Map<String, String> errors = new HashMap<>();
         errors = addMealHelper.checkData(addMealRequestDTO);
-        ResponseBodyDTO responseBodyDTO;
         if (!errors.isEmpty()) {
-            responseBodyDTO = ResponseBodyDTO.builder()
-                    .status(ResponseBodyDTO.ResponseStatus.BAD_DATA)
-                    .data(errors)
-                    .build();
-            return new ResponseEntity<>(responseBodyDTO, HttpStatus.OK);
+            return Mono.just(ResponseEntity.badRequest().body(errors));
         }
-//        String url = "http://" + UrlTools.apiUrl + "/auth/meal/addMeal";
-//        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendPostRequest(url, addMealRequestDTO, ResponseBodyDTO.class, request, httpResponse);
-//            return apiMealService.addMeal(addMealRequestDTO).map(
-//                    responseDto ->{
-//                        model.addAttribute(responseDto);
-//                        return responseDto;
-//                    }
-//            );
-        responseBodyDTO = ResponseBodyDTO.builder()
-                .status(ResponseBodyDTO.ResponseStatus.OK).build();
-        return new ResponseEntity<>(responseBodyDTO, HttpStatus.OK);
+        return apiMealService.addMeal(addMealRequestDTO).flatMap(
+                        response -> {
+                            if (response.getStatusCode().is2xxSuccessful()) {
+                                iWebPageService.setMsg(MessageType.SUCCESS, "Posiłek został dodany");
+                                return Mono.just(ResponseEntity.ok().build());
+                            } else if (response.getStatusCode().is4xxClientError()) {
+                                iWebPageService.setMsg(MessageType.ERROR, "Nie udało się dodać posiłku.");
+                                return Mono.just(ResponseEntity.status(response.getStatusCode()).build());
+                            } else {
+                                iWebPageService.setMsg(MessageType.ERROR, "Wystąpił nieoczekiwany błąd serwera.");
+                                return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                            }
+                        })
+                .onErrorResume(error -> {
+                    iWebPageService.setMsg(MessageType.ERROR, "Błąd połączenia z API");
+                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to connect to API: " + error.getMessage()));
+                });
     }
 
     @GetMapping(value = "/generateMealBoard")
@@ -91,7 +90,7 @@ public class MealPageController {
         apiReq.setMealIds(form.getMealIds());
         apiReq.setMultiplier(form.getMultiplier());
         return apiMealService.generateMealBoard(apiReq)
-                .map(mealBoardData->{
+                .map(mealBoardData -> {
                     model.addAttribute("meals", mealBoardData.getMealList());
                     model.addAttribute("result", mealBoardData.getIngredientsToBuy());
                     model.addAttribute("idsList", form.getMealIds());
@@ -123,7 +122,7 @@ public class MealPageController {
 
     @GetMapping(value = "/mealsHistory")
     public String mealsHistory(Model model, HttpServletRequest request, HttpServletResponse response) {
-        ArrayList<Map<String, Object>> dane = new ArrayList<Map<String,Object>>();
+        ArrayList<Map<String, Object>> dane = new ArrayList<Map<String, Object>>();
 //        String url = "http://" + UrlTools.MEAL_SERVICE_URL + "/meal/getMealHistory";
 //        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendGetRequest(url, ResponseBodyDTO.class, request, response);
 //        if (apiResponse.getStatusCode() == HttpStatus.OK && apiResponse.getBody() != null) {
@@ -144,7 +143,7 @@ public class MealPageController {
     }
 
     @PostMapping(value = "/mealHistory")
-    public String getMealHistoryPage(@RequestParam("id")String param, Model model, HttpServletRequest request, HttpServletResponse response, InputStream inputStream) {
+    public String getMealHistoryPage(@RequestParam("id") String param, Model model, HttpServletRequest request, HttpServletResponse response, InputStream inputStream) {
 //        String url = "http://" + UrlTools.MEAL_SERVICE_URL + "/meal/getMealHistory";
 //        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendPostRequest(url, param, ResponseBodyDTO.class, request, response);
 //        if (apiResponse.getStatusCode() == HttpStatus.OK && apiResponse.getBody() != null) {

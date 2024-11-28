@@ -1,10 +1,10 @@
 package pl.kowalecki.dietplanner.model.DTO.meal;
 
 import lombok.*;
+import pl.kowalecki.dietplanner.model.DTO.IngredientUnit;
+import pl.kowalecki.dietplanner.model.DTO.MeasurementType;
 import pl.kowalecki.dietplanner.model.enums.MealType;
 import pl.kowalecki.dietplanner.model.ingredient.IngredientName;
-import pl.kowalecki.dietplanner.model.ingredient.ingredientAmount.IngredientUnit;
-import pl.kowalecki.dietplanner.model.ingredient.ingredientMeasurement.MeasurementType;
 
 import java.util.List;
 

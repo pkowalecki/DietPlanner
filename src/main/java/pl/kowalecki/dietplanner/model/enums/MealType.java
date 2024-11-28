@@ -11,7 +11,8 @@ public enum MealType {
     BREAKFAST("śniadanie", "breakfast"),
     SNACK("przekąska", "snack"),
     LUNCH("obiad", "lunch"),
-    SUPPER("kolacja", "supper")
+    SUPPER("kolacja", "supper"),
+    OTHER("inne", "other")
     ;
 
     private String mealTypePl;

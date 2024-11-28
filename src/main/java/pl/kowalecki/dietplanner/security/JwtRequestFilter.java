@@ -52,13 +52,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         if (accessToken != null) {
             try {
                 authUtils.validateToken(accessToken);
+                filterChain.doFilter(request, response);
             } catch (ExpiredJwtException e) {
                 log.info("Access token expired. Attempting to refresh...");
                 handleRefreshToken(request, response, filterChain);
             } catch (Exception e) {
                 log.error("Invalid JWT token: {}", e.getMessage());
                 redirectToLogin(response);
-                return;
             }
         } else {
             handleRefreshToken(request, response, filterChain);

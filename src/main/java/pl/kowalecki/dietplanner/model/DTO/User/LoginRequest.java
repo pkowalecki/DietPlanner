@@ -7,7 +7,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class LoginRequestDTO {
+public class LoginRequest {
     private String email;
     @ToString.Exclude
     private String password;

@@ -4,8 +4,6 @@ import org.springframework.stereotype.Component;
 import pl.kowalecki.dietplanner.model.DTO.meal.AddMealRequestDTO;
 import pl.kowalecki.dietplanner.model.DTO.meal.IngredientDTO;
 import pl.kowalecki.dietplanner.model.enums.MealType;
-import pl.kowalecki.dietplanner.model.ingredient.ingredientAmount.IngredientUnit;
-import pl.kowalecki.dietplanner.model.ingredient.ingredientMeasurement.MeasurementType;
 import pl.kowalecki.dietplanner.utils.TextTools;
 
 import java.util.HashMap;
@@ -107,7 +105,6 @@ public class AddMealHelper {
             return true;
         }
         try {
-            IngredientUnit.getByShortName(ingredientUnit);
             return false;
         } catch (IllegalArgumentException e) {
             return true;
@@ -123,7 +120,6 @@ public class AddMealHelper {
             return true;
         }
         try {
-            MeasurementType.getByName(measurementType);
             return false;
         } catch (IllegalArgumentException e) {
             return true;

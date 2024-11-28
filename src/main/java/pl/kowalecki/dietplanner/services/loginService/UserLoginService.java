@@ -4,7 +4,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import pl.kowalecki.dietplanner.model.DTO.User.LoginRequestDTO;
+import pl.kowalecki.dietplanner.model.DTO.User.LoginRequest;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
@@ -20,10 +20,10 @@ public class UserLoginService {
         this.webClient = webClientBuilder.baseUrl(AUTH_SERVICE_URL).build();
     }
 
-    public Mono<ResponseEntity<Map<String, String>>> postUserLogin(LoginRequestDTO loginRequestDto) {
+    public Mono<ResponseEntity<Map<String, String>>> postUserLogin(LoginRequest loginRequest) {
         return webClient.post()
                 .uri("/login")
-                .bodyValue(loginRequestDto)
+                .bodyValue(loginRequest)
                 .retrieve()
                 .toEntity(new ParameterizedTypeReference<>() {});
     }

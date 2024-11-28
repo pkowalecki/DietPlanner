@@ -1,7 +1,7 @@
 package pl.kowalecki.dietplanner.model.DTO.meal;
 
 import lombok.*;
-import pl.kowalecki.dietplanner.model.DTO.IngredientToBuyDTO;
+import pl.kowalecki.dietplanner.model.DTO.IngredientToBuy;
 import pl.kowalecki.dietplanner.model.Meal;
 
 import java.util.List;
@@ -15,5 +15,5 @@ public class MealHistoryDetailsDTO {
         List<String> mealNames;
         Double multiplier;
         List<Meal> meals;
-        List<IngredientToBuyDTO> ingredientsToBuy;
+        List<IngredientToBuy> ingredientsToBuy;
 }

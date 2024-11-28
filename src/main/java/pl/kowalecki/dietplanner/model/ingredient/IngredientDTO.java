@@ -1,9 +1,9 @@
 package pl.kowalecki.dietplanner.model.ingredient;
 
 import lombok.*;
+import pl.kowalecki.dietplanner.model.DTO.IngredientUnit;
+import pl.kowalecki.dietplanner.model.DTO.MeasurementType;
 import pl.kowalecki.dietplanner.model.DTO.meal.IngredientNameDTO;
-import pl.kowalecki.dietplanner.model.ingredient.ingredientAmount.IngredientUnit;
-import pl.kowalecki.dietplanner.model.ingredient.ingredientMeasurement.MeasurementType;
 
 @Getter
 @Setter
@@ -11,7 +11,7 @@ import pl.kowalecki.dietplanner.model.ingredient.ingredientMeasurement.Measureme
 @AllArgsConstructor
 @ToString
 @Builder
-public class IngredientTDTO {
+public class IngredientDTO {
     private IngredientNameDTO name;
     private Double ingredientAmount;
     private IngredientUnit ingredientUnit;

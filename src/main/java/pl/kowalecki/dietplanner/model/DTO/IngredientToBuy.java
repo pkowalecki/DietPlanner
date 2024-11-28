@@ -5,15 +5,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MealWithNamesDto {
+public class IngredientToBuy {
 
-    private List<FoodDTO> foodList;
-    private List<String> meals;
+    String name;
+    String ingredientAmount;
+    String ingredientUnit;
+    String measurementAmount;
+    String measurementUnit;
 
 }
