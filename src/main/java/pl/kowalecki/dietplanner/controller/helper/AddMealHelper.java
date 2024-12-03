@@ -23,7 +23,14 @@ public class AddMealHelper {
         checkMealNotes(addMealRequestDTO.getNotes());
         checkMealTypes(addMealRequestDTO.getMealTypes());
         checkIngredients(addMealRequestDTO.getIngredients());
+        checkPortions(addMealRequestDTO.getPortions());
         return errors;
+    }
+
+    private void checkPortions(double portions) {
+        if (!checkPortionsAmount(portions)){
+            errors.put(AddMealPole.PORTIONS.getFieldName(), "Portions should be between 0 and 1000");
+        }
     }
 
     private void checkMealName(String mealName) {
@@ -101,14 +108,7 @@ public class AddMealHelper {
     }
 
     private boolean checkIngredientUnit(String ingredientUnit) {
-        if (ingredientUnit == null || ingredientUnit.isEmpty()) {
-            return true;
-        }
-        try {
-            return false;
-        } catch (IllegalArgumentException e) {
-            return true;
-        }
+        return ingredientUnit == null || ingredientUnit.isEmpty();
     }
 
     private boolean checkIngredientAmount(Double ingredientAmount) {
@@ -116,17 +116,16 @@ public class AddMealHelper {
     }
 
     private boolean checkMeasurementType(String measurementType) {
-        if (measurementType == null || measurementType.isEmpty()) {
-            return true;
-        }
-        try {
-            return false;
-        } catch (IllegalArgumentException e) {
-            return true;
-        }
+        return measurementType == null || measurementType.isEmpty();
     }
 
     private boolean checkMeasurementValue(Double measurementValue) {
         return measurementValue == null || measurementValue <= 0;
+    }
+
+    private boolean checkPortionsAmount(Double portionsAmount){
+        if(portionsAmount == null || portionsAmount <= 0){
+            return false;
+        }else return portionsAmount <= 1000;
     }
 }

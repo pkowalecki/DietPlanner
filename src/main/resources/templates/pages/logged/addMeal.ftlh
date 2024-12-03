@@ -3,55 +3,61 @@
 <div id="content-wrap" class="container wrapper">
 
     <div class="ingredient-form">
-            <div class="mainFields">
-                <div class="field mealName">
-                    <label for="mealName" class="form-label">Name</label>
-                    <input type="text" class="form-control" id="mealName" name="mealName" placeholder="Meal name"
-                           required>
-                    <div class="error-message" id="mealNameError"></div>
-                </div>
-
-                <div class="field description">
-                    <label for="description" class="form-label">Description</label>
-                    <textarea class="form-control" id="description" name="description"
-                              placeholder="Enter your description here..." rows="4"></textarea>
-                    <div class="error-message" id="descriptionError"></div>
-                </div>
-
-                <div class="field recipe">
-                    <label for="recipe" class="form-label">Recipe</label>
-                    <textarea class="form-control" id="recipe" name="recipe" placeholder="Enter the recipe..."
-                              rows="4"></textarea>
-                    <div class="error-message" id="recipeError"></div>
-                </div>
-
-                <div class="field notes">
-                    <label for="notes" class="form-label">Notes</label>
-                    <textarea class="form-control" id="notes" name="notes" placeholder="Your notes here..."
-                              rows="4"></textarea>
-                    <div class="error-message" id="notesError"></div>
-                </div>
-
-                <div class="field mealTypes">
-                    <label for="mealTypesSelect" class="form-label">Meal Types</label>
-                    <select class="selectpicker form-control" data-live-search="true" name="mealTypes"
-                            id="mealTypesSelect" multiple>
-                        <#list mealTypes as mealType>
-                            <#if mealType??>
-                                <option value="${mealType.getMealTypePl()}">${mealType.getMealTypePl()}</option>
-                            </#if>
-                        </#list>
-                    </select>
-                    <div class="error-message" id="mealTypesSelectError"></div>
-                </div>
+        <div class="mainFields">
+            <div class="field mealName">
+                <label for="mealName" class="form-label">Name</label>
+                <input type="text" class="form-control" id="mealName" name="mealName" placeholder="Meal name"
+                       required>
+                <div class="error-message" id="mealNameError"></div>
             </div>
-            <div id="ingredientList">
+
+            <div class="field description">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" id="description" name="description"
+                          placeholder="Enter your description here..." rows="4"></textarea>
+                <div class="error-message" id="descriptionError"></div>
             </div>
-            <div class="mb-3 goCenter">
-                <a id="openIngredientModalBtn" href="#">Add Ingredient</a>
-                <div class="error-message" id="ingredientError"></div>
+
+            <div class="field recipe">
+                <label for="recipe" class="form-label">Recipe</label>
+                <textarea class="form-control" id="recipe" name="recipe" placeholder="Enter the recipe..."
+                          rows="4"></textarea>
+                <div class="error-message" id="recipeError"></div>
             </div>
-            <button type="submit" id="submitButton" class="btn btn-primary mt-3">Submit</button>
+
+            <div class="field notes">
+                <label for="notes" class="form-label">Notes</label>
+                <textarea class="form-control" id="notes" name="notes" placeholder="Your notes here..."
+                          rows="4"></textarea>
+                <div class="error-message" id="notesError"></div>
+            </div>
+
+            <div class="field mealTypes">
+                <label for="mealTypesSelect" class="form-label">Meal Types</label>
+                <select class="selectpicker form-control" data-live-search="true" name="mealTypes"
+                        id="mealTypesSelect" multiple>
+                    <#list mealList.mealTypeList as mealType>
+                        <#if mealType??>
+                            <option value="${mealType.getMealTypePl()}">${mealType.getMealTypePl()}</option>
+                        </#if>
+                    </#list>
+                </select>
+                <div class="error-message" id="mealTypesSelectError"></div>
+            </div>
+        </div>
+        <div id="ingredientList">
+        </div>
+        <div class="mb-3 goCenter">
+            <a id="openIngredientModalBtn" href="#">Add Ingredient</a>
+            <div class="error-message" id="ingredientError"></div>
+        </div>
+        <div class="field portions">
+            <label for="portions" class="form-label">Na ile porcji dzielisz przepis?</label>
+            <input type="number" class="input shorten" id="portions" name="portions"
+                   step="0.25" value="1" min="0" max="1000" required>
+            <div class="error-message" id="portionsError"></div>
+        </div>
+        <button type="submit" id="submitButton" class="btn btn-primary mt-3">Submit</button>
     </div>
 </div>
 
@@ -65,10 +71,11 @@
             <div class="ingredientPackage">
                 <div class="ingredient" id="ingredient">
                     <label for="ingredientSelect" class="label">Ingredient</label>
-                    <select class="selectpicker" data-width="100%" data-live-search="true" name="ingredientNameId" id="ingredientSelect">
-                        <#list ingredientsNames as ingredient>
+                    <select class="selectpicker" data-width="100%" data-live-search="true" name="ingredientNameId"
+                            id="ingredientSelect">
+                        <#list mealList.ingredientNameList as ingredient>
                             <#if ingredient??>
-                                <option value="${ingredient.getId()}">${ingredient.getName()}</option>
+                                <option value="${ingredient.getId()}">${ingredient.getIngredientName()}</option>
                             </#if>
                         </#list>
                     </select>
@@ -77,10 +84,11 @@
                     <div class="amount">
                         <label for="ingredientAmount" class="label">Amount</label>
                         <div class="inputs-container">
-                            <input type="text" class="input shorten" id="ingredientAmount" name="ingredientAmount"
-                                   required>
-                            <select class="selectpicker" data-width="55%" data-live-search="true" name="ingredientUnits" id="ingredientUnitsSelect">
-                                <#list ingredientUnits as ingredientUnit>
+                            <input type="number" class="input shorten" id="ingredientAmount" name="ingredientAmount"
+                                   step="0.25" value="1" min="0" max="2000" required>
+                            <select class="selectpicker" data-width="55%" data-live-search="true" name="ingredientUnits"
+                                    id="ingredientUnitsSelect">
+                                <#list mealList.ingredientUnitList as ingredientUnit>
                                     <#if ingredientUnit??>
                                         <option value="${ingredientUnit.getShortName()}">${ingredientUnit.getShortName()}</option>
                                     </#if>
@@ -91,12 +99,13 @@
                     <div class="measurement">
                         <label for="measurementValue" class="label">Measurement</label>
                         <div class="inputs-container">
-                            <input type="text" class="input shorten" id="measurementValue" name="measurementValue"
-                                   required>
-                            <select class="selectpicker" data-width="70%" data-live-search="true" name="measurementTypes" id="measurementTypesSelect">
-                                <#list measurementTypes as measurementType>
+                            <input type="number" class="input shorten" id="measurementValue" name="measurementValue"
+                                   step="0.25" value="1" min="0" max="2000" required>
+                            <select class="selectpicker" data-width="70%" data-live-search="true"
+                                    name="measurementTypes" id="measurementTypesSelect">
+                                <#list mealList.measurementTypeList as measurementType>
                                     <#if measurementType??>
-                                        <option value="${measurementType.getMeasurementName()}">${measurementType.getMeasurementName()}</option>
+                                        <option value="${measurementType.getId()}">${measurementType.getNamePL()}</option>
                                     </#if>
                                 </#list>
                             </select>
@@ -144,11 +153,8 @@
         });
 
         function resetModal() {
-            // $("#ingredientSelect").val('').selectpicker('refresh');
             $("#ingredientAmount").val('');
-            // $("#ingredientUnitsSelect").val('').selectpicker('refresh');
             $("#measurementValue").val('');
-            // $("#measurementTypesSelect").val('').selectpicker('refresh');
             $("#addIngredientBtn").show();
             $("#updateIngredientBtn").hide();
         }
@@ -169,10 +175,10 @@
             const ingredient = {
                 ingredientNameId: $("#ingredientSelect").val(),
                 ingredientName: $("#ingredientSelect option:selected").text(),
-                ingredientAmount: $("#ingredientAmount").val(),
+                ingredientAmount: parseFloat(parseFloat($("#ingredientAmount").val()).toFixed(2)),
                 ingredientUnit: $("#ingredientUnitsSelect").val(),
                 ingredientUnitText: $("#ingredientUnitsSelect option:selected").text(),
-                measurementValue: $("#measurementValue").val(),
+                measurementValue: parseFloat(parseFloat($("#measurementValue").val()).toFixed(2)),
                 measurementType: $("#measurementTypesSelect").val(),
                 measurementTypeText: $("#measurementTypesSelect option:selected").text()
             };
@@ -268,41 +274,22 @@
             });
         }
 
-        function resetErrors() {
-            $(".error-message").text("");
-            $(".form-control").removeClass('is-invalid');
-        }
-
         function submitMeal() {
-            const mealData = {
+            var mealData = {
                 mealName: $("#mealName").val(),
                 description: $("#description").val(),
                 recipe: $("#recipe").val(),
                 notes: $("#notes").val(),
                 mealTypes: $("#mealTypesSelect").val(),
-                ingredients: jsIngredientsList
+                ingredients: jsIngredientsList,
+                portions: $("#portions").val()
             };
+            var url = '/app/auth/addMeal';
+            var method = 'POST';
+            var contentType = 'application/json';
 
-            $.ajax({
-                url: '/app/auth/addMeal',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(mealData),
-                success: function (response) {
-                    if (response.status === 'BAD_DATA') {
-                        const errors = response.data;
-                        for (const field in errors) {
-                            $('#' + field + 'Error').text(errors[field]);
-                            $('#' + field).addClass('is-invalid');
-                        }
-                    } else if (response.status === 'OK') {
-                        console.log("Meal added successfully");
-                    }
-                },
-                error: function () {
-                    alert('An error occurred while processing your request.');
-                }
-            });
+            ajaxCall(url, method, contentType, JSON.stringify(mealData));
+
         }
     });
 </script>

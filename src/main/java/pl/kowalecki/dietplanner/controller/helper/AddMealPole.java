@@ -9,6 +9,7 @@ public enum AddMealPole {
     MEAL_TYPES_SELECT("mealTypesSelect"),
 
     INGREDIENT("ingredient"),
+    PORTIONS("portions"),
     ;
 
     private String fieldName;

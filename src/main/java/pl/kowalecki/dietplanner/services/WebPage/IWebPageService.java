@@ -1,11 +1,9 @@
 package pl.kowalecki.dietplanner.services.WebPage;
 
 
-import org.springframework.ui.Model;
+
+import java.util.Map;
 
 public interface IWebPageService {
-    void setSessionAttribute(String key, Object value);
-    Object getSessionAttribute(String key);
-    void setMsg(MessageType type, String message);
-    void addCommonWebData(Model model);
+    Map<String, String> addMessageToPage(MessageType type, String message);
 }

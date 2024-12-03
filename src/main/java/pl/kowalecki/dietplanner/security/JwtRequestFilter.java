@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.reactive.function.client.WebClient;
 import pl.kowalecki.dietplanner.utils.AuthUtils;
+import pl.kowalecki.dietplanner.utils.RouteUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -25,24 +26,19 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final WebClient authorizationWebClient;
     private final AuthUtils authUtils;
+    private final RouteUtils routeUtils;
 
-    public JwtRequestFilter(WebClient.Builder webClientBuilder, AuthUtils authUtils) {
+    public JwtRequestFilter(WebClient.Builder webClientBuilder, AuthUtils authUtils, RouteUtils routeUtils) {
         this.authorizationWebClient = webClientBuilder.baseUrl(AUTH_SERVICE_URL).build();
         this.authUtils = authUtils;
+        this.routeUtils = routeUtils;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        List<String> openPaths = List.of(
-                "/",
-                "/app/",
-                "/app/login",
-                "/app/registerModal"
-        );
-
-        if (openPaths.stream().anyMatch(request.getRequestURI()::equals) || request.getRequestURI().startsWith("/static/")) {
+        if (routeUtils.isOpenPath(request.getRequestURI())) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -95,7 +91,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private void redirectToLogin(HttpServletResponse response) {
         try {
             response.sendRedirect("/app/?sessionExpired=true");
-            return;
         } catch (Exception e) {
             log.error("Unable to redirect to login");
         }
