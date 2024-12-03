@@ -23,7 +23,14 @@ public class AddMealHelper {
         checkMealNotes(addMealRequestDTO.getNotes());
         checkMealTypes(addMealRequestDTO.getMealTypes());
         checkIngredients(addMealRequestDTO.getIngredients());
+        checkPortions(addMealRequestDTO.getPortions());
         return errors;
+    }
+
+    private void checkPortions(double portions) {
+        if (!checkPortionsAmount(portions)){
+            errors.put(AddMealPole.PORTIONS.getFieldName(), "Portions should be between 0 and 1000");
+        }
     }
 
     private void checkMealName(String mealName) {
@@ -114,5 +121,11 @@ public class AddMealHelper {
 
     private boolean checkMeasurementValue(Double measurementValue) {
         return measurementValue == null || measurementValue <= 0;
+    }
+
+    private boolean checkPortionsAmount(Double portionsAmount){
+        if(portionsAmount == null || portionsAmount <= 0){
+            return false;
+        }else return portionsAmount <= 1000;
     }
 }

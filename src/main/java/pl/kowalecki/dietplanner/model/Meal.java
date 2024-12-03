@@ -14,9 +14,6 @@ import java.util.List;
 @ToString
 public class Meal{
 
-//    private Long mealId;
-    private LocalDateTime additionDate;
-    private LocalDateTime editDate;
     private String name;
     private String description;
     private String recipe;
@@ -24,5 +21,6 @@ public class Meal{
     private String notes;
     private List<MealType> mealTypes;
     private boolean isDeleted;
+    private int portions;
 
 }

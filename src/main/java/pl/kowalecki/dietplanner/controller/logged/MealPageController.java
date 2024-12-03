@@ -15,6 +15,8 @@ import pl.kowalecki.dietplanner.model.DTO.FoodBoardPageRequest;
 import pl.kowalecki.dietplanner.model.DTO.meal.AddMealRequestDTO;
 import pl.kowalecki.dietplanner.model.page.FoodBoardPageData;
 
+import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
+import pl.kowalecki.dietplanner.services.WebPage.MessageType;
 import pl.kowalecki.dietplanner.services.dietplannerapi.meal.DietPlannerApiMealService;
 
 import reactor.core.publisher.Mono;
@@ -31,6 +33,7 @@ public class MealPageController {
 
     DietPlannerApiMealService apiMealService;
     AddMealHelper addMealHelper;
+    IWebPageService webPageService;
 
     @GetMapping(value = "/addMeal")
     public Mono<String> getListMeal(Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
@@ -44,29 +47,23 @@ public class MealPageController {
 
 
     @PostMapping(value = "/addMeal")
-    public Mono<ResponseEntity<Object>> addMeal(@RequestBody AddMealRequestDTO addMealRequestDTO, Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
+    public Mono<ResponseEntity<Map<String, String>>> addMeal(@RequestBody AddMealRequestDTO addMealRequestDTO, Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
         Map<String, String> errors = new HashMap<>();
         errors = addMealHelper.checkData(addMealRequestDTO);
         if (!errors.isEmpty()) {
-            return Mono.just(ResponseEntity.badRequest().body(errors));
+            return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors));
         }
         return apiMealService.addMeal(addMealRequestDTO).flatMap(
                         response -> {
                             if (response.getStatusCode().is2xxSuccessful()) {
-//                                iWebPageService.setMsg(MessageType.SUCCESS, "Posiłek został dodany");
-                                return Mono.just(ResponseEntity.ok().build());
+                                return Mono.just(ResponseEntity.status(HttpStatus.OK).body(webPageService.addMessageToPage(MessageType.SUCCESS, "Posiłek został dodany")));
                             } else if (response.getStatusCode().is4xxClientError()) {
-//                                iWebPageService.setMsg(MessageType.ERROR, "Nie udało się dodać posiłku.");
-                                return Mono.just(ResponseEntity.status(response.getStatusCode()).build());
+                                return Mono.just(ResponseEntity.status(response.getStatusCode()).body(webPageService.addMessageToPage( MessageType.ERROR, "Nie udało się dodać posiłku.")));
                             } else {
-//                                iWebPageService.setMsg(MessageType.ERROR, "Wystąpił nieoczekiwany błąd serwera.");
-                                return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                                return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body( webPageService.addMessageToPage(MessageType.ERROR, "Wystąpił nieoczekiwany błąd serwera")));
                             }
                         })
-                .onErrorResume(error -> {
-//                    iWebPageService.setMsg(MessageType.ERROR, "Błąd połączenia z API");
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to connect to API: " + error.getMessage()));
-                });
+                .onErrorResume(error -> Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(webPageService.addMessageToPage(MessageType.ERROR, "Wystąpił nieoczekiwany błąd serwera"))));
     }
 
     @GetMapping(value = "/generateMealBoard")

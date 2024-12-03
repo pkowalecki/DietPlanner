@@ -16,4 +16,5 @@ public class AddMealRequestDTO {
     private String notes;
     private List<IngredientDTO> ingredients;
     private List<String> mealTypes;
+    private double portions;
 }

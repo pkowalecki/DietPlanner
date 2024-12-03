@@ -91,7 +91,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private void redirectToLogin(HttpServletResponse response) {
         try {
             response.sendRedirect("/app/?sessionExpired=true");
-            return;
         } catch (Exception e) {
             log.error("Unable to redirect to login");
         }
