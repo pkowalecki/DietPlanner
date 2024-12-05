@@ -1,40 +1,62 @@
-//package pl.kowalecki.dietplanner.controller.logged;
-//
-//import feign.Response;
-//import jakarta.servlet.http.HttpServletRequest;
-//import jakarta.servlet.http.HttpServletResponse;
-//import lombok.AllArgsConstructor;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.stereotype.Controller;
-//import org.springframework.ui.Model;
-//import org.springframework.web.bind.annotation.*;
-//import pl.kowalecki.dietplanner.controller.DietplannerApiClient;
-//import pl.kowalecki.dietplanner.model.DTO.meal.IngredientNameDTO;
-//import pl.kowalecki.dietplanner.utils.ClassMapper;
-//import pl.kowalecki.dietplanner.utils.UrlTools;
-//
-//@Controller
-//@AllArgsConstructor
-//@RequestMapping("/app/auth")
-//public class AddIngredientNamesController {
-//
-//    private final ClassMapper classMapper;
-//    private final DietplannerApiClient apiClient;
-//    private final String ADD_INGREDIENT_VIEW = "pages/logged/addIngredient";
-//
-//    @GetMapping(value = "/addIngredientName")
-//    public String addIngredientPage(Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
-//        return ADD_INGREDIENT_VIEW;
+package pl.kowalecki.dietplanner.controller.logged;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import pl.kowalecki.dietplanner.controller.helper.IngredientNamesHelper;
+import pl.kowalecki.dietplanner.model.DTO.meal.IngredientNameDTO;
+import pl.kowalecki.dietplanner.model.ingredient.IngredientName;
+import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
+import pl.kowalecki.dietplanner.services.WebPage.MessageType;
+import pl.kowalecki.dietplanner.services.dietplannerapi.ingredientName.DietPlannerApiIngredientNameService;
+import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.Map;
+
+@Controller
+@AllArgsConstructor
+@RequestMapping("/app/auth")
+public class AddIngredientNamesController {
+
+    private final DietPlannerApiIngredientNameService apiClient;
+    private final String ADD_INGREDIENT_VIEW = "pages/logged/addIngredient";
+    private final IngredientNamesHelper ingredientNamesHelper;
+    private final IWebPageService webPageService;
+
+    @GetMapping(value = "/addIngredient")
+    public String addIngredientPage() {
+        return ADD_INGREDIENT_VIEW;
+    }
+
+    @PostMapping(value = "/addIngredientName")
+    public Mono<ResponseEntity<Map<String,String>>> addIngredient(@RequestBody IngredientName ingredientName){
+        Map<String, String> errors = ingredientNamesHelper.checkIngredients(ingredientName);
+        if(!errors.isEmpty()){
+            return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors));
+        }
+        return apiClient.addIngredientName(ingredientName).flatMap(
+                response -> {
+                    if (response.getStatusCode().is2xxSuccessful()){
+                        return Mono.just(ResponseEntity.status(HttpStatus.OK).body(webPageService.addMessageToPage(MessageType.SUCCESS, "Składnik został dodany")));
+                    }else if(response.getStatusCode().is4xxClientError()) {
+                        return Mono.just(ResponseEntity.status(response.getStatusCode()).body(webPageService.addMessageToPage( MessageType.ERROR, "Nie udało się dodać składnika.")));
+                    }else{
+                        return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(webPageService.addMessageToPage(MessageType.ERROR, "Wystąpił nieoczekiwany błąd serwera")));
+                    }
+                })
+            .onErrorResume(error -> Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(webPageService.addMessageToPage(MessageType.ERROR, "Wystąpił nieoczekiwany błąd serwera"))));
+    }
+
+//    @GetMapping("/ingredientNames/search")
+//    public Mono<List<IngredientName>> searchIngredients(@RequestParam("query") String query) {
+//        System.out.println("Kłerass: " + query);
+//        return apiClient.searchIngredientName(query);
 //    }
-//
-//    @PostMapping(value = "/addIngredientName")
-//    public String addIngredient(@ModelAttribute("addIngredientForm") IngredientNameDTO ingredientNameDTO, HttpServletRequest request, HttpServletResponse httpResponse){
-//        System.out.println("dodaje nowego ingredienta: " + ingredientNameDTO);
-//        String url = "http://" + UrlTools.apiUrl + "/auth/ingredientNames/ingredient";
-//
-//        ResponseEntity<String> apiResponse = apiClient.addIngredientName(ingredientNameDTO);
-//        //TODO continue
-//        return ADD_INGREDIENT_VIEW;
-//    }
-//
-//}
+
+}

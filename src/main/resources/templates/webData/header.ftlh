@@ -31,7 +31,7 @@
                 <button class="dropbtn">Posiłek</button>
                 <div class="dropdown-content">
                     <a class="dropbtn-child" onclick="location.href='/app/auth/addMeal'">Dodaj posiłek</a>
-                    <a class="dropbtn-child" onclick="location.href='/app/auth/addIngredientName'">Dodaj składnik</a>
+                    <a class="dropbtn-child" onclick="location.href='/app/auth/addIngredient'">Dodaj składnik</a>
                     <a class="dropbtn-child" onclick="location.href='/app/auth/generateMealBoard'">Wygeneruj plan żywienia</a>
                     <a class="dropbtn-child" onclick="location.href='/app/auth/mealsHistory'">Historia posiłków</a>
                 </div>
