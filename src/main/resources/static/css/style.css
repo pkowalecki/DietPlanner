@@ -19,14 +19,9 @@ body {
     min-height: 100vh;
 }
 
-header {
-    background: #005da2;
-    color: white;
-    height: 100px;
-}
 
 footer {
-    background: #005da2;
+    background: #22272b;
     color: white;
     height: 100px;
     margin-top: auto;
