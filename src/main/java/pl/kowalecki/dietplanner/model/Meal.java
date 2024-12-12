@@ -1,26 +1,21 @@
 package pl.kowalecki.dietplanner.model;
 
-import lombok.*;
 import pl.kowalecki.dietplanner.model.enums.MealType;
 import pl.kowalecki.dietplanner.model.ingredient.IngredientDTO;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString
-public class Meal{
 
-    private String name;
-    private String description;
-    private String recipe;
-    private List<IngredientDTO> ingredients;
-    private String notes;
-    private List<MealType> mealTypes;
-    private boolean isDeleted;
-    private int portions;
+public record Meal(
+        String name,
+        String description,
+        String recipe,
+        List<IngredientDTO> ingredients,
+        String notes,
+        List<MealType> mealTypes,
+        boolean isDeleted,
+        int portions
+
+) {
 
 }

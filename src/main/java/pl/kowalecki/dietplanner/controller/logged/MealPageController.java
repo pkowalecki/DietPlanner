@@ -10,9 +10,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import pl.kowalecki.dietplanner.controller.helper.AddMealHelper;
-import pl.kowalecki.dietplanner.model.DTO.FoodBoardPageRequest;
+import pl.kowalecki.dietplanner.model.DTO.*;
 
 import pl.kowalecki.dietplanner.model.DTO.meal.AddMealRequestDTO;
+import pl.kowalecki.dietplanner.model.DTO.meal.IngredientNameDTO;
+import pl.kowalecki.dietplanner.model.ingredient.IngredientName;
 import pl.kowalecki.dietplanner.model.page.FoodBoardPageData;
 
 import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
@@ -39,10 +41,60 @@ public class MealPageController {
     public Mono<String> getListMeal(Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
         return apiMealService.getMealStarterPack()
                 .map(mealList -> {
+                    List<Map<String, String>> mealTypes = convertMealTypes(mealList);
+                    List<Map<String, String>> ingredientUnit = convertIngredientUnit(mealList);
+                    List<Map<String, String>> measurementType = convertMeasurement(mealList);
+                    List<Map<String, String>> ingredientNames = convertIngredientNames(mealList);
                     model.addAttribute("mealList", mealList);
+                    model.addAttribute("ingredientUnit", ingredientUnit);
+                    model.addAttribute("measurementType", measurementType);
+                    model.addAttribute("mealTypes", mealTypes);
+                    model.addAttribute("ingredientNames", ingredientNames);
+                    System.out.println(mealTypes);
                     return "pages/logged/addMeal";
                 })
                 .defaultIfEmpty("pages/logged/addMeal");
+    }
+
+    public List<Map<String, String>> convertMealTypes(MealStarterPack mealStarterPack) {
+        List<Map<String, String>> mealTypes = new ArrayList<>();
+        for (MealType mealType : mealStarterPack.getMealTypeList()) {
+            Map<String, String> mealTypeMap = new HashMap<>();
+            mealTypeMap.put("value", String.valueOf(mealType.getId()));
+            mealTypeMap.put("name", mealType.getMealTypePl());
+            mealTypes.add(mealTypeMap);
+        }
+        return mealTypes;
+    }
+    public List<Map<String, String>> convertMeasurement(MealStarterPack mealStarterPack) {
+        List<Map<String, String>> mealTypes = new ArrayList<>();
+        for (MeasurementType mealType : mealStarterPack.getMeasurementTypeList()) {
+            Map<String, String> mealTypeMap = new HashMap<>();
+            mealTypeMap.put("value", String.valueOf(mealType.getId()));
+            mealTypeMap.put("name", mealType.getNamePL());
+            mealTypes.add(mealTypeMap);
+        }
+        return mealTypes;
+    }
+    public List<Map<String, String>> convertIngredientUnit(MealStarterPack mealStarterPack) {
+        List<Map<String, String>> mealTypes = new ArrayList<>();
+        for (IngredientUnit mealType : mealStarterPack.getIngredientUnitList()) {
+            Map<String, String> mealTypeMap = new HashMap<>();
+            mealTypeMap.put("value", String.valueOf(mealType.getId()));
+            mealTypeMap.put("name", mealType.getShortName());
+            mealTypes.add(mealTypeMap);
+        }
+        return mealTypes;
+    }
+    public List<Map<String, String>> convertIngredientNames(MealStarterPack mealStarterPack) {
+        List<Map<String, String>> mealTypes = new ArrayList<>();
+        for (IngredientNameDTO mealType : mealStarterPack.getIngredientNameList()) {
+            Map<String, String> mealTypeMap = new HashMap<>();
+            mealTypeMap.put("value", String.valueOf(mealType.getId()));
+            mealTypeMap.put("name", mealType.getIngredientName());
+            mealTypes.add(mealTypeMap);
+        }
+        return mealTypes;
     }
 
 

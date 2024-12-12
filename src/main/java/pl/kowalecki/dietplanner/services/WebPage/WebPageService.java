@@ -19,6 +19,7 @@ import java.util.Map;
 public class WebPageService implements IWebPageService {
 
     private final Map<String, ArrayList<String>> errors = new HashMap<String, ArrayList<String>>();
+    private final Map<Object, Object> dane = new HashMap<Object, Object>();
 
     private Map<String, String> setMsg(MessageType type, String message) {
         Map<String, String> messageData = new HashMap<>();
@@ -35,6 +36,7 @@ public class WebPageService implements IWebPageService {
 
     @Override
     public void addError(final String pole, final String error) {
+        System.out.println("WRZUCIŁEM ERORR DO PAGE: " + pole +" " + error);
         ArrayList<String> lista = errors.get(pole);
         if (lista == null) lista = new ArrayList<String>();
         lista.add(error);
@@ -57,4 +59,19 @@ public class WebPageService implements IWebPageService {
         }
         return ss;
     }
+
+    @Override
+    public void cleanData() {
+        synchronized (errors) {
+            errors.clear();
+        }
+    }
+
+    @Override
+    public void put(String name, Object value) {
+        synchronized (dane) {
+            dane.put(name, value);
+        }
+    }
+
 }

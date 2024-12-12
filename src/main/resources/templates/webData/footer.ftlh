@@ -56,19 +56,30 @@
         function handleFieldErrors(errors) {
             $('.text-danger').text('');
             $('.is-invalid').removeClass('is-invalid');
-
             for (const field in errors) {
                 const errorMessage = errors[field];
                 if (errorMessage) {
+                    const inputField = $('#' + field);
+                    const labelField = $('#labelFor' + field);
+
                     $('#' + field + 'Error').text(errorMessage);
-                    $('#' + field).addClass('is-invalid');
+                    inputField.addClass('is-invalid');
+                    labelField.css({
+                        background: '#ff0018',
+                        color: '#ffffff'
+                    });
                 }
             }
         }
 
         function resetErrors() {
             $(".error-message").text("");
+
             $(".form-control").removeClass('is-invalid');
+            $(".floating-label").css({
+                background: '#22272b',
+                color: '#ffffff'
+            });
         }
 
     </script>

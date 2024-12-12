@@ -22,7 +22,6 @@ public class WebPageConfig {
     public void insertPageAttributes(Model model, HttpServletRequest request, HttpServletResponse response) throws IOException {
         //Insertuje wszystkie dane które page wymaga.
         try{
-            System.out.println("Putuje dane do pejdża");
             model.addAttribute("errors", webPageService.getErrors());
             model.addAttribute("errorsList", webPageService.getErrorsAsList());
 
