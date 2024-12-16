@@ -7,7 +7,7 @@
             <@simpleTextArea name="recipe" placeholder="Wprowadź przepis..." label="Przepis" id="recipe" rows="4" />
             <@simpleTextArea name="description" placeholder="Wprowadź opis tutaj..." label="Opis posiłku" id="description" rows="4" />
             <@simpleTextArea name="notes" placeholder="Wprowadź notatki..." label="Notatki" id="notes" rows="4" />
-            <@simpleSelectPlain name="mealType" id="mealTypeId" source=mealTypes placeholder="Wybierz typ posiłku" />
+            <@simpleSelect name="mealType" id="mealTypeId" source=mealTypes placeholder="dummy" label="Typ posiłku"/>
             <@simpleInput name="portions" placeholder="Na ile porcji dzielisz przepis?" label="Liczba porcji" id="portions" />
         </div>
 
@@ -18,6 +18,7 @@
             <a id="openIngredientModalBtn" href="#">Add Ingredient</a>
             <div class="error-message" id="ingredientError"></div>
         </div>
+
 
         <@sendFormButton id="sendFormButton" formToSend="mealForm" method="post" url="/app/auth/addMeal" buttonText="Wyślij" />
     </form>

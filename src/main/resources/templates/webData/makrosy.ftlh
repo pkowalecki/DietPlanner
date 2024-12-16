@@ -20,7 +20,7 @@
     <#assign classPolka = class/>
     <input <#if disabled>disabled="disabled"</#if>
            type="${type}" name="${name}"
-           class="floating-input ${classPolka}" <#if style != "">style="floating-input ${style}"</#if>
+           class="floating-input form-control ${classPolka}" <#if style != "">style="floating-input ${style}"</#if>
             <#if step!="">step="${step}"</#if>
             <#if minLength != "">minlength="${minLength}"</#if> <#if idPolka!="">id="${idPolka}"</#if>
             <#if maxLength != "">maxlength="${maxLength}"</#if>
@@ -49,7 +49,7 @@
     <#assign classPolka = class/>
     <textarea
             <#if disabled>disabled="disabled"</#if>
-           class="floating-textarea ${classPolka} <#if rows??> no-rows </#if>"
+           class="floating-textarea form-control ${classPolka} <#if rows??> no-rows </#if>"
             <#if style != "">style="floating-textarea ${style}"</#if>
             <#if idPolka!="">id="${idPolka}"</#if>
             <#if minLength != "">minlength="${minLength}"</#if>
@@ -85,6 +85,7 @@
             <#if idPolka!="">id="${idPolka}"</#if>
             <#if placeholder !="">title="${placeholder}"</#if>
             <#if multiple>multiple</#if>
+            onchange="toggleLabelActive('${idPolka}')"
     >
         <#if source?exists && 0 < source?size>
             <#if showMinus>
@@ -114,3 +115,19 @@
         });
     </script>
 </#macro>
+
+<script>
+
+    function toggleLabelActive(selectId) {
+        const selectElement = document.getElementById(selectId);
+        const labelElement = document.getElementById("labelFor"+selectId);
+        const selectedValues = Array.from(selectElement.selectedOptions).map(option => option.value);
+
+        if (selectedValues.length > 0) {
+            labelElement.classList.add('active');
+        } else {
+            labelElement.classList.remove('active');
+        }
+    }
+
+</script>
