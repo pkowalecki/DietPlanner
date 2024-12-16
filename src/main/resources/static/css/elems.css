@@ -172,8 +172,7 @@
     border-color: #1e4c82;
 }
 
-.floating-select:focus + .floating-label,
-.floating-select:not([value=""]) + .floating-label {
+.floating-label.active {
     top: -38px;
     font-size: 13px;
     border-radius: 5px;

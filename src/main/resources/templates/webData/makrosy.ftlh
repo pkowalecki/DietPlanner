@@ -74,7 +74,7 @@
     </div>
 </#macro>
 
-<#macro simpleSelectPlain name source style="" class="" liveSearch=true id="" disabled=false placeholder="" divWrapperId="" divWrapperStyle="" label="" multiple=true emptyValue="-" showMinus=false>
+<#macro simpleSelectPlain name source style="" class="" liveSearch=true id="" disabled=false placeholder="" divWrapperId="" divWrapperStyle="" multiple=true emptyValue="-" showMinus=false>
     <#assign idPolka = id/><#rt>
     <#assign classPolka = class/>
     <select
@@ -98,6 +98,7 @@
             <option value="-1">Brak</option>
         </#if>
     </select>
+
 </#macro>
 
 

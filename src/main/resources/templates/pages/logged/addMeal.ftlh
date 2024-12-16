@@ -7,7 +7,7 @@
             <@simpleTextArea name="recipe" placeholder="Wprowadź przepis..." label="Przepis" id="recipe" rows="4" />
             <@simpleTextArea name="description" placeholder="Wprowadź opis tutaj..." label="Opis posiłku" id="description" rows="4" />
             <@simpleTextArea name="notes" placeholder="Wprowadź notatki..." label="Notatki" id="notes" rows="4" />
-            <@simpleSelect name="mealType" source=mealTypes label="Typ posiłku" placeholder="Wybierz typ posiłku" />
+            <@simpleSelectPlain name="mealType" id="mealTypeId" source=mealTypes placeholder="Wybierz typ posiłku" />
             <@simpleInput name="portions" placeholder="Na ile porcji dzielisz przepis?" label="Liczba porcji" id="portions" />
         </div>
 
@@ -36,7 +36,6 @@
                     <@simpleSelectPlain
                     name="ingredientNameId"
                     source=ingredientNames
-                    label="Ingredient"
                     placeholder="Wybierz składnik"
                     id="ingredientSelect"
                     multiple=false
@@ -57,7 +56,6 @@
                         <@simpleSelectPlain
                         name="ingredientUnits"
                         source=ingredientUnit
-                        label="Unit"
                         placeholder="Wybierz jednostkę"
                         id="ingredientUnitsSelect"
                         multiple=false
@@ -77,7 +75,6 @@
                         <@simpleSelectPlain
                         name="measurementTypes"
                         source=measurementType
-                        label="Measurement Type"
                         placeholder="Wybierz typ miary"
                         id="measurementTypesSelect"
                         multiple=false

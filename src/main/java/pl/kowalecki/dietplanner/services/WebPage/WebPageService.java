@@ -19,7 +19,6 @@ import java.util.Map;
 public class WebPageService implements IWebPageService {
 
     private final Map<String, ArrayList<String>> errors = new HashMap<String, ArrayList<String>>();
-    private final Map<Object, Object> dane = new HashMap<Object, Object>();
 
     private Map<String, String> setMsg(MessageType type, String message) {
         Map<String, String> messageData = new HashMap<>();
@@ -58,20 +57,6 @@ public class WebPageService implements IWebPageService {
             ss.add(mapka);
         }
         return ss;
-    }
-
-    @Override
-    public void cleanData() {
-        synchronized (errors) {
-            errors.clear();
-        }
-    }
-
-    @Override
-    public void put(String name, Object value) {
-        synchronized (dane) {
-            dane.put(name, value);
-        }
     }
 
 }
