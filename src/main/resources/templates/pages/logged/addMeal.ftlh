@@ -7,8 +7,8 @@
             <@simpleTextArea name="recipe" placeholder="Wprowadź przepis..." label="Przepis" id="recipe" rows="4" />
             <@simpleTextArea name="description" placeholder="Wprowadź opis tutaj..." label="Opis posiłku" id="description" rows="4" />
             <@simpleTextArea name="notes" placeholder="Wprowadź notatki..." label="Notatki" id="notes" rows="4" />
-            <@simpleSelect name="mealType" id="mealTypeId" source=mealTypes placeholder="dummy" label="Typ posiłku"/>
-            <@simpleInput name="portions" placeholder="Na ile porcji dzielisz przepis?" label="Liczba porcji" id="portions" />
+            <@simpleSelect name="mealType" id="mealTypeId" source=mealTypes placeholder="dummy" label="Typ posiłku" divWrapperClass="form-group-container"/>
+            <@simpleInput name="portions" placeholder="Na ile porcji dzielisz przepis?" label="Liczba porcji" id="portions" type="number" step="0.25" />
         </div>
 
         <div id="ingredientList">
@@ -24,63 +24,60 @@
     </form>
 </div>
 
-<div id="ingredientModal" class="modal">
-    <div class="modal-dialog">
+<div id="ingredientModal" class="modal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Add Ingredient</h4>
+                <h4 class="modal-title">Dodaj składnik do posiłku</h4>
                 <button id="closeIngredientModal" type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
-            <div class="">
-                <div class="">
-                    <label for="ingredientSelect" class="label">Składnik</label>
-                    <@simpleSelectPlain
-                    name="ingredientNameId"
-                    source=ingredientNames
-                    placeholder="Wybierz składnik"
-                    id="ingredientSelect"
+            <div class="row" style="margin-top: 50px">
+                <div class="col-md-12">
+                    <@simpleSelect name="ingredientName" id="ingredientNameId" source=ingredientNames label="Składnik" placeholder="Składnik" multiple=false />
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                <div class="d-flex flex-nowrap flex-grow-1 align-items-center">
+                    <@simpleInput
+                    name="ingredientAmount"
+                    placeholder="Wprowadź ilość..."
+                    id="ingredientAmount"
+                    type="number"
+                    step="0.25"
+                    minLength="0"
+                    maxLength="2000"
+                    label="Wartość"
+                    inputStyle="max-width: 150px"
+                    labelStyle="width:35%"/>
+                    <@simpleSelect
+                    name="ingredientUnits"
+                    source=ingredientUnit
+                    placeholder="g"
+                    id="ingredientUnitsSelect"
                     multiple=false
+                    divWrapperStyle="max-width: 70px"
                     />
                 </div>
-                <div class="ingredient-group">
-                    <div class="">
-                        <label for="ingredientAmount" class="label">Amount</label>
-                        <@simpleInputPlain
-                        name="ingredientAmount"
-                        placeholder="Wprowadź ilość..."
-                        id="ingredientAmount"
-                        type="number"
-                        step="0.25"
-                        value="1"
-                        minLength="0"
-                        maxLength="2000" />
-                        <@simpleSelectPlain
-                        name="ingredientUnits"
-                        source=ingredientUnit
-                        placeholder="Wybierz jednostkę"
-                        id="ingredientUnitsSelect"
-                        multiple=false
-                        />
-                    </div>
-                    <div class="">
-                        <label for="measurementValue" class="label">Measurement</label>
-                        <@simpleInputPlain
-                        name="measurementValue"
-                        placeholder="Wprowadź miarę..."
-                        id="measurementValue"
-                        type="number"
-                        step="0.25"
-                        value="1"
-                        minLength="0"
-                        maxLength="2000" />
-                        <@simpleSelectPlain
-                        name="measurementTypes"
-                        source=measurementType
-                        placeholder="Wybierz typ miary"
-                        id="measurementTypesSelect"
-                        multiple=false
-                        />
-                    </div>
+                <div class="d-flex flex-nowrap flex-grow-1 align-items-center">
+                    <@simpleInput
+                    name="measurementValue"
+                    placeholder="Wprowadź miarę..."
+                    id="measurementValue"
+                    type="number"
+                    step="0.25"
+                    minLength="0"
+                    maxLength="2000"
+                    label="Miara"
+                    inputStyle="max-width: 150px"
+                    labelStyle="width:35%"/>
+                    <@simpleSelect
+                    name="measurementTypes"
+                    source=measurementType
+                    placeholder="porcja"
+                    id="measurementTypesSelect"
+                    multiple=false
+                    divWrapperStyle="max-width: 130px"
+                    />
                 </div>
             </div>
             <button id="addIngredientBtn" type="button" class="btn btn-primary mt-3">Add ingredient</button>
@@ -152,7 +149,9 @@
 
         $("#submitButton").click(function (e) {
             e.preventDefault();
+            console.log("przed resetem");
             resetErrors();
+            console.log("po resecie");
             submitMeal();
         });
 

@@ -75,10 +75,7 @@
         function resetErrors() {
             $(".error-message").text("");
             $(".form-control").removeClass('is-invalid');
-            $(".floating-label").css({
-                background: '#22272b',
-                color: '#ffffff'
-            });
+            $(".floating-label").removeAttr("style");
         }
 
     </script>
