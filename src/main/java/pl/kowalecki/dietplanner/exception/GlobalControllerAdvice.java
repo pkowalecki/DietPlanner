@@ -27,6 +27,9 @@ public class GlobalControllerAdvice {
         log.error(e.getMessage(), e);
         log.error(errorMessage);
         model.addAttribute("error", "Wystąpił nieoczekiwany błąd.");
+        System.out.println("===========================================================");
+        System.out.println("HandleGenericException");
+        System.out.println("===========================================================");
         return "pages/unlogged/errorPage";
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.reactive.function.client.WebClient;
+import pl.kowalecki.dietplanner.exception.GlobalControllerAdvice;
 import pl.kowalecki.dietplanner.utils.AuthUtils;
 import pl.kowalecki.dietplanner.utils.RouteUtils;
 
@@ -53,6 +54,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 log.info("Access token expired. Attempting to refresh...");
                 handleRefreshToken(request, response, filterChain);
             } catch (Exception e) {
+                //FIXME Do fixu bo za dużo łapie. W tym błąd renderowania strony.
                 log.error("Invalid JWT token: {}", e.getMessage());
                 redirectToLogin(response);
             }

@@ -9,7 +9,7 @@
             });
         }
 
-        function ajaxCall(url, method, contentType, data, successCallback, errorCallback) {
+        function ajaxCall(url, method, contentType, data, shouldReloadOnSuccess = false) {
             $.ajax({
                 url: url,
                 type: method,
@@ -21,7 +21,9 @@
                     }else{
                         showSwalMessage('Sukces', 'Operacja zakończona pomyślnie.', 'success');
                     }
-                    if (successCallback) successCallback(response, status, xhr);
+                    if (shouldReloadOnSuccess) {
+                        location.reload();
+                    }
                 },
                 error: function (xhr, status, error) {
                     try {
@@ -36,7 +38,6 @@
                     } catch (e) {
                         showSwalMessage('Error', 'Nie można przetworzyć odpowiedzi. Spróbuj ponownie.', 'error');
                     }
-                    if (errorCallback) errorCallback(xhr, status, error);
                 }
             });
         }
@@ -56,19 +57,27 @@
         function handleFieldErrors(errors) {
             $('.text-danger').text('');
             $('.is-invalid').removeClass('is-invalid');
-
             for (const field in errors) {
                 const errorMessage = errors[field];
                 if (errorMessage) {
+                    const inputField = $('#' + field);
+                    const labelField = $('#labelFor' + field);
+
                     $('#' + field + 'Error').text(errorMessage);
-                    $('#' + field).addClass('is-invalid');
+                    inputField.addClass('is-invalid');
+                    labelField.css({
+                        background: '#ff0018',
+                        color: '#ffffff'
+                    });
                 }
             }
         }
 
-        function resetErrors() {
-            $(".error-message").text("");
-            $(".form-control").removeClass('is-invalid');
+        function resetErrors(selector = "") {
+            const scope = selector ? $(selector) : $(document);
+            scope.find(".error-message").text("");
+            scope.find(".form-control").removeClass("is-invalid");
+            scope.find(".floating-label").removeAttr("style");
         }
 
     </script>

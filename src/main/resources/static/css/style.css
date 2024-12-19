@@ -6,6 +6,11 @@ html, body {
     height: 100%;
     display: flex;
     flex-direction: column;
+    background-image: url("../images/bg-tlo.jpg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+    background-size: cover;
 }
 
 body {
@@ -14,14 +19,9 @@ body {
     min-height: 100vh;
 }
 
-header {
-    background: #005da2;
-    color: white;
-    height: 100px;
-}
 
 footer {
-    background: #005da2;
+    background: #22272b;
     color: white;
     height: 100px;
     margin-top: auto;
@@ -61,19 +61,51 @@ h1:after {
     text-align: center;
 }
 
-
-.error-message{
-    color: red;
-    padding: 5px 5px 5px 0px;
-    font-weight: bold;
-}
-.is-invalid {
-    border-color: #dc3545;
-}
-
 label {
     margin: 0;
     padding: 0;
     display: inline-block;
     vertical-align: middle;
+}
+
+
+@media (min-width: 576px) {
+    .form-container {
+        max-width: 540px;
+        max-height: 400px;
+    }
+}
+
+@media (min-width: 768px) {
+    .form-container {
+        max-width: 720px;
+        max-height: 500px;
+    }
+}
+
+@media (min-width: 992px) {
+    .form-container {
+        max-width: 960px;
+        max-height: 600px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .form-container {
+        max-width: 1140px;
+        max-height: 700px;
+    }
+}
+
+.form-container {
+    margin: 5% auto;
+    padding: 3%;
+    width: 90%;
+    height: 80%;
+    overflow-y:auto;
+    background-color: rgba(255, 255, 255, 90%);
+    border: 1px solid #cccccc;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }
