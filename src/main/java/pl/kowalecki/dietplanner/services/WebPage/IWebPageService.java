@@ -3,6 +3,7 @@ package pl.kowalecki.dietplanner.services.WebPage;
 import freemarker.template.SimpleSequence;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public interface IWebPageService {

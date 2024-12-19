@@ -1,13 +1,14 @@
 <#macro onClick objId url urlParams formId >
 
 </#macro>
-<#macro simpleInput name inputStyle="" class="" minLength="" maxLength="" type="text" id="" disabled=false placeholder="" divWrapperId="" divWrapperStyle="" label="" labelStyle="" step="" value="">
+<#macro simpleInput name inputStyle="" class="" min="" max="" type="text" id="" disabled=false placeholder="" divWrapperId="" divWrapperStyle="" label="" labelStyle="" step="" value="">
     <#assign idPolka = id/><#rt>
     <#assign classPolka = class/>
     <div class="form-group-container" id="${divWrapperId}" style="">
         <div class="floating-group">
-            <@simpleInputPlain name=name inputStyle=inputStyle class=classPolka minLength=minLength maxLength=maxLength type=type id=idPolka disabled=false placeholder=placeholder step=step value=value/>
-            <#if label!=""><label class="floating-label" for="${idPolka}" id="labelFor${idPolka}" style="${labelStyle}">${label}</label></#if>
+            <@simpleInputPlain name=name inputStyle=inputStyle class=classPolka min=min max=max type=type id=idPolka disabled=false placeholder=placeholder step=step value=value/>
+            <#if label!=""><label class="floating-label" for="${idPolka}" id="labelFor${idPolka}"
+                                  style="${labelStyle}">${label}</label></#if>
             <div class="error-message" id="${idPolka}Error">
                 <i class="error-icon fa-solid fa-circle-exclamation" id="${idPolka}Error" style="display: none"></i>
             </div>
@@ -15,15 +16,22 @@
     </div>
 </#macro>
 
-<#macro simpleInputPlain name inputStyle="" class="" minLength="" maxLength="" type="text" id="" disabled=false placeholder="" step="" value="">
+<#macro simpleInputPlain name inputStyle="" class="" min="" max="" type="text" id="" disabled=false placeholder="" step="" value="">
     <#assign idPolka = id/><#rt>
     <#assign classPolka = class/>
     <input <#if disabled>disabled="disabled"</#if>
            type="${type}" name="${name}"
            class="floating-input form-control ${classPolka}" <#if inputStyle != "">style="floating-input ${inputStyle}"</#if>
             <#if step!="">step="${step}"</#if>
-            <#if minLength != "">minlength="${minLength}"</#if> <#if idPolka!="">id="${idPolka}"</#if>
-            <#if maxLength != "">maxlength="${maxLength}"</#if>
+            <#if idPolka!="">id="${idPolka}"</#if>
+            <#if type == "number">
+                <#if min != "">min="${min}"</#if>
+                <#if max != "">max="${max}"</#if>
+            </#if>
+            <#if type == "text">
+                <#if min != "">minlength="${min}"</#if>
+                <#if max != "">maxlength="${max}"</#if>
+            </#if>
            autocomplete="off"
             <#if placeholder !="">placeholder="${placeholder}"</#if>
             <#if value!=""> value="${value}" </#if>
@@ -48,6 +56,7 @@
     <#assign idPolka = id/><#rt>
     <#assign classPolka = class/>
     <textarea
+            name="${name}"
             <#if disabled>disabled="disabled"</#if>
            class="floating-textarea form-control ${classPolka} <#if rows??> no-rows </#if>"
             <#if style != "">style="floating-textarea ${style}"</#if>
@@ -80,6 +89,7 @@
     <#assign classPolka = class/>
     <div style="${selectWrapperStyle}">
         <select
+                name="${name}"
                 <#if disabled>disabled="disabled"</#if>
                 class="selectpicker form-control floating-select ${classPolka}"
                 <#if liveSearch> data-live-search="true"</#if>
@@ -94,29 +104,29 @@
                     <option value="-1">${emptyValue}</option>
                 </#if>
                 <#list source as val>
-                    <option value="${val.value}"
-                            <#if val.blokada?? && val.blokada == "true">disabled</#if>>${val.name}</option>
+                    <#if val?has_content>
+                        <option value="${val['value']}"
+                                <#if val['blokada']?? && val['blokada'] == "true">disabled</#if>>${val['name']}</option>
+                    </#if>
                 </#list>
             <#else>
                 <option value="-1">Brak</option>
             </#if>
         </select>
     </div>
-
 </#macro>
 
 
-<#macro sendFormButton id, formToSend, url, method="post" buttonText="Wyślij" contentType="application/json">
+<#macro sendFormButton id, formToSend, url, method="post" buttonText="Wyślij" contentType="application/json" reloadPageAfterSuccess=false >
     <button type="button" id="${id}" class="btn btn-primary mt-3">${buttonText}</button>
     <script>
         document.getElementById("${id}").addEventListener("click", function () {
-            resetErrors();
-
+            resetErrors("#${formToSend}");
             const form = document.getElementById("${formToSend}");
             const formData = new FormData(form);
             const jsonData = Object.fromEntries(formData.entries());
 
-            ajaxCall("${url}", "${method}", "${contentType}", JSON.stringify(jsonData));
+            ajaxCall("${url}", "${method}", "${contentType}", JSON.stringify(jsonData), ${reloadPageAfterSuccess?c});
         });
     </script>
 </#macro>

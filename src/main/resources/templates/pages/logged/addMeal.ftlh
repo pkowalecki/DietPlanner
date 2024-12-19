@@ -7,12 +7,13 @@
             <@simpleTextArea name="recipe" placeholder="Wprowadź przepis..." label="Przepis" id="recipe" rows="4" />
             <@simpleTextArea name="description" placeholder="Wprowadź opis tutaj..." label="Opis posiłku" id="description" rows="4" />
             <@simpleTextArea name="notes" placeholder="Wprowadź notatki..." label="Notatki" id="notes" rows="4" />
-            <@simpleSelect name="mealType" id="mealTypeId" source=mealTypes placeholder="dummy" label="Typ posiłku" divWrapperClass="form-group-container"/>
-            <@simpleInput name="portions" placeholder="Na ile porcji dzielisz przepis?" label="Liczba porcji" id="portions" type="number" step="0.25" />
+            <@simpleSelect name="mealType" id="mealType" source=mealTypeList placeholder="dummy" label="Typ posiłku" divWrapperClass="form-group-container"/>
+            <@simpleInput name="portions" placeholder="Na ile porcji dzielisz przepis?" label="Liczba porcji" id="portions" type="number" step="0.25" min="0" max="1000"/>
         </div>
 
         <div id="ingredientList">
         </div>
+        <input type="hidden" name="ingredients" id="ingredientsInput" />
 
         <div class="mb-3 goCenter">
             <a id="openIngredientModalBtn" href="#">Add Ingredient</a>
@@ -20,11 +21,12 @@
         </div>
 
 
-        <@sendFormButton id="sendFormButton" formToSend="mealForm" method="post" url="/app/auth/addMeal" buttonText="Wyślij" />
+<#--        <@sendFormButton id="sendFormButton" formToSend="mealForm" method="post" url="/app/auth/addMeal" buttonText="Wyślij"   />-->
     </form>
+    <button type="submit" id="submitButton" class="btn btn-primary mt-3">Submit</button>
 </div>
 
-<div id="ingredientModal" class="modal" role="dialog" aria-hidden="true">
+<div id="ingredientModal" class="modal" role="dialog">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -33,7 +35,7 @@
             </div>
             <div class="row" style="margin-top: 50px">
                 <div class="col-md-12">
-                    <@simpleSelect name="ingredientName" id="ingredientNameId" source=ingredientNames label="Składnik" placeholder="Składnik" multiple=false />
+                    <@simpleSelect name="ingredientName" id="ingredientNameId" source=ingredientNameList label="Składnik" placeholder="Składnik" multiple=false />
                 </div>
             </div>
             <div class="d-flex align-items-center gap-3 flex-wrap">
@@ -44,14 +46,14 @@
                     id="ingredientAmount"
                     type="number"
                     step="0.25"
-                    minLength="0"
-                    maxLength="2000"
+                    min="0"
+                    max="2000"
                     label="Wartość"
                     inputStyle="max-width: 150px"
                     labelStyle="width:35%"/>
                     <@simpleSelect
                     name="ingredientUnits"
-                    source=ingredientUnit
+                    source=ingredientUnitList
                     placeholder="g"
                     id="ingredientUnitsSelect"
                     multiple=false
@@ -65,14 +67,14 @@
                     id="measurementValue"
                     type="number"
                     step="0.25"
-                    minLength="0"
-                    maxLength="2000"
+                    min="0"
+                    max="2000"
                     label="Miara"
                     inputStyle="max-width: 150px"
                     labelStyle="width:35%"/>
                     <@simpleSelect
                     name="measurementTypes"
-                    source=measurementType
+                    source=measurementTypeList
                     placeholder="porcja"
                     id="measurementTypesSelect"
                     multiple=false
@@ -86,42 +88,8 @@
 </div>
 
 
-<#--<div id="content-wrap" class="container wrapper">-->
-<#--    <div class="ingredient-form">-->
-<#--        <div class="mainFields">-->
-<#--            <div class="field mealTypes">-->
-<#--                <label for="mealTypesSelect" class="form-label">Meal Types</label>-->
-<#--                <select class="selectpicker form-control" data-live-search="true" name="mealTypes"-->
-<#--                        id="mealTypesSelect" multiple>-->
-<#--                    <#list mealList.mealTypeList as mealType>-->
-<#--                        <#if mealType??>-->
-<#--                            <option value="${mealType.getMealTypePl()}">${mealType.getMealTypePl()}</option>-->
-<#--                        </#if>-->
-<#--                    </#list>-->
-<#--                </select>-->
-<#--                <div class="error-message" id="mealTypesSelectError"></div>-->
-<#--            </div>-->
-<#--        </div>-->
-<#--        <div id="ingredientList">-->
-<#--        </div>-->
-<#--        <div class="mb-3 goCenter">-->
-<#--            <a id="openIngredientModalBtn" href="#">Add Ingredient</a>-->
-<#--            <div class="error-message" id="ingredientError"></div>-->
-<#--        </div>-->
-<#--        <div class="field portions">-->
-<#--            <label for="portions" class="form-label">Na ile porcji dzielisz przepis?</label>-->
-<#--            <input type="number" class="input shorten" id="portions" name="portions"-->
-<#--                   step="0.25" value="1" min="0" max="1000" required>-->
-<#--            <div class="error-message" id="portionsError"></div>-->
-<#--        </div>-->
-<#--        <button type="submit" id="submitButton" class="btn btn-primary mt-3">Submit</button>-->
-<#--    </div>-->
-<#--</div>-->
-
-
 <script>
     $(document).ready(function () {
-
         const jsIngredientsList = [];
         $("#openIngredientModalBtn").click(function (e) {
             e.preventDefault();
@@ -149,9 +117,7 @@
 
         $("#submitButton").click(function (e) {
             e.preventDefault();
-            console.log("przed resetem");
-            resetErrors();
-            console.log("po resecie");
+            resetErrors("#mealForm");
             submitMeal();
         });
 
@@ -170,14 +136,14 @@
                 updateIngredientList();
                 closeModal();
             } else {
-                alert("Please fill in all fields before adding an ingredient.");
+                alert("Wybierz wszystkie wartości.");
             }
         }
 
         function getIngredientFromModal() {
             const ingredient = {
-                ingredientNameId: $("#ingredientSelect").val(),
-                ingredientName: $("#ingredientSelect option:selected").text(),
+                ingredientNameId: $("#ingredientNameId").val(),
+                ingredientName: $("#ingredientNameId option:selected").text(),
                 ingredientAmount: parseFloat(parseFloat($("#ingredientAmount").val()).toFixed(2)),
                 ingredientUnit: $("#ingredientUnitsSelect").val(),
                 ingredientUnitText: $("#ingredientUnitsSelect option:selected").text(),
@@ -283,7 +249,7 @@
                 description: $("#description").val(),
                 recipe: $("#recipe").val(),
                 notes: $("#notes").val(),
-                mealTypes: $("#mealTypesSelect").val(),
+                mealTypes: $("#mealType").val(),
                 ingredients: jsIngredientsList,
                 portions: $("#portions").val()
             };
@@ -291,7 +257,7 @@
             var method = 'POST';
             var contentType = 'application/json';
 
-            ajaxCall(url, method, contentType, JSON.stringify(mealData));
+            ajaxCall(url, method, contentType, JSON.stringify(mealData), true);
 
         }
     });

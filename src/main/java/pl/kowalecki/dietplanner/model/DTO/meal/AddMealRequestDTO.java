@@ -11,7 +11,7 @@ public record AddMealRequestDTO(
         String recipe,
         String notes,
         List<IngredientDTO> ingredients,
-        List<String> mealTypes,
+        List<Integer> mealTypes,
         double portions
 ) {
     @Getter
@@ -21,7 +21,7 @@ public record AddMealRequestDTO(
         DESCRIPTION("description"),
         RECIPE("recipe"),
         NOTES("notes"),
-        MEAL_TYPES_SELECT("mealTypesSelect"),
+        MEAL_TYPES_SELECT("mealType"),
 
         INGREDIENT("ingredient"),
         PORTIONS("portions"),

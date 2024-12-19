@@ -8,9 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
 import org.springframework.ui.Model;
+import pl.kowalecki.dietplanner.model.DTO.MealType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Configuration
@@ -58,5 +60,6 @@ public class WebPageService implements IWebPageService {
         }
         return ss;
     }
+
 
 }
