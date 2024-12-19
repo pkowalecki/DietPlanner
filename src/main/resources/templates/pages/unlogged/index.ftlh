@@ -17,11 +17,8 @@
                        placeholder="Password" autocomplete="on" required>
             </div>
             <div class="mb-3 group form-link">
-                <span><input type="checkbox" name="rememberMe" autocomplete="off">Remember me</span>
-                <a href="/forgotPassword">Forgot password?</a>
-            </div>
-            <div class="mb-3 goCenter">
                 <a id="registerBtn" href="#">Create account</a>
+                <a href="/forgotPassword">Forgot password?</a>
             </div>
             <div class="d-grid gap-2">
                 <button type="submit" class="btn btn-primary btn-block">Login</button>

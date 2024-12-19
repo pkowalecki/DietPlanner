@@ -7,13 +7,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import pl.kowalecki.dietplanner.services.WebPage.MessageType;
+import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
 
 @Controller
 @RequestMapping("/app/auth")
 @AllArgsConstructor
 public class LoggedBoardController {
 
+    IWebPageService webPageService;
 
     @GetMapping("/loggedUserBoard")
     public String getLoggedUserBoard(HttpSession session, HttpServletRequest request, Model model) {

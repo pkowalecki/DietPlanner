@@ -4,17 +4,37 @@ import lombok.*;
 
 import java.util.List;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@ToString
-public class AddMealRequestDTO {
-    private String mealName;
-    private String description;
-    private String recipe;
-    private String notes;
-    private List<IngredientDTO> ingredients;
-    private List<String> mealTypes;
-    private double portions;
+
+public record AddMealRequestDTO(
+        String mealName,
+        String description,
+        String recipe,
+        String notes,
+        List<IngredientDTO> ingredients,
+        List<Integer> mealTypes,
+        double portions
+) {
+    @Getter
+    public enum AddMealPole {
+
+        MEAL_NAME("mealName"),
+        DESCRIPTION("description"),
+        RECIPE("recipe"),
+        NOTES("notes"),
+        MEAL_TYPES_SELECT("mealType"),
+
+        INGREDIENT("ingredient"),
+        PORTIONS("portions"),
+        ;
+
+        private final String fieldName;
+
+        AddMealPole(String fieldName) {
+            this.fieldName = fieldName;
+        }
+
+        public String getFieldName() {
+            return fieldName;
+        }
+    }
 }

@@ -3,22 +3,28 @@ package pl.kowalecki.dietplanner.controller.logged;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import pl.kowalecki.dietplanner.controller.helper.AddMealHelper;
-import pl.kowalecki.dietplanner.model.DTO.FoodBoardPageRequest;
+//import pl.kowalecki.dietplanner.mapper.MealStarterPackMapper;
+import pl.kowalecki.dietplanner.model.DTO.*;
 
 import pl.kowalecki.dietplanner.model.DTO.meal.AddMealRequestDTO;
+import pl.kowalecki.dietplanner.model.DTO.meal.IngredientNameDTO;
+import pl.kowalecki.dietplanner.model.ingredient.IngredientName;
 import pl.kowalecki.dietplanner.model.page.FoodBoardPageData;
 
 import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
 import pl.kowalecki.dietplanner.services.WebPage.MessageType;
 import pl.kowalecki.dietplanner.services.dietplannerapi.meal.DietPlannerApiMealService;
 
+import pl.kowalecki.dietplanner.utils.MapUtils;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -38,8 +44,11 @@ public class MealPageController {
     @GetMapping(value = "/addMeal")
     public Mono<String> getListMeal(Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
         return apiMealService.getMealStarterPack()
-                .map(mealList -> {
-                    model.addAttribute("mealList", mealList);
+                .map(mealStarterPack -> {
+                    model.addAttribute("ingredientNameList", MapUtils.mapIngredientName(mealStarterPack.getIngredientNameList()));
+                    model.addAttribute("ingredientUnitList", MapUtils.mapIngredientUnit(mealStarterPack.getIngredientUnitList()));
+                    model.addAttribute("mealTypeList", MapUtils.mapMealType(mealStarterPack.getMealTypeList()));
+                    model.addAttribute("measurementTypeList", MapUtils.mapMeasurementType(mealStarterPack.getMeasurementTypeList()));
                     return "pages/logged/addMeal";
                 })
                 .defaultIfEmpty("pages/logged/addMeal");

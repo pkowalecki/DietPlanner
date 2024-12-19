@@ -25,17 +25,34 @@
 </head>
 <body>
 <header>
-        <div class="nav-container">
-            <button class="dropbtn" onclick="location.href='/app/auth/loggedUserBoard'">Strona główna</button>
-            <div class="dropdown">
-                <button class="dropbtn">Posiłek</button>
-                <div class="dropdown-content">
-                    <a class="dropbtn-child" onclick="location.href='/app/auth/addMeal'">Dodaj posiłek</a>
-                    <a class="dropbtn-child" onclick="location.href='/app/auth/addIngredientName'">Dodaj składnik</a>
-                    <a class="dropbtn-child" onclick="location.href='/app/auth/generateMealBoard'">Wygeneruj plan żywienia</a>
-                    <a class="dropbtn-child" onclick="location.href='/app/auth/mealsHistory'">Historia posiłków</a>
-                </div>
+    <div class="main-bar">
+        <nav>
+            <input type="checkbox" id="check">
+            <label for="check" class="checkbtn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </label>
+
+            <div class="logo-header">
+                <a href="#">DietPlanner</a>
             </div>
-        </div>
+
+            <ul>
+                <li class="active"> <a href="#" onclick="location.href='/app/auth/loggedUserBoard'">Strona główna</a></li>
+                <li class="dropdown">
+                    <a href="#">Posiłek</a>
+                    <ul class="dropdown-content">
+                        <li><a href="#" onclick="location.href='/app/auth/addMeal'">Dodaj posiłek</a></li>
+                        <li><a href="#" onclick="location.href='/app/auth/addIngredientName'">Dodaj składnik</a></li>
+                        <li><a href="#" onclick="location.href='/app/auth/generateMealBoard'">Wygeneruj plan żywienia</a></li>
+                        <li><a href="#" onclick="location.href='/app/auth/mealsHistory'">Historia posiłków</a></li>
+                    </ul>
+                </li>
+
+            </ul>
+        </nav>
+    </div>
+
 </header>
 <div id="page-container">
