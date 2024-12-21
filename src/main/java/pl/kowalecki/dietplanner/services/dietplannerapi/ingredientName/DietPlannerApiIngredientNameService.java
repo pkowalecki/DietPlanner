@@ -1,13 +1,14 @@
 package pl.kowalecki.dietplanner.services.dietplannerapi.ingredientName;
 
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import pl.kowalecki.dietplanner.model.ingredient.IngredientName;
 import reactor.core.publisher.Mono;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static pl.kowalecki.dietplanner.utils.UrlTools.MEAL_SERVICE_URL;
@@ -29,13 +30,11 @@ public class DietPlannerApiIngredientNameService {
                 .toBodilessEntity();
     }
 
-//    public Mono<List<IngredientName>> searchIngredientName(String query){
-//        String url = MEAL_SERVICE_URL + "/ingredient/ingredientNames/search?query=" + query;
-//        return webClient.get()
-//                .uri(url)
-//                .retrieve()
-//                .bodyToMono(new ParameterizedTypeReference<List<IngredientName>>() {})
-//                .doOnNext(System.out::println);
-//
-//    }
+    public Mono<List<IngredientName>> searchIngredientName(String query) {
+        String url = MEAL_SERVICE_URL + "/ingredient/ingredientNames/search?query=" + URLEncoder.encode(query, StandardCharsets.UTF_8);
+        return webClient.get()
+                .uri(url)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<List<IngredientName>>() {});
+    }
 }

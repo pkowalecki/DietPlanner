@@ -1,15 +1,13 @@
 package pl.kowalecki.dietplanner.controller.logged;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.kowalecki.dietplanner.controller.helper.IngredientNamesHelper;
-import pl.kowalecki.dietplanner.model.DTO.meal.IngredientNameDTO;
 import pl.kowalecki.dietplanner.model.ingredient.IngredientName;
 import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
 import pl.kowalecki.dietplanner.services.WebPage.MessageType;
@@ -24,13 +22,18 @@ import java.util.Map;
 @RequestMapping("/app/auth")
 public class AddIngredientNamesController {
 
-    private final DietPlannerApiIngredientNameService apiClient;
     private final String ADD_INGREDIENT_VIEW = "pages/logged/addIngredient";
+
+    private final DietPlannerApiIngredientNameService apiClient;
     private final IngredientNamesHelper ingredientNamesHelper;
     private final IWebPageService webPageService;
 
     @GetMapping(value = "/addIngredient")
-    public String addIngredientPage() {
+    public String addIngredientPage(Model model) {
+        String liveSearchUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/app/auth/ingredientNames/search")
+                .toUriString();
+        model.addAttribute("liveSearchUrl", liveSearchUrl);
         return ADD_INGREDIENT_VIEW;
     }
 
@@ -53,10 +56,10 @@ public class AddIngredientNamesController {
             .onErrorResume(error -> Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(webPageService.addMessageToPage(MessageType.ERROR, "Wystąpił nieoczekiwany błąd serwera"))));
     }
 
-//    @GetMapping("/ingredientNames/search")
-//    public Mono<List<IngredientName>> searchIngredients(@RequestParam("query") String query) {
-//        System.out.println("Kłerass: " + query);
-//        return apiClient.searchIngredientName(query);
-//    }
+    @GetMapping("/ingredientNames/search")
+    @ResponseBody
+    public Mono<List<IngredientName>> searchIngredients(@RequestParam("query") String query) {
+        return apiClient.searchIngredientName(query);
+    }
 
 }
