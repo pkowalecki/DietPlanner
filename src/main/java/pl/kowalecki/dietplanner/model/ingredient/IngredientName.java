@@ -6,13 +6,12 @@ import lombok.*;
 @Data
 public class IngredientName {
 
-    private Long id;
     @JsonProperty("ingredientName")
     private String name;
     @JsonProperty("ingredientBrand")
     private String brand;
-    private int protein;
-    private int carbohydrates;
-    private int fat;
-    private int kcal;
+    private double protein;
+    private double carbohydrates;
+    private double fat;
+    private double kcal;
 }

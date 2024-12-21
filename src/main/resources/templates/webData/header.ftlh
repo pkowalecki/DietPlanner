@@ -44,7 +44,7 @@
                     <a href="#">Posiłek</a>
                     <ul class="dropdown-content">
                         <li><a href="#" onclick="location.href='/app/auth/addMeal'">Dodaj posiłek</a></li>
-                        <li><a href="#" onclick="location.href='/app/auth/addIngredientName'">Dodaj składnik</a></li>
+                        <li><a href="#" onclick="location.href='/app/auth/addIngredient'">Dodaj składnik</a></li>
                         <li><a href="#" onclick="location.href='/app/auth/generateMealBoard'">Wygeneruj plan żywienia</a></li>
                         <li><a href="#" onclick="location.href='/app/auth/mealsHistory'">Historia posiłków</a></li>
                     </ul>

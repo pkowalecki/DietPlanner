@@ -1,86 +1,80 @@
 <#include "../../webData/header.ftlh">
 <link rel="stylesheet" href="../../../static/css/addIngredientPage.css"/>
-<div id="content-wrap" class="container wrapper">
-    <div class="ingredient-form-container">
-        <h2>Dodaj nowy składnik</h2>
-        <p>Wartości odżywcze powinny być dodawane w odniesieniu do 100g/100ml na produkt</p>
-        <form id="ingredientForm" method="POST" action="/app/auth/addIngredientName" name="addIngredientForm">
-            <div class="flex-container">
-                <div class="flex-child">
-                    <label for="ingredientName">Nazwa składnika</label>
-                    <input type="text" class="form-control" id="ingredientName" name="ingredientName"
-                           placeholder="Wpisz nazwę składnika"
-                           autocomplete="off"
-                           required/>
-                    <ul id="suggestionsList" class="suggestions-list"></ul>
+<div class="form-container">
+    <h2>Dodaj lub edytuj składnik</h2>
+    <p>Wartości odżywcze powinny być dodawane w odniesieniu do 100g/100ml na produkt</p>
+    <div class="mainFields">
+        <form id="ingredient-form">
+            <div class="parent">
+                <div class="div1">
+                    <@simpleInputPlain id="liveSearch" name="liveSearch" placeholder="Wyszukaj składnik"/>
+                    <div id="suggestionsList" class="suggestions-list"></div>
                 </div>
-                <div class="flex-child">
-                    <label for="ingredientBrand">Marka produktu</label>
-                    <input type="text" class="form-control" id="ingredientBrand" name="ingredientBrand"
-                           placeholder="Wpisz markę produktu"
-                           autocomplete="off"/>
+                <div class="div2">
+                    <@simpleInput name="ingredientName" placeholder="Wpisz nazwę składnika" label="Składnik" id="ingredientName" />
                 </div>
-            </div>
-            <div class="flex-container">
-                <div class="flex-child">
-                    <label for="protein">Białka</label>
-                    <input type="number" class="form-control" id="protein"
-                           name="protein" placeholder="Białka"
-                           autocomplete="off"/>
+                <div class="div3">
+                    <@simpleInput name="ingredientBrand" placeholder="Marka produktu" label="Marka" id="ingredientBrand" />
                 </div>
-                <div class="flex-child">
-                    <label for="carbohydrates">Węglowodany</label>
-                    <input type="number" class="form-control"
-                           id="carbohydrates" name="carbohydrates"
-                           placeholder="Węglowodany"
-                           autocomplete="off"/>
+                <div class="div4">
+                    <@simpleInput name="protein" placeholder="Białka" label="Białka" id="protein" type="number" step="0.25" min="0" max="1000"/>
                 </div>
-                <div class="flex-child">
-                    <label for="fat">Tłuszcze</label>
-                    <input type="number" class="form-control" id="fat" name="fat"
-                           placeholder="Tłuszcze"
-                           autocomplete="off"/>
+                <div class="div5">
+                    <@simpleInput name="carbohydrates" placeholder="Węglowodany" label="Węglowodany" id="carbohydrates" type="number" step="0.25" min="0" max="1000"/>
                 </div>
-                <div class="flex-child">
-                    <label for="kcal">Kcal</label>
-                    <input type="number" class="form-control" id="kcal" name="kcal"
-                           placeholder="Kcal"
-                           autocomplete="off"/>
+                <div class="div6">
+                    <@simpleInput name="fat" placeholder="Tłuszcze" label="Tłuszcze" id="fat" type="number" step="0.25" min="0" max="1000"/>
+                </div>
+                <div class="div7">
+                    <@simpleInput name="kcal" placeholder="Kcal" label="Kcal" id="kcal" type="number" step="0.25" min="0" max="1000"/>
+                </div>
+                <div class="div8">
+                    <@sendFormButton
+                    id="sendIngredientForm"
+                    formToSend="ingredient-form"
+                    url="/app/auth/addIngredientName"
+                    reloadPageAfterSuccess=true />
                 </div>
             </div>
-
-            <button type="submit" class="btn btn-primary mt-3">Dodaj składnik</button>
         </form>
-        <div id="ingredientMsg" class="message"></div>
     </div>
 </div>
+
+
 <script>
     let debounceTimer;
-    document.getElementById('ingredientName').addEventListener('input', function () {
+    document.getElementById('liveSearch').addEventListener('input', function () {
         const query = this.value.trim();
+        const suggestionsList = document.getElementById('suggestionsList');
+
         if (query.length < 3) {
-            document.getElementById('suggestionsList').innerHTML = '';
+            suggestionsList.innerHTML = '';
             return;
         }
+
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
-            fetch('/app/auth/ingredientNames/search?query=' + encodeURIComponent(query))
+            const url = '${liveSearchUrl}?query=' + encodeURIComponent(query);
+            fetch(url)
                 .then(response => response.json())
                 .then(data => {
-                    const suggestionsList = document.getElementById('suggestionsList');
                     suggestionsList.innerHTML = '';
                     if (data.length > 0) {
                         data.forEach(ingredient => {
                             const listItem = document.createElement('li');
+                            listItem.textContent = ingredient.ingredientBrand && ingredient.ingredientBrand.trim()
+                                ? ingredient.ingredientName + ", " + ingredient.ingredientBrand
+                                : ingredient.ingredientName;
 
-                            if (ingredient.ingredientBrand && ingredient.ingredientBrand.trim() !== "") {
-                                listItem.textContent = ingredient.ingredientName + ", " + ingredient.ingredientBrand;
-                            } else {
-                                listItem.textContent = ingredient.ingredientName;
-                            }
                             listItem.classList.add('suggestion-item');
                             listItem.addEventListener('click', () => {
-                                document.getElementById('ingredientName').value = ingredient.ingredientName;
+                                document.getElementById('ingredientName').value = ingredient.ingredientName || '';
+                                document.getElementById('ingredientBrand').value = ingredient.ingredientBrand || '';
+                                document.getElementById('protein').value = ingredient.protein || '';
+                                document.getElementById('carbohydrates').value = ingredient.carbohydrates || '';
+                                document.getElementById('fat').value = ingredient.fat || '';
+                                document.getElementById('kcal').value = ingredient.kcal || '';
+
                                 suggestionsList.innerHTML = '';
                             });
                             suggestionsList.appendChild(listItem);
@@ -88,15 +82,16 @@
                     } else {
                         suggestionsList.innerHTML = '<li>Brak wyników</li>';
                     }
-                }).catch(error => {
-                document.getElementById('ingredientMsg').textContent = 'Wystąpił błąd przy wyszukiwaniu składników.';
-                document.getElementById('ingredientMsg').style.color = 'red';
-            });
-        }, 300); //ms
+                })
+                .catch(() => {
+                    document.getElementById('ingredientMsg').textContent = 'Wystąpił błąd przy wyszukiwaniu składników.';
+                    document.getElementById('ingredientMsg').style.color = 'red';
+                });
+        }, 300); // 300 ms opóźnienia
     });
 
     document.addEventListener('click', function (event) {
-        const inputElement = document.getElementById('ingredientName');
+        const inputElement = document.getElementById('liveSearch');
         const suggestionsList = document.getElementById('suggestionsList');
 
         if (!inputElement.contains(event.target) && !suggestionsList.contains(event.target)) {
