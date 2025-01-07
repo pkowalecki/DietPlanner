@@ -1,8 +1,5 @@
 package pl.kowalecki.dietplanner.services.dietplannerapi.meal;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -10,9 +7,10 @@ import pl.kowalecki.dietplanner.model.DTO.FoodBoardPageRequest;
 import pl.kowalecki.dietplanner.model.DTO.MealStarterPack;
 import pl.kowalecki.dietplanner.model.DTO.meal.AddMealRequestDTO;
 import pl.kowalecki.dietplanner.model.DTO.meal.MealBoardDTO;
-import pl.kowalecki.dietplanner.model.Meal;
+import pl.kowalecki.dietplanner.model.DTO.meal.MealNameDTO;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 import java.util.List;
 
 import static pl.kowalecki.dietplanner.utils.UrlTools.MEAL_SERVICE_URL;
@@ -33,12 +31,13 @@ public class DietPlannerApiMealService {
                 .bodyToMono(MealStarterPack.class);
     }
 
-    public Mono<List<Meal>> getAllMeals() {
+    public Mono<List<MealNameDTO>> getMealNamesByUserId() {
         return webClient.get()
                 .uri(MEAL_SERVICE_URL+"/meal/allMeal")
                 .retrieve()
-                .bodyToFlux(Meal.class)
-                .collectList();
+                .bodyToFlux(MealNameDTO.class)
+                .collectList()
+                .onErrorReturn(Collections.emptyList());
     }
 
     public Mono<MealBoardDTO> generateMealBoard(FoodBoardPageRequest apiReq) {

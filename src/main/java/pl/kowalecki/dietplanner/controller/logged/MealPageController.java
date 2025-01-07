@@ -3,9 +3,7 @@ package pl.kowalecki.dietplanner.controller.logged;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.MessageSource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,8 +14,7 @@ import pl.kowalecki.dietplanner.controller.helper.AddMealHelper;
 import pl.kowalecki.dietplanner.model.DTO.*;
 
 import pl.kowalecki.dietplanner.model.DTO.meal.AddMealRequestDTO;
-import pl.kowalecki.dietplanner.model.DTO.meal.IngredientNameDTO;
-import pl.kowalecki.dietplanner.model.ingredient.IngredientName;
+import pl.kowalecki.dietplanner.model.DTO.meal.MealNameDTO;
 import pl.kowalecki.dietplanner.model.page.FoodBoardPageData;
 
 import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
@@ -77,7 +74,7 @@ public class MealPageController {
 
     @GetMapping(value = "/generateMealBoard")
     public Mono<String> mealPage(Model model, HttpServletRequest request, HttpServletResponse response) {
-        return apiMealService.getAllMeals()
+        return apiMealService.getMealNamesByUserId()
                 .map(mealList -> {
                     model.addAttribute("mealList", mealList);
                     return "pages/logged/foodBoardPage";
