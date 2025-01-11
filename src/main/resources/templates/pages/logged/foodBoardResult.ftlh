@@ -15,7 +15,7 @@
             text-decoration: line-through;
         }
     </style>
-<div class="container">
+<div class="form-container">
     <p>Lista zakupów</p>
     <#assign id = 1 />
     <#list result as food>
@@ -23,7 +23,9 @@
             <input type="checkbox" id="check_${id}" class="checkbox" onclick="toggleIngredient(${id})"/>
             <div class="ingredient" id="ingredient_${id}">
                 ${food.getName()} ${food.getIngredientAmount()}${food.getIngredientUnit()}
-                ${food.getMeasurementAmount()} ${food.getMeasurementUnit()}
+                <#list food.getMeasurementList() as measurement>
+                    ${measurement.getMeasurementAmount()} ${measurement.getMeasurementUnit()}
+                </#list>
             </div>
         </div>
         <#assign id = id + 1/>
