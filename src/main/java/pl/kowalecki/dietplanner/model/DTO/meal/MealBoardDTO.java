@@ -1,19 +1,17 @@
 package pl.kowalecki.dietplanner.model.DTO.meal;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import pl.kowalecki.dietplanner.model.DTO.IngredientToBuy;
-import pl.kowalecki.dietplanner.model.Meal;
+import lombok.*;
+import pl.kowalecki.dietplanner.model.DTO.MeasurementDTO;
 
 import java.util.List;
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class MealBoardDTO {
-
-    List<Meal> mealList;
-    List<IngredientToBuy> ingredientsToBuy;
+    private String name;
+    private String brand;
+    private double ingredientAmount;
+    private String ingredientUnit;
+    private List<MeasurementDTO> measurementList;
 }
+

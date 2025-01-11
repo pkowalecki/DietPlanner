@@ -1,5 +1,6 @@
 package pl.kowalecki.dietplanner.services.dietplannerapi.meal;
 
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -40,12 +41,13 @@ public class DietPlannerApiMealService {
                 .onErrorReturn(Collections.emptyList());
     }
 
-    public Mono<MealBoardDTO> generateMealBoard(FoodBoardPageRequest apiReq) {
+    public Mono<List<MealBoardDTO>> generateMealBoard(FoodBoardPageRequest apiReq) {
         return webClient.post()
                 .uri(MEAL_SERVICE_URL+"/meal/generateFoodBoard")
                 .bodyValue(apiReq)
                 .retrieve()
-                .bodyToMono(MealBoardDTO.class);
+                .bodyToMono(new ParameterizedTypeReference<List<MealBoardDTO>>() {})
+                .onErrorReturn(Collections.emptyList());
     }
 
     public Mono<ResponseEntity<Void>> addMeal(AddMealRequestDTO addMealRequestDTO) {
@@ -54,5 +56,14 @@ public class DietPlannerApiMealService {
                 .bodyValue(addMealRequestDTO)
                 .retrieve()
                 .toBodilessEntity();
+    }
+
+    public Mono<List<String>> getMealNamesByMealId(List<Long> mealIds){
+        return webClient.post()
+                .uri(MEAL_SERVICE_URL+"/meal/getMealNamesById")
+                .bodyValue(mealIds)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<List<String>>() {})
+                .onErrorReturn(Collections.emptyList());
     }
 }
