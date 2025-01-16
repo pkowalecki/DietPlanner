@@ -116,6 +116,9 @@
     </div>
 </#macro>
 
+<#macro simpleButton id, url, buttonText="Wyślij" class="">
+    <a id="${id}" href="${url}" class="btn ${class}">${buttonText}</a>
+</#macro>
 
 <#macro sendFormButton id, formToSend, url, method="post" buttonText="Wyślij" contentType="application/json" reloadPageAfterSuccess=false >
     <button type="button" id="${id}" class="btn btn-primary mt-3">${buttonText}</button>
