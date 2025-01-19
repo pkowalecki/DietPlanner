@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.kowalecki.dietplanner.controller.helper.AddMealHelper;
 import pl.kowalecki.dietplanner.model.DTO.*;
 import pl.kowalecki.dietplanner.model.DTO.meal.AddMealRequestDTO;
+import pl.kowalecki.dietplanner.model.DTO.meal.MealHistoryDetailsDTO;
 import pl.kowalecki.dietplanner.model.page.FoodBoardPageData;
 import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
 import pl.kowalecki.dietplanner.services.WebPage.MessageType;
@@ -118,36 +119,24 @@ public class MealPageController {
     }
 
     @GetMapping(value = "/mealsHistory")
-    public String mealsHistory(Model model, HttpServletRequest request, HttpServletResponse response) {
-        ArrayList<Map<String, Object>> dane = new ArrayList<Map<String, Object>>();
-//        String url = "http://" + UrlTools.MEAL_SERVICE_URL + "/meal/getMealHistory";
-//        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendGetRequest(url, ResponseBodyDTO.class, request, response);
-//        if (apiResponse.getStatusCode() == HttpStatus.OK && apiResponse.getBody() != null) {
-//            List<?> mealHistoryList = (List<?>) apiResponse.getBody().getData().get("mealHistoryList");
-//            List<MealHistoryDTO> mealHistory = classMapper.convertToDTOList(mealHistoryList, MealHistoryDTO.class);
-//            for (MealHistoryDTO historyDTO : mealHistory) {
-//                Map<String, Object> meal = new HashMap<>();
-//                meal.put("id", historyDTO.getPublic_id());
-//                meal.put("userId", historyDTO.getUserId());
-//                meal.put("mealsId", historyDTO.getMealsIds());
-//                meal.put("created", DateUtils.parseDateToddmmyy(historyDTO.getCreated()));
-//                meal.put("multiplier", historyDTO.getMultiplier());
-//                dane.add(meal);
-//            }
-//            model.addAttribute("mealHistory", dane);
-//        }
-        return "pages/logged/mealsHistoryPage";
+    public Mono<String> mealsHistory(Model model, HttpServletRequest request, HttpServletResponse response) {
+       return apiMealService.getMealHistoryList()
+                .flatMap(mealHistory ->{
+                    model.addAttribute("mealHistory", mealHistory);
+                    return Mono.just("pages/logged/mealsHistoryPage");
+                })
+                .defaultIfEmpty("pages/logged/mealsHistoryPage");
     }
 
     @PostMapping(value = "/mealHistory")
-    public String getMealHistoryPage(@RequestParam("id") String param, Model model, HttpServletRequest request, HttpServletResponse response, InputStream inputStream) {
-//        String url = "http://" + UrlTools.MEAL_SERVICE_URL + "/meal/getMealHistory";
-//        ResponseEntity<ResponseBodyDTO> apiResponse = webPageService.sendPostRequest(url, param, ResponseBodyDTO.class, request, response);
-//        if (apiResponse.getStatusCode() == HttpStatus.OK && apiResponse.getBody() != null) {
-//            MealHistoryDetailsDTO mealHistory = classMapper.convertToDTO(apiResponse.getBody().getData().get("mealHistory"), MealHistoryDetailsDTO.class);
-//            model.addAttribute("mealHistory", mealHistory);
-//        }
-        return "pages/logged/mealHistoryPage";
+    public Mono<String> getMealHistoryPage(@RequestParam("id") String param, Model model, HttpServletRequest request, HttpServletResponse response, InputStream inputStream) {
+        return apiMealService.getMealHistoryById(param)
+                .map(mealHistory ->{
+                    model.addAttribute("mealHistory", mealHistory);
+                    return "pages/logged/mealHistoryPage";
+                });
+                //TODO DAĆ TU RETURNA JAKIEGOŚ FAJNEGO.
+
     }
 
 }

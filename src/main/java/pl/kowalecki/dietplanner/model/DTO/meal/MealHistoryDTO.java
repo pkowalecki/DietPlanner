@@ -16,6 +16,6 @@ public class MealHistoryDTO{
     private UUID public_id;
     private Long userId;
     private String mealsIds;
-    private LocalDateTime created;
+    private String created;
     private Double multiplier;
 }
