@@ -43,6 +43,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
+        System.out.println("doFilterInternal in closed path");
 
         String accessToken = authUtils.extractAccessTokenFromRequest(request);
 

@@ -1,5 +1,6 @@
 package pl.kowalecki.dietplanner.services.dietplannerapi.meal;
 
+import org.springframework.core.ParameterizedTypeReference;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -9,9 +10,15 @@ import org.springframework.web.reactive.function.client.WebClient;
 import pl.kowalecki.dietplanner.mapper.MealHistoryMapper;
 import pl.kowalecki.dietplanner.model.DTO.FoodBoardPageRequest;
 import pl.kowalecki.dietplanner.model.DTO.MealStarterPack;
+import pl.kowalecki.dietplanner.model.DTO.PageResponse;
+import pl.kowalecki.dietplanner.model.DTO.meal.AddMealRequestDTO;
+import pl.kowalecki.dietplanner.model.DTO.meal.MealBoardDTO;
+import pl.kowalecki.dietplanner.model.DTO.meal.MealMainInfoDTO;
+import pl.kowalecki.dietplanner.model.Meal;
 import pl.kowalecki.dietplanner.model.DTO.meal.*;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -90,5 +97,15 @@ public class DietPlannerApiMealService {
                 .retrieve()
                 .bodyToMono(MealHistoryDetailsDTO.class)
                 .onErrorReturn(new MealHistoryDetailsDTO());
+    }
+
+    public Mono<PageResponse<MealMainInfoDTO>> getPageMeals(int page, int size, String mealType) {
+        String url = MEAL_SERVICE_URL + "/meal/getMealsData?page=" + page + "&size=" + size + "&mealType=" + mealType;
+
+        return webClient.get()
+                .uri(url)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<PageResponse<MealMainInfoDTO>>() {})
+                .onErrorReturn(new PageResponse<>(Collections.emptyList(), page, size, 0, 0));
     }
 }

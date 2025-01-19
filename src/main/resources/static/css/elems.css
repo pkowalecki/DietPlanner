@@ -183,3 +183,27 @@
     transition: 0.2s ease all;
 }
 
+
+.btn.active {
+    color: #020101;
+    background-color: #fddb0d;
+    border-radius: 14px;
+    font-weight: bold;
+}
+
+.btn {
+    color: #ffffff;
+    background-color: #343a40;
+    border-radius: 14px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.btn.active:hover {
+    text-decoration: underline;
+}
+
+.btn:hover {
+    color: #020101;
+    background-color: #fddb0d;
+}
+

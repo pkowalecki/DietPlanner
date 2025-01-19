@@ -24,6 +24,7 @@ public class WebClientConfig {
     public WebClient webClient(WebClient.Builder webClientBuilder, AuthUtils authUtils, RouteUtils routeUtils) {
         return webClientBuilder
                 .filter((request, next) -> {
+                    System.out.println("WebClientFilter");
                     HttpServletRequest httpRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 
                     if (routeUtils.isOpenPath(httpRequest.getRequestURI())) {
