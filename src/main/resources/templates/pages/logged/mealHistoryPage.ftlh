@@ -1,70 +1,49 @@
 <#include "../../webData/header.ftlh">
-<link rel="stylesheet" href="../../../static/css/mealsHistoryPage.css"/>
-<style>
-    table {
-        border-collapse: collapse;
-        width: 100%;
-    }
+<link rel="stylesheet" href="../../../static/css/mealHistoryPage.css"/>
+<link rel="stylesheet" href="../../../static/css/foodBoardPage.css"/>
+<div class="meal-board-container">
+    <div class="meal-board-table">
 
-    th, td {
-        border: 1px solid #dddddd;
-        text-align: left;
-        padding: 8px;
-    }
-
-    th {
-        background-color: #f2f2f2;
-    }
-
-    .foodType {
-        background-color: #f2f2f2;
-    }
-</style>
-<div id="content-wrap" class="container wrapper">
-    <div class="tabelka">
-        <table>
-            <thead>
-            <tr>
-                <th>Typ</th>
-                <th>Poniedziałek</th>
-                <th>Wtorek</th>
-                <th>Środa</th>
-                <th>Czwartek</th>
-                <th>Piątek</th>
-                <th>Sobota</th>
-                <th>Niedziela</th>
-            </tr>
-            </thead>
-            <tbody>
-            <#list 1..4 as row>
-                <tr>
-                    <#if row ==1>
-                        <td class="foodType">Śniadanie</td></#if>
-                    <#if row ==2>
-                        <td class="foodType">Przekąska</td></#if>
-                    <#if row ==3>
-                        <td class="foodType">Obiad</td></#if>
-                    <#if row ==4>
-                        <td class="foodType">Kolacja</td></#if>
+        <div class="meal-type-header">Typ</div>
+        <div class="day-name">Poniedziałek</div>
+        <div class="day-short">Pon</div>
+        <div class="day-name">Wtorek</div>
+        <div class="day-short">Wt</div>
+        <div class="day-name">Środa</div>
+        <div class="day-short">Śr</div>
+        <div class="day-name">Czwartek</div>
+        <div class="day-short">Czw</div>
+        <div class="day-name">Piątek</div>
+        <div class="day-short">Pią</div>
+        <div class="day-name">Sobota</div>
+        <div class="day-short">Sob</div>
+        <div class="day-name">Niedziela</div>
+        <div class="day-short">Nie</div>
+        <#list 1..4 as row>
+            <div class="meal-type">
+                <#if row == 1>Śniadanie</#if>
+                <#if row == 2>Przekąska</#if>
+                <#if row == 3>Obiad</#if>
+                <#if row == 4>Kolacja</#if>
+            </div>
 
                     <#assign mealIndex = (row - 1) * 7>
                     <#list 1..7 as column>
-                        <td>
-                            <#if (mealHistory.getMealNames()?size > mealIndex + (column - 1))>
+                        <div>
+                            <#if (mealHistory.getMealNames()?has_content && mealHistory.getMealNames()?size > mealIndex + (column - 1))>
                                 ${mealHistory.getMealNames()[mealIndex + (column - 1)]}
                             <#else >
                                 Brak danych
                             </#if>
 
-                        </td>
+                        </div>
                     </#list>
-                </tr>
             </#list>
-            </tbody>
-        </table>
+    </div>
+    <div>
         <span>
             Przelicznik:
-            <#if mealHistory.getMultiplier()??>
+            <#if mealHistory.getMultiplier()?has_content>
                 ${mealHistory.getMultiplier()}
             <#else>
                 Brak danych
@@ -72,27 +51,6 @@
 
             <button type="button">Wygeneruj tabelkę</button>
         </span>
-    </div>
-    <div>
-        <p>
-            <#if mealHistory.getMeals()?has_content>
-                <#list mealHistory.getMeals() as meal>
-                    ${meal.getName()} <br/>
-                    ${meal.getDescription()} <br/>
-                    ${meal.getNotes()} <br/>
-                    ${meal.getRecipe()} <br/>
-                    <#if meal.getIngredients()?has_content>
-                        <#list meal.getIngredients() as ingredient>
-                            ${ingredient.getName().getIngredientName()}
-                            ${ingredient.getIngredientAmount()}
-                            ${ingredient.getIngredientUnit().getShortName()}
-                            ${ingredient.getMeasurementValue()}
-                            ${ingredient.getMeasurementType().getMeasurementName()}
-                        </#list>
-                    </#if>
-                </#list>
-            </#if>
-        </p>
     </div>
     <div>
         <h2>Lista zakupów</h2>

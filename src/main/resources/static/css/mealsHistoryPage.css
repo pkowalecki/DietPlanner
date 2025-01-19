@@ -27,6 +27,7 @@
 }
 
 .details {
+    padding: 5px;
     flex-grow: 1;
     font-weight: bold;
     color: #333;
