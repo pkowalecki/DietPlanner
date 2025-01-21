@@ -1,0 +1,74 @@
+/* Ogólne ustawienia dla meal-details */
+.meal-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+}
+
+.meal-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.meal-header h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.meal-header .meal-servings {
+    font-size: 1.2rem;
+    color: #666;
+    margin-top: 5px;
+}
+
+.meal-body {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.meal-left,
+.meal-right {
+    flex: 1;
+    padding: 10px;
+    min-width: 300px;
+}
+
+.meal-left h2,
+.meal-right h2 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #e5e5e5;
+    padding-bottom: 5px;
+}
+
+.ingredients,
+.directions {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.ingredients li,
+.directions li {
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+    line-height: 1.5;
+}
+
+.directions {
+    list-style: decimal inside;
+}
+
+.meal-left p {
+    margin-top: 10px;
+    font-style: italic;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #e5e5e5;
+}

@@ -108,4 +108,12 @@ public class DietPlannerApiMealService {
                 .bodyToMono(new ParameterizedTypeReference<PageResponse<MealMainInfoDTO>>() {})
                 .onErrorReturn(new PageResponse<>(Collections.emptyList(), page, size, 0, 0));
     }
+
+    public Mono<Meal> getMealDetails(Long id) {
+        return webClient.get()
+                .uri(MEAL_SERVICE_URL+"/meal/getMealDetails/{id}", id)
+                .retrieve()
+                .bodyToMono(Meal.class);
+    }
+
 }
