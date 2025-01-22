@@ -1,74 +1,166 @@
-/* Ogólne ustawienia dla meal-details */
-.meal-details {
+.form-container {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    font-family: 'Arial', sans-serif;
-    color: #333;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    text-align: left;
 }
 
-.meal-header {
-    text-align: center;
+.page-section {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.titleSection {
     margin-bottom: 20px;
 }
 
-.meal-header h1 {
-    font-size: 2.5rem;
+.meal-title {
+    font-size: 46px;
     font-weight: bold;
+    color: black;
     margin: 0;
 }
 
-.meal-header .meal-servings {
-    font-size: 1.2rem;
-    color: #666;
-    margin-top: 5px;
+.meal-description {
+    font-size: 23px;
+    color: #777;
+    margin: 5px 0 0;
 }
 
-.meal-body {
+.sectionName {
+    font-size: 30px;
+}
+
+.contentSection {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
     gap: 20px;
 }
 
-.meal-left,
-.meal-right {
+.leftPart {
+    flex: 4;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.quantity {
+    width: 200px;
+    height: 50px;
+    padding: 15px;
+    display: inline-flex;
+    overflow: hidden;
+    align-items: center;
+    border-radius: 20px;
+    background: #fddb0d;
+    border-color: #22272b;
+    border-style: solid;
+    border-width: 2px;
+}
+
+.btnS {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border: none !important;
+    border-radius: 0;
+    width: 50px;
+    height: 50px;
+    font-size: 1rem;
+    background: transparent;
+    cursor: pointer;
+    color: #000;
+    outline: none;
+    box-shadow: none;
+}
+
+#qtyInput {
+    width: 100%;
+    border: none;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+    color: #000;
+    background: 0 0;
     flex: 1;
-    padding: 10px;
-    min-width: 300px;
+    font-weight: 700;
+    -moz-appearance: textfield;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
-.meal-left h2,
-.meal-right h2 {
-    font-size: 1.8rem;
-    margin-bottom: 10px;
-    border-bottom: 2px solid #e5e5e5;
-    padding-bottom: 5px;
-}
-
-.ingredients,
-.directions {
-    list-style: none;
-    padding: 0;
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
     margin: 0;
 }
 
-.ingredients li,
-.directions li {
-    margin-bottom: 8px;
-    font-size: 1.1rem;
-    line-height: 1.5;
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
 }
 
-.directions {
-    list-style: decimal inside;
+#qtyInput:focus-visible {
+    outline: none;
 }
 
-.meal-left p {
-    margin-top: 10px;
-    font-style: italic;
-    background-color: #f9f9f9;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #e5e5e5;
+
+.ingredients {
+    list-style: none;
+    padding: 0;
+}
+
+.ingredients li {
+    font-size: 16px;
+    color: #333;
+}
+
+.rightPart {
+    flex: 6;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+
+@media screen and (max-width: 768px) {
+    .contentSection {
+        flex-direction: column;
+    }
+
+    .leftPart,
+    .rightPart {
+        flex: none;
+        width: 100%;
+    }
+
+    .quantity {
+        width: 100%;
+        justify-content: space-around;
+    }
+
+    .ingredients li,
+    .notes {
+        font-size: 14px;
+    }
+
+    .meal-title {
+        font-size: 32px;
+    }
+
+    .meal-description {
+        font-size: 18px;
+    }
+
+    .sectionName {
+        font-size: 24px;
+    }
+
+    .btnS {
+        width: 40px;
+        height: 40px;
+    }
 }
