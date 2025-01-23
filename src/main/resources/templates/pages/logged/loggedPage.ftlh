@@ -17,15 +17,17 @@
 
     <div class="item-grid" id="meal-grid">
         <#list meals as meal>
-            <div class="item-container">
-                <div class="icon">
-                    <div class="no-image">Brak zdjęcia</div>
+            <a href="details/${meal.getMealId()}" class="item-link">
+                <div class="item-container">
+                    <div class="icon">
+                        <div class="no-image">Brak zdjęcia</div>
+                    </div>
+                    <div class="item-details">
+                        <p class="item-name">${meal.getName()}</p>
+                        <p class="item-description">${meal.getDescription()}</p>
+                    </div>
                 </div>
-                <div class="item-details">
-                    <p class="item-name">${meal.getName()}</p>
-                    <p class="item-description">${meal.getDescription()}</p>
-                </div>
-            </div>
+            </a>
         </#list>
     </div>
     <div>

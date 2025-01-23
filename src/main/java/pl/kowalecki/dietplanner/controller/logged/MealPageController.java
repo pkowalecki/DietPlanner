@@ -138,5 +138,15 @@ public class MealPageController {
                 //TODO DAĆ TU RETURNA JAKIEGOŚ FAJNEGO.
 
     }
+    @GetMapping(value = "/details/{id}")
+    public Mono<String> getMealDetailsPage(@PathVariable Long id, Model model){
+        return apiMealService.getMealDetails(id)
+                .map(response ->{
+                    model.addAttribute("meal", response);
+                    return "pages/logged/mealDetailsPage";
+                });
+
+
+    }
 
 }
