@@ -3,7 +3,15 @@
 <div class="form-container">
     <div class="page-section">
         <div class="titleSection">
-            <p class="meal-title">${meal.name}</p>
+            <div class="meal-title-container">
+                <div class="">
+                    <p class="meal-title">${meal.name}</p>
+                </div>
+                <div class="meal-buttons-container">
+                    <@simpleButton id="bEditMeal_${meal.getMealId()}" url="" buttonText="Edytuj posiłek"/>
+                    <@simpleButton id="bDeleteMeal_${meal.getMealId()}" url="" buttonText="Usuń posiłek"/>
+                </div>
+            </div>
             <p class="meal-description">${meal.description}</p>
         </div>
         <hr>
@@ -23,7 +31,8 @@
                     <p class="sectionName">Składniki</p>
                     <#list meal.getIngredients() as ingredient>
                         <li id="ingredient-${ingredient_index}">
-                            <span class="amount">${ingredient.getIngredientAmount()}</span>${ingredient.getIngredientUnit().getShortName()} - ${ingredient.getName().getIngredientName()}
+                            <span class="amount">${ingredient.getIngredientAmount()}</span>${ingredient.getIngredientUnit().getShortName()}
+                            - ${ingredient.getName().getIngredientName()}
                         </li>
                     </#list>
                 </div>

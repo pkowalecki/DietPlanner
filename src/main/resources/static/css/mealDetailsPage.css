@@ -125,6 +125,15 @@ input[type=number] {
     gap: 20px;
 }
 
+.meal-title-container{
+    display: flex;
+}
+.meal-buttons-container{
+    align-content: center;
+    margin-left: auto;
+    margin-right: 0;
+}
+
 
 @media screen and (max-width: 768px) {
     .contentSection {
