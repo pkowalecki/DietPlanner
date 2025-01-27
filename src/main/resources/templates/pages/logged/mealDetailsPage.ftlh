@@ -8,7 +8,7 @@
                     <p class="meal-title">${meal.name}</p>
                 </div>
                 <div class="meal-buttons-container">
-                    <@simpleButton id="bEditMeal_${meal.getMealId()}" url="" buttonText="Edytuj posiłek"/>
+                    <@simpleButton id="bEditMeal_${meal.getMealId()}" url="${url}${meal.getMealId()}" buttonText="Edytuj posiłek"/>
                     <@simpleButton id="bDeleteMeal_${meal.getMealId()}" url="" buttonText="Usuń posiłek"/>
                 </div>
             </div>

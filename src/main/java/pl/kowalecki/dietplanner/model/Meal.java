@@ -5,6 +5,7 @@ import pl.kowalecki.dietplanner.model.DTO.MealType;
 import pl.kowalecki.dietplanner.model.ingredient.IngredientDTO;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -13,17 +14,16 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-@Builder
 public class Meal {
-    private Long mealId;
+    private Long mealId =-1L;
     private LocalDateTime additionDate;
     private LocalDateTime editDate;
-    private String name;
-    private String description;
-    private String recipe;
-    private List<IngredientDTO> ingredients;
-    private String notes;
-    private List<MealType> mealTypes;
-    private Double portions;
-    private boolean isDeleted;
+    private String name ="";
+    private String description ="";
+    private String recipe ="";
+    private List<IngredientDTO> ingredients = new ArrayList<>();
+    private String notes ="";
+    private List<MealType> mealTypes = new ArrayList<>();
+    private Double portions = 0.0;
+    private boolean isDeleted = false ;
 }
