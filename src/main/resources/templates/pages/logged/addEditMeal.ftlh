@@ -2,12 +2,7 @@
 <link rel="stylesheet" href="../../../static/css/addMealPage.css"/>
 <div class="form-container">
     <form id="mealForm">
-        <input type="hidden" name="mealId"
-               value="<#if meal?? && meal.getMealId()??>
-                   ${meal.getMealId()}
-                   <#else>
-                   -1
-               </#if> "/>
+        <input type="hidden" name="mealId" value="<#if meal?? && meal.getMealId()??>${meal.getMealId()}<#else>-1</#if>"/>
         <div class="mainFields">
             <@simpleInput name="mealName" placeholder="Nazwa posiłku" label="Nazwa posiłku" id="mealName" value="${meal.getName()}" />
             <@simpleTextArea name="recipe" placeholder="Wprowadź przepis..." label="Przepis" id="recipe" rows="4" value="${meal.getRecipe()}"/>
@@ -164,11 +159,12 @@
         $("#submitButton").click(e => {
             e.preventDefault();
             const mealData = {
+                mealId: $("input[name='mealId']").val(),
                 mealName: $("#mealName").val(),
                 description: $("#description").val(),
                 recipe: $("#recipe").val(),
                 notes: $("#notes").val(),
-                mealType: $("#mealType").val(),
+                mealTypes: $("#mealType").val(),
                 ingredients: ingredientsList,
                 portions: $("#portions").val()
             };
@@ -178,8 +174,8 @@
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(mealData),
-                success: () => swal("Sukces", "Posiłek został dodany!", "success"),
-                error: () => swal("Błąd", "Nie udało się dodać posiłku.", "error")
+                success: () => showSwalMessage("Sukces", "Posiłek został dodany!", "success"),
+                error: () => showSwalMessage("Błąd", "Nie udało się dodać posiłku.", "error")
             });
         });
         function getIngredientFromModal() {

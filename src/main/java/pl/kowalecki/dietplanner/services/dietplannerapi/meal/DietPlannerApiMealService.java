@@ -63,9 +63,9 @@ public class DietPlannerApiMealService {
                 .onErrorReturn(Collections.emptyList());
     }
 
-    public Mono<ResponseEntity<Void>> addMeal(AddMealRequestDTO addMealRequestDTO) {
+    public Mono<ResponseEntity<Void>> addOrUpdateMeal(AddMealRequestDTO addMealRequestDTO) {
         return webClient.post()
-                .uri(MEAL_SERVICE_URL+"/meal/addMeal")
+                .uri(MEAL_SERVICE_URL+"/meal/addOrUpdateMeal")
                 .bodyValue(addMealRequestDTO)
                 .retrieve()
                 .toBodilessEntity();
