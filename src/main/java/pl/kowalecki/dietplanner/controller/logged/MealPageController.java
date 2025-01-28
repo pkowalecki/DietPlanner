@@ -1,5 +1,6 @@
 package pl.kowalecki.dietplanner.controller.logged;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @AllArgsConstructor
@@ -60,19 +62,21 @@ public class MealPageController {
         if (!errors.isEmpty()) {
             return Mono.just(ResponseEntity.badRequest().body(errors));
         }
-        return apiMealService.addMeal(addMealRequestDTO)
-                .flatMap(response -> {
-                            if (response.getStatusCode().is2xxSuccessful()) {
-                                return Mono.just(ResponseEntity.status(HttpStatus.OK).body(webPageService.addMessageToPage(MessageType.SUCCESS, "Posiłek został dodany")));
-                            } else {
-                                String errorMessage = response.getStatusCode().is4xxClientError()
-                                        ? "Nie udało się dodać posiłku."
-                                        : "Wystąpił nieoczekiwany błąd serwera";
-                                return Mono.just(ResponseEntity.status(response.getStatusCode()).body(webPageService.addMessageToPage(MessageType.ERROR, errorMessage)));
-                            }
-                        })
-                .onErrorResume(error -> Mono.just(ResponseEntity.internalServerError()
-                        .body(webPageService.addMessageToPage(MessageType.ERROR, "Wystąpił nieoczekiwany błąd serwera"))));
+//        return apiMealService.addMeal(addMealRequestDTO)
+//                .flatMap(response -> {
+//                            if (response.getStatusCode().is2xxSuccessful()) {
+//                                return Mono.just(ResponseEntity.status(HttpStatus.OK).body(webPageService.addMessageToPage(MessageType.SUCCESS, "Posiłek został dodany")));
+//                            } else {
+//                                String errorMessage = response.getStatusCode().is4xxClientError()
+//                                        ? "Nie udało się dodać posiłku."
+//                                        : "Wystąpił nieoczekiwany błąd serwera";
+//                                return Mono.just(ResponseEntity.status(response.getStatusCode()).body(webPageService.addMessageToPage(MessageType.ERROR, errorMessage)));
+//                            }
+//                        })
+//                .onErrorResume(error -> Mono.just(ResponseEntity.internalServerError()
+//                        .body(webPageService.addMessageToPage(MessageType.ERROR, "Wystąpił nieoczekiwany błąd serwera"))));
+//    }
+        return Mono.just(ResponseEntity.ok().build());
     }
 
     @GetMapping(value = "/generateMealBoard")
@@ -170,6 +174,7 @@ public class MealPageController {
             model.addAttribute("mealTypeList", MapUtils.mapMealType(starterPack.getMealTypeList()));
             model.addAttribute("measurementTypeList", MapUtils.mapMeasurementType(starterPack.getMeasurementTypeList()));
             model.addAttribute("meal", mealDetails);
+            model.addAttribute("selectedMealTypeIds", mealDetails.getMealTypes().stream().map(MealType::getId).collect(Collectors.toList()));
             return "pages/logged/addEditMeal";
         });
 

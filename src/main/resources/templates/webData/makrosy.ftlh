@@ -66,18 +66,16 @@
            autocomplete="off"
             <#if placeholder !="">placeholder="${placeholder}"</#if>
             <#if rows !="">rows="${rows}"</#if>
-    >
-        <#if value!= "">${value}</#if>
-    </textarea>
+    ><#if value?has_content>${value}</#if></textarea>
 </#macro>
 
-<#macro simpleSelect name source style="" class="" liveSearch=true id="" disabled=false placeholder="" divWrapperId="" divWrapperStyle="" selectWrapperStyle="" label="" multiple=true showMinus=false divWrapperClass="">
+<#macro simpleSelect name source style="" class="" liveSearch=true id="" disabled=false placeholder="" divWrapperId="" divWrapperStyle="" selectWrapperStyle="" label="" multiple=true showMinus=false divWrapperClass="" selectedValues=[]>
     <#assign idPolka = id/><#rt>
     <#assign classPolka = class/>
     <#assign isLabel = (label?has_content)>
     <div id="${divWrapperId}" class="${divWrapperClass} style="${divWrapperStyle}">
         <div class="floating-group">
-            <@simpleSelectPlain name=name style=style class=classPolka liveSearch=liveSearch id=idPolka disabled=false placeholder=placeholder multiple=multiple source=source showMinus=showMinus selectWrapperStyle=selectWrapperStyle labelled=isLabel/>
+            <@simpleSelectPlain name=name style=style class=classPolka liveSearch=liveSearch id=idPolka disabled=false placeholder=placeholder multiple=multiple source=source showMinus=showMinus selectWrapperStyle=selectWrapperStyle labelled=isLabel selectedValues=selectedValues/>
             <#if label!=""><label class="floating-label" for="${idPolka}" id="labelFor${idPolka}">${label}</label></#if>
             <div class="error-message" id="${idPolka}Error">
                 <i class="error-icon f a-solid fa-circle-exclamation" id="${idPolka}Error" style="display: none"></i>
@@ -86,7 +84,7 @@
     </div>
 </#macro>
 
-<#macro simpleSelectPlain name source style="" class="" liveSearch=true id="" disabled=false placeholder="" divWrapperId="" divWrapperStyle="" multiple=true emptyValue="-" showMinus=false selectWrapperStyle="" labelled=false>
+<#macro simpleSelectPlain name source style="" class="" liveSearch=true id="" disabled=false placeholder="" divWrapperId="" divWrapperStyle="" multiple=true emptyValue="-" showMinus=false selectWrapperStyle="" labelled=false selectedValues=[]>
     <#assign idPolka = id/><#rt>
     <#assign classPolka = class/>
     <div style="${selectWrapperStyle}">
@@ -108,7 +106,9 @@
                 <#list source as val>
                     <#if val?has_content>
                         <option value="${val['value']}"
-                                <#if val['blokada']?? && val['blokada'] == "true">disabled</#if>>${val['name']}</option>
+                                <#if val['blokada']?? && val['blokada'] == "true">disabled</#if>
+                                <#if selectedValues?seq_contains(val['value']?number)>selected</#if>
+                        >${val['name']}</option>
                     </#if>
                 </#list>
             <#else>
@@ -116,6 +116,13 @@
             </#if>
         </select>
     </div>
+    <#if selectedValues?has_content>
+        <script>
+            $(document).ready(function() {
+                $('#${idPolka}').selectpicker('refresh').change();
+            });
+        </script>
+    </#if>
 </#macro>
 
 <#macro simpleButton id, url, buttonText="Wyślij" class="">

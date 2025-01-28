@@ -13,13 +13,12 @@
             <@simpleTextArea name="recipe" placeholder="Wprowadź przepis..." label="Przepis" id="recipe" rows="4" value="${meal.getRecipe()}"/>
             <@simpleTextArea name="description" placeholder="Wprowadź opis tutaj..." label="Opis posiłku" id="description" rows="4" value="${meal.getDescription()}" />
             <@simpleTextArea name="notes" placeholder="Wprowadź notatki..." label="Notatki" id="notes" rows="4" value="${meal.getNotes()}"/>
-            <@simpleSelect name="mealType" id="mealType" source=mealTypeList placeholder="dummy" label="Typ posiłku" divWrapperClass="form-group-container"/>
+            <@simpleSelect name="mealType" id="mealType" source=mealTypeList placeholder="dummy" label="Typ posiłku" divWrapperClass="form-group-container" selectedValues=selectedMealTypeIds![]/>
             <@simpleInput name="portions" placeholder="Na ile porcji dzielisz przepis?" label="Liczba porcji" id="portions" type="number" step="0.25" min="0" max="1000" value="${meal.getPortions()}"/>
         </div>
 
         <div id="ingredientList">
         </div>
-        <input type="hidden" name="ingredients" id="ingredientsInput" />
 
         <div class="mb-3 goCenter">
             <a id="openIngredientModalBtn" href="#">Add Ingredient</a>
@@ -95,9 +94,37 @@
 
 
 <script>
-    <#noparse>
     $(document).ready(function () {
+
+        function parseForNumber(value) {
+            if (typeof value !== 'string') return value;
+            const cleanValue = value.replace(/\s/g, '').replace(',', '.');
+            const numberValue = parseFloat(cleanValue);
+
+            return isNaN(numberValue) ? cleanValue : (numberValue % 1 === 0 ? parseInt(numberValue, 10) : numberValue);
+        }
+
+        const presetIngredients = [
+            <#list meal.ingredients as ingredient>
+            {
+                ingredientNameId: "${ingredient.name.getId()}",
+                ingredientName: "${ingredient.name.getIngredientName()}",
+                ingredientAmount: parseForNumber("${ingredient.getIngredientAmount()}"),
+                ingredientUnit: "${ingredient.ingredientUnit.getId()}",
+                ingredientUnitText: "${ingredient.ingredientUnit.getShortName()}",
+                measurementValue: parseForNumber("${ingredient.getMeasurementValue()}"),
+                measurementType: "${ingredient.measurementType.getId()}",
+                measurementTypeText: "${ingredient.measurementType.getNamePL()}"
+            }<#if ingredient?has_next>,</#if>
+            </#list>
+        ];
+
+
         const ingredientsList  = [];
+
+        if (presetIngredients && presetIngredients.length > 0) {
+            loadPresetIngredients(presetIngredients);
+        }
 
         $("#openIngredientModalBtn").click(e => {
             e.preventDefault();
@@ -115,10 +142,24 @@
                 ingredientsList.push(ingredient);
                 updateIngredientList();
                 $("#ingredientModal").hide();
+                resetModal();
             } else {
                 alert("Wybierz wszystkie wartości.");
             }
         });
+
+        function updateIngredient(index) {
+            const ingredient = getIngredientFromModal();
+
+            if (validateIngredient(ingredient)) {
+                ingredientsList[index] = ingredient;
+                updateIngredientList();
+                $("#ingredientModal").hide();
+                resetModal();
+            } else {
+                alert("Please fill in all fields before updating an ingredient.");
+            }
+        }
 
         $("#submitButton").click(e => {
             e.preventDefault();
@@ -145,10 +186,12 @@
             return {
                 ingredientNameId: $("#ingredientNameId").val(),
                 ingredientName: $("#ingredientNameId option:selected").text(),
-                ingredientAmount: parseFloat($("#ingredientAmount").val()),
+                ingredientAmount: parseFloat(parseFloat($("#ingredientAmount").val()).toFixed(2)),
                 ingredientUnit: $("#ingredientUnitsSelect").val(),
-                measurementValue: parseFloat($("#measurementValue").val()),
-                measurementType: $("#measurementTypesSelect").val()
+                ingredientUnitText: $("#ingredientUnitsSelect option:selected").text(),
+                measurementValue: parseFloat(parseFloat($("#measurementValue").val()).toFixed(2)),
+                measurementType: $("#measurementTypesSelect").val(),
+                measurementTypeText: $("#measurementTypesSelect option:selected").text()
             };
         }
 
@@ -161,15 +204,71 @@
             ingredientListDiv.empty();
 
             ingredientsList.forEach((ingredient, index) => {
-                const ingredientDiv = $("<div>").addClass("ingredient-item").text(`${ingredient.ingredientName}: ${ingredient.ingredientAmount} ${ingredient.ingredientUnit}`);
-                const removeBtn = $("<button>").text("Usuń").click(() => {
-                    ingredientsList.splice(index, 1);
-                    updateIngredientList();
-                });
+                const ingredientDiv = $("<div>").addClass("ingredient-item").attr("id", "ingredient-" + index);
+                const ingredientDesc = $("<p>").html(
+                    "<strong>" + ingredient.ingredientName + "</strong>: " +
+                    ingredient.ingredientAmount +
+                    ingredient.ingredientUnitText + ", " +
+                    ingredient.measurementValue + " " +
+                    ingredient.measurementTypeText
+                );
 
-                ingredientDiv.append(removeBtn);
+                const editButton = $("<i>")
+                    .addClass("fa fa-edit edit-ingredient")
+                    .css("padding", "0px 5px")
+                    .attr("data-index", index)
+                    .click(function () {
+                        editIngredient(index);
+                    });
+
+                const removeIcon = $("<span>")
+                    .html("&times;")
+                    .addClass("remove-ingredient")
+                    .attr("data-index", index)
+                    .css({
+                        color: "red",
+                        cursor: "pointer",
+                        fontWeight: "bold",
+                        marginLeft: "10px"
+                    })
+                    .click(function () {
+                        ingredientsList.splice(index, 1);
+                        updateIngredientList();
+                    });
+
+                ingredientDesc.append(editButton, removeIcon);
+                ingredientDiv.append(ingredientDesc);
                 ingredientListDiv.append(ingredientDiv);
             });
+        }
+
+        function editIngredient(index) {
+            const ingredientEl = ingredientsList[index];
+
+            $("#ingredientNameId").val(ingredientEl.ingredientNameId).selectpicker('refresh').change();
+            $("#ingredientAmount").val(ingredientEl.ingredientAmount);
+            $("#ingredientUnitsSelect").val(ingredientEl.ingredientUnit).selectpicker('refresh');
+            $("#measurementValue").val(ingredientEl.measurementValue);
+            $("#measurementTypesSelect").val(ingredientEl.measurementType).selectpicker('refresh');
+
+            $("#ingredientModal").show();
+
+            $("#addIngredientBtn").hide();
+            const updateButton = $("#updateIngredientBtn");
+            if (updateButton.length === 0) {
+                $("<button>")
+                    .attr("id", "updateIngredientBtn")
+                    .addClass("btn btn-primary mt-3")
+                    .text("Update Ingredient")
+                    .insertAfter("#addIngredientBtn")
+                    .click(function () {
+                        updateIngredient(index);
+                    });
+            } else {
+                updateButton.off().click(function () {
+                    updateIngredient(index);
+                }).show();
+            }
         }
 
         function resetModal() {
@@ -177,8 +276,16 @@
             $("#measurementValue").val('');
             $("#ingredientModal").hide();
         }
-    });
 
-    </#noparse>
+
+    function loadPresetIngredients(presetIngredients) {
+        if (presetIngredients && presetIngredients.length > 0) {
+            presetIngredients.forEach((ingredient) => {
+                ingredientsList.push(ingredient);
+            });
+            updateIngredientList();
+        }
+    }
+    });
 </script>
 <#include "../../webData/footer.ftlh">
