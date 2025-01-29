@@ -6,6 +6,7 @@ import java.util.List;
 
 
 public record AddMealRequestDTO(
+        Long mealId,
         String mealName,
         String description,
         String recipe,
