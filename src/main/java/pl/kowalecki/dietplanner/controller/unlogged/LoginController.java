@@ -5,19 +5,15 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-
 import pl.kowalecki.dietplanner.model.DTO.User.LoginRequest;
-import pl.kowalecki.dietplanner.services.loginService.UserLoginService;
-import pl.kowalecki.dietplanner.utils.AuthUtils;
+import pl.kowalecki.dietplanner.services.loginService.AuthService;
+import pl.kowalecki.dietplanner.utils.CookieUtils;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
-
 
 @RequestMapping("/app")
 @Controller
@@ -25,9 +21,8 @@ import java.util.Map;
 @Slf4j
 public class LoginController {
 
-    private final AuthUtils authUtils;
-    private final UserLoginService loginService;
-
+    private final CookieUtils cookieUtils;
+    private final AuthService loginService;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String index(@RequestParam(value = "sessionExpired", required = false) String sessionExpired, Model model) {
@@ -50,8 +45,8 @@ public class LoginController {
                         log.info("Login successful for user: {}", loginRequest.getEmail());
                         log.debug("Access Token: {}, Refresh Token: {}", accessToken, refreshToken);
 
-                        authUtils.setAccessTokenCookie(httpResponse, accessToken, 15 * 60);
-                        authUtils.setRefreshTokenCookie(httpResponse, refreshToken, 7 * 24 * 60 * 60);
+                        cookieUtils.setAccessTokenCookie(httpResponse, accessToken, 15 * 60);
+                        cookieUtils.setRefreshTokenCookie(httpResponse, refreshToken, 7 * 24 * 60 * 60);
                         return Mono.just("redirect:/app/auth/loggedUserBoard");
                     } else if (loginResponse.getStatusCode() == HttpStatus.BAD_REQUEST) {
                         model.addAttribute("error", "Invalid email or password");

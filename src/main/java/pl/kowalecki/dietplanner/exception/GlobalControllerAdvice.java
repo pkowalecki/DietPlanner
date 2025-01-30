@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.reactive.function.client.WebClientException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 
 import java.util.Map;
@@ -14,7 +16,6 @@ import java.util.Map;
 @Slf4j
 @AllArgsConstructor
 public class GlobalControllerAdvice {
-
 
     @ExceptionHandler(Exception.class)
     public String handleGenericException(Exception e, Model model, HttpServletRequest request) {
@@ -27,9 +28,20 @@ public class GlobalControllerAdvice {
         log.error(e.getMessage(), e);
         log.error(errorMessage);
         model.addAttribute("error", "Wystąpił nieoczekiwany błąd.");
-        System.out.println("===========================================================");
-        System.out.println("HandleGenericException");
-        System.out.println("===========================================================");
+        model.addAttribute("logged", false);
+        return "pages/unlogged/errorPage";
+    }
+
+    @ExceptionHandler(WebClientException.class)
+    public String handleWebClientException(Exception e, Model model, HttpServletRequest request) {
+        log.error("WebClient error at {}: {}", request.getRequestURI(), e.getMessage(), e);
+
+        if (e instanceof WebClientResponseException.Unauthorized) {
+            log.warn("Session expired or unauthorized access detected.");
+            return "redirect:/?sessionExpired=true";
+        }
+
+        model.addAttribute("error", "Błąd podczas komunikacji z serwerem.");
         return "pages/unlogged/errorPage";
     }
 }

@@ -1,6 +1,6 @@
 <#include "../../webData/header.ftlh">
 
-<div class="container">
+<div class="form-container">
     <h1>Coś poszło nie tak</h1>
     <p>${error}</p>
     <p>Proszę spróbować ponownie później lub skontaktować się z administratorem.</p>
