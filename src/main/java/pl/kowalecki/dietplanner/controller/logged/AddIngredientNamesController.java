@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import pl.kowalecki.dietplanner.UrlBuilder;
 import pl.kowalecki.dietplanner.controller.helper.IngredientNamesHelper;
 import pl.kowalecki.dietplanner.model.ingredient.IngredientName;
 import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
@@ -30,10 +31,8 @@ public class AddIngredientNamesController {
 
     @GetMapping(value = "/addIngredient")
     public String addIngredientPage(Model model) {
-        String liveSearchUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/app/auth/ingredientNames/search")
-                .toUriString();
-        model.addAttribute("liveSearchUrl", liveSearchUrl);
+        UrlBuilder builder = new UrlBuilder("/app/auth/ingredientNames/search");
+        model.addAttribute("liveSearchUrl", builder.buildUrl());
         return ADD_INGREDIENT_VIEW;
     }
 

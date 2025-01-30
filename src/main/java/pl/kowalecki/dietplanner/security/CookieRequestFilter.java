@@ -39,11 +39,13 @@ public class CookieRequestFilter extends OncePerRequestFilter {
             String newAccessToken = attemptTokenRefresh(refreshToken);
             if (newAccessToken != null) {
                 cookieUtils.setAccessTokenCookie(response, newAccessToken, 15 * 60);
+                log.info("new access token: {}", newAccessToken);
             } else {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Session expired. Please log in again.");
                 return;
             }
         }
+
         filterChain.doFilter(request, response);
     }
 

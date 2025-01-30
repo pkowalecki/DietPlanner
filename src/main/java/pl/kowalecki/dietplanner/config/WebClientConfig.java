@@ -41,7 +41,7 @@ public class WebClientConfig {
                     if (refreshToken != null) {
                         requestBuilder.header("X-Refresh-Token", refreshToken);
                     }
-
+                    log.info("headers: {}", requestBuilder.build().headers());
                     return next.exchange(requestBuilder.build());
                 })
                 .build();

@@ -55,5 +55,73 @@
         </div>
     </div>
 </div>
+<script>
+    let currentSearchPage = 0;
+    const searchInput = document.getElementById('searchInput');
+    const mealGrid = document.getElementById('meal-grid');
+    const paginationContainer = document.querySelector('.pagination');
+
+    function updateSearchResults(query, page = 0) {
+        if (query.length < 3) return;
+
+        const url = '${liveSearchUrl}?query=' + encodeURIComponent(query) + '&page='+page+'&size=10';
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                mealGrid.innerHTML = '';
+                paginationContainer.innerHTML = '';
+
+                if (data.content.length > 0) {
+                    data.content.forEach(meal => {
+                        <#noparse>
+                        const itemLink = document.createElement('a');
+                        itemLink.href = `details/${meal.mealId}`;
+                        itemLink.classList.add('item-link');
+                        itemLink.innerHTML = `
+                        <div class="item-container">
+                            <div class="icon">
+                                <div class="no-image">${meal.image ? '' : 'Brak zdjęcia'}</div>
+                            </div>
+                            <div class="item-details">
+                                <p class="item-name">${meal.name}</p>
+                                <p class="item-description">${meal.description || 'Brak opisu'}</p>
+                            </div>
+                        </div>`;
+                        mealGrid.appendChild(itemLink);
+                        </#noparse>
+                    });
+
+                    const totalPages = data.totalPages;
+                    for (let i = 0; i < totalPages; i++) {
+                        const pageLink = document.createElement('a');
+                        pageLink.href = '#';
+                        pageLink.classList.add('btn');
+                        if (i === page) {
+                            pageLink.classList.add('active');
+                        }
+                        pageLink.innerText = i + 1;
+                        pageLink.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            updateSearchResults(query, i);
+                        });
+                        paginationContainer.appendChild(pageLink);
+                    }
+                } else {
+                    mealGrid.innerHTML = '<div class="no-results">Brak wyników dla podanej frazy.</div>';
+                }
+            })
+            .catch(() => {
+                mealGrid.innerHTML = '<div class="error">Wystąpił błąd podczas wyszukiwania posiłków.</div>';
+            });
+    }
+
+    searchInput.addEventListener('input', function () {
+        const query = this.value.trim();
+        currentSearchPage = 0;
+        updateSearchResults(query);
+    });
+</script>
+
 
 <#include "../../webData/footer.ftlh">

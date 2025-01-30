@@ -16,6 +16,7 @@ import pl.kowalecki.dietplanner.model.DTO.meal.MealBoardDTO;
 import pl.kowalecki.dietplanner.model.DTO.meal.MealMainInfoDTO;
 import pl.kowalecki.dietplanner.model.Meal;
 import pl.kowalecki.dietplanner.model.DTO.meal.*;
+import pl.kowalecki.dietplanner.model.ingredient.IngredientName;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
@@ -116,4 +117,12 @@ public class DietPlannerApiMealService {
                 .bodyToMono(Meal.class);
     }
 
+    public Mono<List<MealMainInfoDTO>> searchMealsByName(String query) {
+        String url = MEAL_SERVICE_URL + "/meal/searchMealsByName?query=" + query;
+        return webClient.get()
+                .uri(url)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<List<MealMainInfoDTO>>() {})
+                .onErrorReturn(Collections.emptyList());
+    }
 }
