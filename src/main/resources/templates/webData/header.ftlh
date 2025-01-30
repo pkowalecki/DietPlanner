@@ -38,19 +38,25 @@
                 <a href="#">DietPlanner</a>
             </div>
 
-            <ul>
-                <li class="active"> <a href="#" onclick="location.href='/app/auth/loggedUserBoard'">Strona główna</a></li>
-                <li class="dropdown">
-                    <a href="#">Posiłek</a>
-                    <ul class="dropdown-content">
-                        <li><a href="#" onclick="location.href='/app/auth/addMeal'">Dodaj posiłek</a></li>
-                        <li><a href="#" onclick="location.href='/app/auth/addIngredient'">Dodaj składnik</a></li>
-                        <li><a href="#" onclick="location.href='/app/auth/generateMealBoard'">Wygeneruj plan żywienia</a></li>
-                        <li><a href="#" onclick="location.href='/app/auth/mealsHistory'">Historia posiłków</a></li>
-                    </ul>
-                </li>
+            <#if logged?? && logged==false>
 
-            </ul>
+            <#else >
+                <ul>
+                    <li class="active"><a href="#" onclick="location.href='/app/auth/loggedUserBoard'">Strona główna</a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#">Posiłek</a>
+                        <ul class="dropdown-content">
+                            <li><a href="#" onclick="location.href='/app/auth/addMeal'">Dodaj posiłek</a></li>
+                            <li><a href="#" onclick="location.href='/app/auth/addIngredient'">Dodaj składnik</a></li>
+                            <li><a href="#" onclick="location.href='/app/auth/generateMealBoard'">Wygeneruj plan
+                                    żywienia</a></li>
+                            <li><a href="#" onclick="location.href='/app/auth/mealsHistory'">Historia posiłków</a></li>
+                        </ul>
+                    </li>
+
+                </ul>
+            </#if>
         </nav>
     </div>
 

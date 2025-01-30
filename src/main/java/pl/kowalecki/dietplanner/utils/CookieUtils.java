@@ -1,9 +1,5 @@
 package pl.kowalecki.dietplanner.utils;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,12 +8,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
-
-import java.security.Key;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Slf4j
 @Component
-public class AuthUtils {
+public class CookieUtils {
 
     @Value("${web.cookie.accessToken.name}")
     private String accessTokenCookieName;
@@ -25,12 +21,6 @@ public class AuthUtils {
     @Value("${web.cookie.refreshToken.name}")
     private String refreshTokenCookieName;
 
-    @Value("${web.app.jwtSecret}")
-    private String jwtSecret;
-
-    public void validateToken(final String token) {
-        Jwts.parserBuilder().setSigningKey(key()).build().parse(token);
-    }
 
     public void setAccessTokenCookie(HttpServletResponse response, String token, int maxAge) {
         setCookie(response, accessTokenCookieName, token, maxAge);
@@ -40,11 +30,11 @@ public class AuthUtils {
         setCookie(response, refreshTokenCookieName, token, maxAge);
     }
 
-    public String extractAccessTokenFromRequest(HttpServletRequest request) {
+    public String extractAccessCookie(HttpServletRequest request) {
         return extractTokenFromRequest(request, accessTokenCookieName);
     }
 
-    public String extractRefreshTokenFromRequest(HttpServletRequest request) {
+    public String extractRefreshCookie(HttpServletRequest request) {
         return extractTokenFromRequest(request, refreshTokenCookieName);
     }
 
@@ -68,22 +58,5 @@ public class AuthUtils {
             }
         }
         return null;
-    }
-
-    private Key key() {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
-    }
-
-    public Claims getClaims(String token) {
-        try {
-            return Jwts.parserBuilder()
-                    .setSigningKey(key())
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-        } catch (Exception e) {
-            log.error("Failed to parse JWT: {}", e.getMessage());
-            throw new IllegalArgumentException("Invalid token", e);
-        }
     }
 }

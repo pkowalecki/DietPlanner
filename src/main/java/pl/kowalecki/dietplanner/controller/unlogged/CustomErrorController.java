@@ -3,7 +3,6 @@ package pl.kowalecki.dietplanner.controller.unlogged;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,6 +22,7 @@ public class CustomErrorController implements ErrorController {
         System.out.println("===========================================================");
         System.out.println("CustomErrorController");
         System.out.println("===========================================================");
+        model.addAttribute("logged", false);
         return "pages/unlogged/errorPage";
     }
 
