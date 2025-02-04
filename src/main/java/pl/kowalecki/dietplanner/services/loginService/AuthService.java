@@ -2,8 +2,6 @@ package pl.kowalecki.dietplanner.services.loginService;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -30,25 +28,5 @@ public class AuthService {
                 .bodyValue(loginRequest)
                 .retrieve()
                 .toEntity(new ParameterizedTypeReference<>() {});
-    }
-
-    public String refreshAccessToken(String refreshToken) {
-        try {
-            Map<String, String> response = webClient.post()
-                    .uri("/refresh")
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + refreshToken)
-                    .retrieve()
-                    .onStatus(HttpStatusCode::isError, clientResponse -> {
-                        log.error("Error during token refresh, status: {}", clientResponse.statusCode());
-                        return Mono.error(new RuntimeException("Token refresh failed"));
-                    })
-                    .bodyToMono(new ParameterizedTypeReference<Map<String, String>>() {})
-                    .block();
-
-            return response != null ? response.get("accessToken") : null;
-        } catch (Exception e) {
-            log.error("Error refreshing token: {}", e.getMessage());
-            return null;
-        }
     }
 }
