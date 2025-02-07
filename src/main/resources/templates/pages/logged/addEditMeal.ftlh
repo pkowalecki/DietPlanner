@@ -123,6 +123,7 @@
 
         $("#openIngredientModalBtn").click(e => {
             e.preventDefault();
+            $("#updateIngredientBtn").hide();
             $("#ingredientModal").show();
         });
 
@@ -152,7 +153,7 @@
                 $("#ingredientModal").hide();
                 resetModal();
             } else {
-                alert("Please fill in all fields before updating an ingredient.");
+                alert("Wybierz wszystkie wartości.");
             }
         }
 
@@ -271,6 +272,7 @@
             $("#ingredientAmount").val('');
             $("#measurementValue").val('');
             $("#ingredientModal").hide();
+            $("#addIngredientBtn").show();
         }
 
 
