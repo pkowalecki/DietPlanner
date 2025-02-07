@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Slf4j
 @Component
@@ -30,11 +28,11 @@ public class CookieUtils {
         setCookie(response, refreshTokenCookieName, token, maxAge);
     }
 
-    public String extractAccessCookie(HttpServletRequest request) {
+    public String extractJwtokenFromAccessCookie(HttpServletRequest request) {
         return extractTokenFromRequest(request, accessTokenCookieName);
     }
 
-    public String extractRefreshCookie(HttpServletRequest request) {
+    public String extractRefreshTokenFromRefreshCookie(HttpServletRequest request) {
         return extractTokenFromRequest(request, refreshTokenCookieName);
     }
 
@@ -44,6 +42,7 @@ public class CookieUtils {
                 .maxAge(maxAge)
                 .httpOnly(true)
                 //.secure(true)
+                .sameSite("Lax")
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
