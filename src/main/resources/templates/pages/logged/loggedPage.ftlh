@@ -116,10 +116,16 @@
             });
     }
 
+    let searchTimeout;
     searchInput.addEventListener('input', function () {
+        clearTimeout(searchTimeout);
         const query = this.value.trim();
-        currentSearchPage = 0;
-        updateSearchResults(query);
+        if (query.length < 3) return;
+
+        searchTimeout = setTimeout(() => {
+            currentSearchPage = 0;
+            updateSearchResults(query);
+        }, 300);
     });
 </script>
 

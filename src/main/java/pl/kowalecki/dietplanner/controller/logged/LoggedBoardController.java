@@ -7,11 +7,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.kowalecki.dietplanner.UrlBuilder;
 import pl.kowalecki.dietplanner.model.DTO.PageResponse;
 import pl.kowalecki.dietplanner.model.DTO.meal.MealMainInfoDTO;
-import pl.kowalecki.dietplanner.model.ingredient.IngredientName;
 import pl.kowalecki.dietplanner.services.dietplannerapi.meal.DietPlannerApiMealService;
 import reactor.core.publisher.Mono;
 

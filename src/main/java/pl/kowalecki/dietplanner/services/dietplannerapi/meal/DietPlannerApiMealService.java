@@ -1,9 +1,8 @@
 package pl.kowalecki.dietplanner.services.dietplannerapi.meal;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -16,18 +15,17 @@ import pl.kowalecki.dietplanner.model.DTO.meal.MealBoardDTO;
 import pl.kowalecki.dietplanner.model.DTO.meal.MealMainInfoDTO;
 import pl.kowalecki.dietplanner.model.Meal;
 import pl.kowalecki.dietplanner.model.DTO.meal.*;
-import pl.kowalecki.dietplanner.model.ingredient.IngredientName;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.List;
 
 import static pl.kowalecki.dietplanner.utils.UrlTools.MEAL_SERVICE_URL;
 
 @Service
+@Slf4j
 public class DietPlannerApiMealService {
 
     private final WebClient webClient;
