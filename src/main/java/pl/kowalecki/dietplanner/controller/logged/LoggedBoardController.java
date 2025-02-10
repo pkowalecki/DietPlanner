@@ -68,7 +68,9 @@ public class LoggedBoardController {
 
     @GetMapping("/meals/search")
     @ResponseBody
-    public Mono<List<MealMainInfoDTO>> searchIngredients(@RequestParam("query") String query) {
-        return dietPlannerApiMealService.searchMealsByName(query);
+    public Mono<PageResponse<MealMainInfoDTO>> searchIngredients(@RequestParam("query") String query,
+                                                                 @RequestParam(defaultValue = "0") int page,
+                                                                 @RequestParam(defaultValue = "10") int size) {
+        return dietPlannerApiMealService.searchMealsByName(query, page, size);
     }
 }

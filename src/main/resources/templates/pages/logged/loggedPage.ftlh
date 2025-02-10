@@ -10,7 +10,8 @@
             <@simpleButton id="bSnack" url="${actionType}?mealType=snack" buttonText="Przekąska" class="${(activeMealType == 'snack')?then('active', '')}"/>
             <@simpleButton id="bLunch" url="${actionType}?mealType=lunch" buttonText="Obiad" class="${(activeMealType == 'lunch')?then('active', '')}"/>
             <@simpleButton id="bSupper" url="${actionType}?mealType=supper" buttonText="Kolacja" class="${(activeMealType == 'supper')?then('active', '')}"/>
-        </div>
+            <@simpleButton id="bPrivate" url="${actionType}?mealType=private" buttonText="Własne" class="${(activeMealType == 'private')?then('active', '')}"/>
+            </div>
         <@simpleInputPlain name="searchInput" id="searchInput" placeholder="Szukaj posiłków..." class="search-bar"/>
     </div>
 
@@ -115,6 +116,7 @@
                 mealGrid.innerHTML = '<div class="error">Wystąpił błąd podczas wyszukiwania posiłków.</div>';
             });
     }
+
 
     let searchTimeout;
     searchInput.addEventListener('input', function () {
