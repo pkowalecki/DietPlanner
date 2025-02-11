@@ -35,8 +35,10 @@ public class LoggedBoardController {
         int currentPage = Math.max(page, 1);
         UrlBuilder actionType = new UrlBuilder("/app/auth/loggedUserBoard");
         UrlBuilder liveSearchUrl = new UrlBuilder("/app/auth/meals/search");
+        UrlBuilder detailsUrl = new UrlBuilder("/app/auth/details/");
         model.addAttribute("actionType", actionType.buildUrl());
         model.addAttribute("liveSearchUrl", liveSearchUrl.buildUrl());
+        model.addAttribute("details", detailsUrl.buildUrl());
 
         PageResponse<MealMainInfoDTO> mealPage = dietPlannerApiMealService.getPageMeals(currentPage - 1, 10, mealType).block();
 
@@ -68,9 +70,10 @@ public class LoggedBoardController {
 
     @GetMapping("/meals/search")
     @ResponseBody
-    public Mono<PageResponse<MealMainInfoDTO>> searchIngredients(@RequestParam("query") String query,
-                                                                 @RequestParam(defaultValue = "0") int page,
-                                                                 @RequestParam(defaultValue = "10") int size) {
-        return dietPlannerApiMealService.searchMealsByName(query, page, size);
+    public Mono<List<MealMainInfoDTO>> searchIngredients(@RequestParam("query") String query) {
+        if (query.length() < 3){
+            return Mono.just(Collections.emptyList());
+        }
+        return dietPlannerApiMealService.searchMealsByName(query);
     }
 }

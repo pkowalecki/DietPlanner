@@ -115,14 +115,14 @@ public class DietPlannerApiMealService {
                 .bodyToMono(Meal.class);
     }
 
-    public Mono<PageResponse<MealMainInfoDTO>> searchMealsByName(String query, int page, int size) {
+    public Mono<List<MealMainInfoDTO>> searchMealsByName(String query) {
         String url = MEAL_SERVICE_URL + "/meal/searchMealsByName?query=" + query;
         return webClient.get()
                 .uri(url)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<PageResponse<MealMainInfoDTO>>() {})
+                .bodyToMono(new ParameterizedTypeReference<List<MealMainInfoDTO>>() {})
                 .doOnNext(response -> System.out.println("Response: " + response))
-                .onErrorReturn(new PageResponse<>(Collections.emptyList(), page, size, 0, 0));
+                .onErrorReturn(Collections.emptyList());
 
     }
 }
