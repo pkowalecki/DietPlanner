@@ -1,6 +1,5 @@
 package pl.kowalecki.dietplanner.controller.logged;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -15,11 +14,10 @@ import pl.kowalecki.dietplanner.controller.helper.AddMealHelper;
 import pl.kowalecki.dietplanner.model.DTO.*;
 import pl.kowalecki.dietplanner.model.DTO.meal.AddMealRequestDTO;
 import pl.kowalecki.dietplanner.model.Meal;
-import pl.kowalecki.dietplanner.model.ingredient.IngredientName;
 import pl.kowalecki.dietplanner.model.page.FoodBoardPageData;
 import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
 import pl.kowalecki.dietplanner.services.WebPage.MessageType;
-import pl.kowalecki.dietplanner.services.dietplannerapi.meal.DietPlannerApiMealService;
+import pl.kowalecki.dietplanner.services.dietplannerapi.meal.DietPlannerApiClient;
 import pl.kowalecki.dietplanner.services.document.DocumentService;
 import pl.kowalecki.dietplanner.utils.MapUtils;
 import reactor.core.publisher.Mono;
@@ -37,7 +35,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/app/auth")
 public class MealPageController {
 
-    DietPlannerApiMealService apiMealService;
+    DietPlannerApiClient apiMealService;
     AddMealHelper addMealHelper;
     IWebPageService webPageService;
 

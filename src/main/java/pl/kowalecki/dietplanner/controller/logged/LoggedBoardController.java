@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import pl.kowalecki.dietplanner.UrlBuilder;
 import pl.kowalecki.dietplanner.model.DTO.PageResponse;
 import pl.kowalecki.dietplanner.model.DTO.meal.MealMainInfoDTO;
-import pl.kowalecki.dietplanner.services.dietplannerapi.meal.DietPlannerApiMealService;
+import pl.kowalecki.dietplanner.services.dietplannerapi.meal.DietPlannerApiClient;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
@@ -24,7 +24,7 @@ import java.util.stream.IntStream;
 @AllArgsConstructor
 public class LoggedBoardController {
 
-    private final DietPlannerApiMealService dietPlannerApiMealService;
+    private final DietPlannerApiClient dietPlannerApiClient;
 
     @GetMapping("/loggedUserBoard")
     public String getLoggedUserBoard(
@@ -40,7 +40,7 @@ public class LoggedBoardController {
         model.addAttribute("liveSearchUrl", liveSearchUrl.buildUrl());
         model.addAttribute("details", detailsUrl.buildUrl());
 
-        PageResponse<MealMainInfoDTO> mealPage = dietPlannerApiMealService.getPageMeals(currentPage - 1, 10, mealType).block();
+        PageResponse<MealMainInfoDTO> mealPage = dietPlannerApiClient.getPageMeals(currentPage - 1, 10, mealType).block();
 
         List<MealMainInfoDTO> meals = Optional.ofNullable(mealPage)
                 .map(PageResponse::getContent)
@@ -74,6 +74,6 @@ public class LoggedBoardController {
         if (query.length() < 3){
             return Mono.just(Collections.emptyList());
         }
-        return dietPlannerApiMealService.searchMealsByName(query);
+        return dietPlannerApiClient.searchMealsByName(query);
     }
 }

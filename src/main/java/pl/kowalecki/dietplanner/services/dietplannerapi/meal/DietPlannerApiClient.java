@@ -1,8 +1,8 @@
 package pl.kowalecki.dietplanner.services.dietplannerapi.meal;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -25,17 +25,12 @@ import java.util.List;
 import static pl.kowalecki.dietplanner.utils.UrlTools.MEAL_SERVICE_URL;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
-public class DietPlannerApiMealService {
+public class DietPlannerApiClient {
 
     private final WebClient webClient;
     private final MealHistoryMapper mealHistoryMapper;
-
-    @Autowired
-    public DietPlannerApiMealService(WebClient webClient, MealHistoryMapper mealHistoryMapper) {
-        this.webClient = webClient;
-        this.mealHistoryMapper = mealHistoryMapper;
-    }
 
     public Mono<MealStarterPack> getMealStarterPack() {
         return webClient.get()
