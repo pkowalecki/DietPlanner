@@ -7,12 +7,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.kowalecki.dietplanner.UrlBuilder;
 import pl.kowalecki.dietplanner.model.DTO.PageResponse;
 import pl.kowalecki.dietplanner.model.DTO.meal.MealMainInfoDTO;
-import pl.kowalecki.dietplanner.model.ingredient.IngredientName;
-import pl.kowalecki.dietplanner.services.dietplannerapi.meal.DietPlannerApiMealService;
+import pl.kowalecki.dietplanner.services.dietplannerapi.meal.DietPlannerApiClient;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
@@ -26,7 +24,7 @@ import java.util.stream.IntStream;
 @AllArgsConstructor
 public class LoggedBoardController {
 
-    private final DietPlannerApiMealService dietPlannerApiMealService;
+    private final DietPlannerApiClient dietPlannerApiClient;
 
     @GetMapping("/loggedUserBoard")
     public String getLoggedUserBoard(
@@ -37,10 +35,12 @@ public class LoggedBoardController {
         int currentPage = Math.max(page, 1);
         UrlBuilder actionType = new UrlBuilder("/app/auth/loggedUserBoard");
         UrlBuilder liveSearchUrl = new UrlBuilder("/app/auth/meals/search");
+        UrlBuilder detailsUrl = new UrlBuilder("/app/auth/details/");
         model.addAttribute("actionType", actionType.buildUrl());
         model.addAttribute("liveSearchUrl", liveSearchUrl.buildUrl());
+        model.addAttribute("details", detailsUrl.buildUrl());
 
-        PageResponse<MealMainInfoDTO> mealPage = dietPlannerApiMealService.getPageMeals(currentPage - 1, 10, mealType).block();
+        PageResponse<MealMainInfoDTO> mealPage = dietPlannerApiClient.getPageMeals(currentPage - 1, 10, mealType).block();
 
         List<MealMainInfoDTO> meals = Optional.ofNullable(mealPage)
                 .map(PageResponse::getContent)
@@ -71,6 +71,9 @@ public class LoggedBoardController {
     @GetMapping("/meals/search")
     @ResponseBody
     public Mono<List<MealMainInfoDTO>> searchIngredients(@RequestParam("query") String query) {
-        return dietPlannerApiMealService.searchMealsByName(query);
+        if (query.length() < 3){
+            return Mono.just(Collections.emptyList());
+        }
+        return dietPlannerApiClient.searchMealsByName(query);
     }
 }

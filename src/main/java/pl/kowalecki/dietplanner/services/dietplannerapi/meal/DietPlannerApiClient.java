@@ -1,8 +1,7 @@
 package pl.kowalecki.dietplanner.services.dietplannerapi.meal;
 
-import org.springframework.core.ParameterizedTypeReference;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -16,28 +15,22 @@ import pl.kowalecki.dietplanner.model.DTO.meal.MealBoardDTO;
 import pl.kowalecki.dietplanner.model.DTO.meal.MealMainInfoDTO;
 import pl.kowalecki.dietplanner.model.Meal;
 import pl.kowalecki.dietplanner.model.DTO.meal.*;
-import pl.kowalecki.dietplanner.model.ingredient.IngredientName;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.List;
 
 import static pl.kowalecki.dietplanner.utils.UrlTools.MEAL_SERVICE_URL;
 
 @Service
-public class DietPlannerApiMealService {
+@RequiredArgsConstructor
+@Slf4j
+public class DietPlannerApiClient {
 
     private final WebClient webClient;
     private final MealHistoryMapper mealHistoryMapper;
-
-    @Autowired
-    public DietPlannerApiMealService(WebClient webClient, MealHistoryMapper mealHistoryMapper) {
-        this.webClient = webClient;
-        this.mealHistoryMapper = mealHistoryMapper;
-    }
 
     public Mono<MealStarterPack> getMealStarterPack() {
         return webClient.get()
@@ -123,6 +116,8 @@ public class DietPlannerApiMealService {
                 .uri(url)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<List<MealMainInfoDTO>>() {})
+                .doOnNext(response -> System.out.println("Response: " + response))
                 .onErrorReturn(Collections.emptyList());
+
     }
 }
