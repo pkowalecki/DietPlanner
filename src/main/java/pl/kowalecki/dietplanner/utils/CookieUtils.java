@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
+import pl.kowalecki.dietplanner.exception.InvalidCookieException;
+
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -37,6 +40,15 @@ public class CookieUtils {
     }
 
     private void setCookie(HttpServletResponse response, String cookieName, String token, int maxAge) {
+        Objects.requireNonNull(response, "HttpServletResponse must not be null");
+        Objects.requireNonNull(cookieName, "CookieName must not be null");
+        if (token == null || token.isBlank()) {
+            throw new InvalidCookieException("Token cannot be null or empty");
+        }
+
+        if (maxAge < 0) {
+            throw new InvalidCookieException("Max-Age cannot be negative");
+        }
         ResponseCookie cookie = ResponseCookie.from(cookieName, token)
                 .path("/")
                 .maxAge(maxAge)
@@ -48,6 +60,8 @@ public class CookieUtils {
     }
 
     private String extractTokenFromRequest(HttpServletRequest request, String cookieName) {
+        Objects.requireNonNull(request, "HttpServletRequest must not be null");
+        Objects.requireNonNull(cookieName, "CookieName must not be null");
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
