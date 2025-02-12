@@ -10,8 +10,12 @@
             <@simpleButton id="bSnack" url="${actionType}?mealType=snack" buttonText="Przekąska" class="${(activeMealType == 'snack')?then('active', '')}"/>
             <@simpleButton id="bLunch" url="${actionType}?mealType=lunch" buttonText="Obiad" class="${(activeMealType == 'lunch')?then('active', '')}"/>
             <@simpleButton id="bSupper" url="${actionType}?mealType=supper" buttonText="Kolacja" class="${(activeMealType == 'supper')?then('active', '')}"/>
+            <@simpleButton id="bPrivate" url="${actionType}?mealType=private" buttonText="Własne" class="${(activeMealType == 'private')?then('active', '')}"/>
         </div>
-        <@simpleInputPlain name="searchInput" id="searchInput" placeholder="Szukaj posiłków..." class="search-bar"/>
+        <div class="suggestions">
+            <@simpleInputPlain name="searchInput" id="searchInput" placeholder="Szukaj posiłków..."/>
+            <div id="suggestionsList" class="suggestions-list"></div>
+        </div>
     </div>
 
 
@@ -56,72 +60,64 @@
     </div>
 </div>
 <script>
-    let currentSearchPage = 0;
-    const searchInput = document.getElementById('searchInput');
-    const mealGrid = document.getElementById('meal-grid');
-    const paginationContainer = document.querySelector('.pagination');
 
-    function updateSearchResults(query, page = 0) {
-        if (query.length < 3) return;
+    $(document).ready(function(){
+        const searchInput = $('#searchInput');
+        let debounceTimeout;
 
-        const url = '${liveSearchUrl}?query=' + encodeURIComponent(query) + '&page='+page+'&size=10';
+        searchInput.on('input', function () {
+            clearTimeout(debounceTimeout);
+            const query = $(this).val().trim();
 
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                mealGrid.innerHTML = '';
-                paginationContainer.innerHTML = '';
+            if (query.length >= 3) {
+                debounceTimeout = setTimeout(function () {
+                    fetchSuggestions(query);
+                }, 300);
+            } else {
+                clearSuggestions();
+            }
+        });
 
-                if (data.content.length > 0) {
-                    data.content.forEach(meal => {
-                        <#noparse>
-                        const itemLink = document.createElement('a');
-                        itemLink.href = `details/${meal.mealId}`;
-                        itemLink.classList.add('item-link');
-                        itemLink.innerHTML = `
-                        <div class="item-container">
-                            <div class="icon">
-                                <div class="no-image">${meal.image ? '' : 'Brak zdjęcia'}</div>
-                            </div>
-                            <div class="item-details">
-                                <p class="item-name">${meal.name}</p>
-                                <p class="item-description">${meal.description || 'Brak opisu'}</p>
-                            </div>
-                        </div>`;
-                        mealGrid.appendChild(itemLink);
-                        </#noparse>
-                    });
+        $(document).on('click', function (e) {
+            if (!$(e.target).closest('#searchInput, #suggestionsList').length) {
+                clearSuggestions();
+            }
+        });
 
-                    const totalPages = data.totalPages;
-                    for (let i = 0; i < totalPages; i++) {
-                        const pageLink = document.createElement('a');
-                        pageLink.href = '#';
-                        pageLink.classList.add('btn');
-                        if (i === page) {
-                            pageLink.classList.add('active');
-                        }
-                        pageLink.innerText = i + 1;
-                        pageLink.addEventListener('click', (e) => {
-                            e.preventDefault();
-                            updateSearchResults(query, i);
-                        });
-                        paginationContainer.appendChild(pageLink);
-                    }
-                } else {
-                    mealGrid.innerHTML = '<div class="no-results">Brak wyników dla podanej frazy.</div>';
+        function fetchSuggestions(query) {
+            $.ajax({
+                url: '${liveSearchUrl}?query='+ encodeURIComponent(query),
+                method: 'GET',
+                success: function (data) {
+                    renderSuggestions(data);
+                },
+                error: function () {
+                    clearSuggestions();
                 }
-            })
-            .catch(() => {
-                mealGrid.innerHTML = '<div class="error">Wystąpił błąd podczas wyszukiwania posiłków.</div>';
             });
-    }
+        }
 
-    searchInput.addEventListener('input', function () {
-        const query = this.value.trim();
-        currentSearchPage = 0;
-        updateSearchResults(query);
+        function renderSuggestions(data) {
+            const suggestionsList = $('#suggestionsList');
+            suggestionsList.empty();
+            if (data.length > 0) {
+                data.forEach(function (meal) {
+
+                    suggestionsList.append(
+                        `<li class="suggestion-item"><a href="${details}<#noparse>${meal.mealId}" style="color: #333;">${meal.name}</#noparse></a></li>`
+                    );
+                    suggestionsList.addClass('show');
+                });
+            } else {
+                suggestionsList.append('<li>Brak wyników</li>').addClass('show');
+            }
+        }
+
+        function clearSuggestions() {
+            $('#suggestionsList').empty().removeClass('show');
+        }
     });
-</script>
 
+</script>
 
 <#include "../../webData/footer.ftlh">
