@@ -116,6 +116,12 @@ label {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
 
+footer {
+    background: #22272b;
+    color: white;
+    height: 100px;
+    margin-top: auto;
+}
 
 @media (min-width: 576px) {
     .form-container {
