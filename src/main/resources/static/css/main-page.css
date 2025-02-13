@@ -106,7 +106,7 @@
 .item-name {
     font-size: 16px;
     color: #333;
-    white-space: nowrap;
+    white-space: pre-line;
     overflow: hidden;
     text-overflow: ellipsis;
     margin: 0;
