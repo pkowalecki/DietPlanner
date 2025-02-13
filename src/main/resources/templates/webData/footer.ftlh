@@ -82,6 +82,14 @@
 
     </script>
 </footer>
+<style>
+    footer {
+        background: #22272b;
+        color: white;
+        height: 100px;
+        margin-top: auto;
+    }
+</style>
 </div>
 </body>
 </html>

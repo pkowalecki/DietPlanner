@@ -20,13 +20,6 @@ body {
 }
 
 
-footer {
-    background: #22272b;
-    color: white;
-    height: 100px;
-    margin-top: auto;
-}
-
 #page-container {
     flex: 1;
     display: flex;
