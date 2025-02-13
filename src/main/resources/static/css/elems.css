@@ -11,14 +11,13 @@
 .floating-label {
     top: 0;
     left: 0;
+    padding: 5px 8px;
     border: 1px solid #22272b;
     color: #ffffff;
     font-size: 13px;
     font-weight: normal;
     position: absolute;
     pointer-events: none;
-    /*width: 35%;*/
-    width: 15%;
     height: 36px;
     display: flex;
     align-items: center;
@@ -26,6 +25,7 @@
     background: #22272b;
     border-radius: 4px;
     transition: 0.2s ease all;
+    min-width: 16vh;
 }
 .floating-input::placeholder {
     color: #aaa;
@@ -207,3 +207,36 @@
     background-color: #fddb0d;
 }
 
+.select-picker-new{
+    background-color: #fff !important;
+    border: 1px solid #020101 !important;
+    padding: 7px 12px !important;
+    font-size: 14px !important;
+    font-weight: normal !important;
+    box-shadow: none !important;
+    border-radius: 4px !important;
+    min-width: 10vh;
+}
+
+.select-picker-new .filter-option {
+    color: #aaa !important;
+}
+.select-picker-new .filter-option-inner-inner {
+    color: #020101 !important;
+}
+
+@media (max-width: 576px) {
+
+}
+
+@media (max-width: 768px) {
+
+}
+
+@media (max-width: 992px) {
+
+}
+
+@media (min-width: 1200px) {
+
+}

@@ -92,6 +92,7 @@
                 name="${name}"
                 <#if disabled>disabled="disabled"</#if>
                 class="selectpicker form-control floating-select ${classPolka}"
+                data-style="select-picker-new"
                 <#if liveSearch> data-live-search="true"</#if>
                 <#if style != "">style="floating-select ${style}"</#if>
                 <#if idPolka!="">id="${idPolka}"</#if>
