@@ -1,8 +1,8 @@
 package pl.kowalecki.dietplanner.utils;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class DateUtils {
 
@@ -13,5 +13,18 @@ public class DateUtils {
         }catch (Exception e){
             throw new RuntimeException("Invalid date format");
         }
+    }
+
+    public static List<String> getDaysOfWeek(){
+        return List.of(
+                "Poniedziałek",
+                "Wtorek",
+                "Środa",
+                "Czwartek",
+                "Piątek",
+                "Sobota",
+                "Niedziela"
+                );
+
     }
 }

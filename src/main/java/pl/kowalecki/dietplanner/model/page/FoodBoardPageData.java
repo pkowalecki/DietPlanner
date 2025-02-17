@@ -15,7 +15,7 @@ import java.util.List;
 public class FoodBoardPageData {
 
     Double multiplier;
-    List<Long> mealIds = new ArrayList<>();
+    List<Long> meals = new ArrayList<>();
     Boolean isSnackMultiplied;
 
 }

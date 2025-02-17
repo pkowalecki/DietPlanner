@@ -62,4 +62,8 @@ public class TextTools {
     public static String generateActivationHash() {
         return UUID.randomUUID().toString();
     }
+
+    public static String firstToUpper(String text) {
+        return text.substring(0, 1).toUpperCase() + text.substring(1);
+    }
 }

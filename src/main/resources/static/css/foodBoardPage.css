@@ -1,50 +1,75 @@
-.meal-board-container {
-    max-width: 100%;
-    height: 80vh;
-    margin: 0 auto;
-    padding: 10px;
-    overflow-x: hidden;
+.meal-form-container {
+    margin: 2% auto;
+    padding: 4% 0;
+    width: 90%;
+    min-height: 70vh;
     background-color: rgba(255, 255, 255, 90%);
     border: 1px solid #cccccc;
     border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    overflow-x: auto;
 }
 
+.meal-board-container {
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 10px;
+    max-width: 100%;
+}
 
 .meal-board-table {
-    margin-top: 50px;
     display: grid;
-    grid-template-columns: auto repeat(7, auto);
-    gap: 5px;
-    text-align: center;
-}
-
-.day-short {
-    display: none;
-}
-
-.meal-board-table select {
-    width: 100%;
-    font-size: 14px;
-}
-
-.options {
-    display: flex;
+    grid-template-columns: minmax(120px, auto) repeat(7, 1fr);
     gap: 10px;
-    margin-top: 15px;
+    align-items: center;
+    text-align: center;
+    min-width: 1200px;
 }
 
-@media (max-width: 992px) {
-    .day-name {
-        display: none;
-    }
-    .day-short {
-        display: block;
+.meal-type-header,
+.day-header {
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-bottom: 2px solid #ccc;
+}
+
+.meal-type-name {
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
+    background-color: #eaeaea;
+    border-right: 2px solid #ccc;
+}
+
+.meal-select {
+    padding: 5px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.meal-select select {
+    width: 100%;
+    min-width: 120px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+@media (max-width: 900px) {
+    .day-header::after {
+        content: attr(data-short);
     }
 }
 
 @media (max-width: 768px) {
     .meal-board-table {
-        grid-template-columns: auto auto;
+        grid-template-columns: minmax(100px, auto) repeat(7, minmax(80px, 1fr));
+    }
+
+    .meal-select select {
+        min-width: 80px;
     }
 }

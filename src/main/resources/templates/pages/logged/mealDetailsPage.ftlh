@@ -45,6 +45,12 @@
                         ${line} <#if line?has_next><br></#if>
                     </#list>
                 </div>
+                <div class="type">
+                    <p class="sectionName">Typ</p>
+                    <#list meal.getMealTypes() as types>
+                        ${types.getMealTypePl()}<#sep>,
+                    </#list>
+                </div>
                 <div class="notes">
                     <p class="sectionName">Notatki</p>
                     <p class="notes">${meal.getNotes()}</p>

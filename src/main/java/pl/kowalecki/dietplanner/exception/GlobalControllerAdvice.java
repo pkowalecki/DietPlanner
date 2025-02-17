@@ -17,17 +17,26 @@ import java.util.Map;
 @AllArgsConstructor
 public class GlobalControllerAdvice {
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public String handleIllegalArgumentException(IllegalArgumentException e, Model model, HttpServletRequest request) {
+        return handleError(e, model, request, "Nieprawidłowy parametr");
+    }
+
     @ExceptionHandler(Exception.class)
     public String handleGenericException(Exception e, Model model, HttpServletRequest request) {
+        return handleError(e, model, request, "Wystąpił nieoczekiwany błąd.");
+    }
+
+    private String handleError(Exception e, Model model, HttpServletRequest request, String userMessage) {
         Map<String, String[]> parameters = request.getParameterMap();
         String requestURI = request.getRequestURI();
-        String errorMessage = "Wystąpił nieoczekiwany błąd przy wywołaniu " + requestURI;
+        String errorMessage = userMessage + " (URL: " + requestURI + ")";
         if (!parameters.isEmpty()) {
-            errorMessage += " z parametrami: " + parameters.toString();
+            errorMessage += " Parametry: " + parameters.toString();
         }
         log.error(e.getMessage(), e);
         log.error(errorMessage);
-        model.addAttribute("error", "Wystąpił nieoczekiwany błąd.");
+        model.addAttribute("error", userMessage);
         model.addAttribute("logged", false);
         return "pages/unlogged/errorPage";
     }
