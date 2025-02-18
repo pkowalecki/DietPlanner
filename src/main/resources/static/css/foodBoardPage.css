@@ -58,7 +58,7 @@
 
 .meal-box {
     width: 200px;
-    height: 200px;
+    height: 325px;
     border: 1px solid #ccc;
     text-align: center;
     padding: 10px;
@@ -69,17 +69,37 @@
     overflow: hidden;
     gap: 5px;
 }
+.meal-box:hover{
+    outline: none;
+    border-color: rgba(34, 39, 43, 0.68);
+}
+
 .meal-content {
-    white-space: pre-line;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    max-height: 100px;
+   text-align: left;
 }
 .meal-day {
     font-weight: bold;
     margin-bottom: 10px;
+}
+
+.meal-type {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+    white-space: normal;
+    max-height: 2.8em;
+    font-size: 14px;
+}
+
+.meal-text {
+    display: inline;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
 }
 
 @media (max-width: 900px) {

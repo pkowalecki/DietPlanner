@@ -4,14 +4,29 @@
     <form id="mealBoardForm" name="form" action="/app/auth/generateMealBoard" method="POST">
         <div class="meal-board-container">
             <div class="meal-board-table">
+                <#assign idx = 1 />
                 <#list days as day>
-                    <div class="meal-box" id="day" data-day="${day}">
+                    <div class="meal-box" id="day-${idx}" data-day="${day}">
                         <div class="meal-day">${day}</div>
-                        <div class="meal-content">Kliknij, aby dodać posiłki</div>
-                        <#list 1..4 as num>
-                            <input type="hidden" class="meal-id_${num}" value="">
+                        <div class="meal-content">
+                            <div class="meal-type"><b>Śniadanie:</b> <span class="meal-text" data-type="br">Brak</span>
+                            </div>
+                            <hr/>
+                            <div class="meal-type"><b>Przekąska:</b> <span class="meal-text" data-type="sn">Brak</span>
+                            </div>
+                            <hr/>
+                            <div class="meal-type"><b>Obiad:</b> <span class="meal-text" data-type="lu">Brak</span>
+                            </div>
+                            <hr/>
+                            <div class="meal-type"><b>Kolacja:</b> <span class="meal-text" data-type="su">Brak</span>
+                            </div>
+                        </div>
+                        <#list ["br", "sn", "lu", "su"] as type>
+                            <input type="hidden" name="meals[${day}][${type}]" class="meal-id" data-type="${type}"
+                                   value="-1">
                         </#list>
                     </div>
+                    <#assign idx = idx + 1 />
                 </#list>
             </div>
         </div>
@@ -19,17 +34,11 @@
             <input id="multiplier" name="multiplier" type="number" step="0.1" value="1">
         </label>
         <label>
-            <input type="checkbox" name="isSnackMultiplied">
-            Mnożyć przekąskę?
+            <input type="checkbox" name="isSnackMultiplied"> Mnożyć przekąskę?
         </label>
-        <div class="mb-3 goCenter">
-            <a id="openIngredientModalBtn" href="#">Open modal</a>
-            <div class="error-message" id="ingredientError"></div>
-        </div>
         <input type="submit" value="Wygeneruj listę zakupów">
     </form>
 </div>
-
 
 <div id="ingredientModal" class="modal" role="dialog">
     <div class="modal-dialog modal-lg">
@@ -41,65 +50,25 @@
             <div class="d-flex align-items-center gap-3 flex-wrap">
                 <div class="d-flex flex-nowrap flex-grow-1 align-items-center flex-column">
                     <div class="meal-type-name">Śniadanie</div>
-                    <div class="meal-select">
-                        <@simpleSelectPlain
-                        name="meals"
-                        id="mealsId_br"
-                        source=breakfastList
-                        placeholder="-"
-                        multiple=false
-                        showMinus=true
-                        selectWrapperStyle="width:200px;"
-                        />
-                    </div>
-
+                    <@simpleSelectPlain name="meals" id="mealsId_br" source=breakfastList placeholder="-" multiple=false showMinus=true />
                     <div class="meal-type-name">Przekąska</div>
-                    <div class="meal-select">
-                        <@simpleSelectPlain
-                        name="meals"
-                        id="mealsId_sn"
-                        source=snackList
-                        placeholder="-"
-                        multiple=false
-                        showMinus=true
-                        selectWrapperStyle="width:200px;"
-                        />
-                    </div>
+                    <@simpleSelectPlain name="meals" id="mealsId_sn" source=snackList placeholder="-" multiple=false showMinus=true/>
                     <div class="meal-type-name">Obiad</div>
-                    <div class="meal-select">
-                        <@simpleSelectPlain
-                        name="meals"
-                        id="mealsId_lu"
-                        source=lunchList
-                        placeholder="-"
-                        multiple=false
-                        showMinus=true
-                        selectWrapperStyle="width:200px;"
-                        />
-                    </div>
-
+                    <@simpleSelectPlain name="meals" id="mealsId_lu" source=lunchList placeholder="-" multiple=false showMinus=true/>
                     <div class="meal-type-name">Kolacja</div>
-                    <div class="meal-select">
-                        <@simpleSelectPlain
-                        name="meals"
-                        id="mealsId_su"
-                        source=supperList
-                        placeholder="-"
-                        multiple=false
-                        showMinus=true
-                        selectWrapperStyle="width:200px;"
-                        />
-                    </div>
+                    <@simpleSelectPlain name="meals" id="mealsId_su" source=supperList placeholder="-" multiple=false showMinus=true/>
                 </div>
+                <button id="addIngredientBtn" type="button" class="btn btn-primary mt-3">Dodaj do kalendarza</button>
             </div>
-            <button id="addIngredientBtn" type="button" class="btn btn-primary mt-3">Dodaj do kalendarza</button>
         </div>
     </div>
 </div>
+
 <script>
     <#noparse>
     $(document).ready(function () {
         let selectedDay = "";
+
         $(".meal-box").click(function () {
             selectedDay = $(this).data("day");
             $("#ingredientModal").show();
@@ -110,21 +79,13 @@
         });
 
         $("#addIngredientBtn").click(function () {
-            const breakfast = $("#mealsId_br option:selected").text();
-            const snack = $("#mealsId_sn option:selected").text();
-            const lunch = $("#mealsId_lu option:selected").text();
-            const dinner = $("#mealsId_su option:selected").text();
-
-            let mealSummary = [breakfast, snack, lunch, dinner].filter(m => m !== "-").join("\n");
-            mealSummary = mealSummary || "Kliknij, aby dodać posiłki";
-
-            const box = $(`.meal-box[data-day='${selectedDay}'] .meal-content`);
-            box.text(mealSummary);
-
-            $(`.meal-box[data-day='${selectedDay}'] .meal-id_1`).val($("#mealsId_br option:selected").val());
-            $(`.meal-box[data-day='${selectedDay}'] .meal-id_2`).val($("#mealsId_sn option:selected").val());
-            $(`.meal-box[data-day='${selectedDay}'] .meal-id_3`).val($("#mealsId_lu option:selected").val());
-            $(`.meal-box[data-day='${selectedDay}'] .meal-id_4`).val($("#mealsId_su option:selected").val());
+            $(".meal-id").each(function () {
+                let type = $(this).data("type");
+                let mealName = $(`#mealsId_${type} option:selected`).text() || "Brak";
+                let mealValue = $(`#mealsId_${type} option:selected`).val() || "-1";
+                $(`.meal-box[data-day='${selectedDay}'] .meal-text[data-type='${type}']`).text(mealName);
+                $(`.meal-box[data-day='${selectedDay}'] .meal-id[data-type='${type}']`).val(mealValue);
+            });
 
             $("#ingredientModal").hide();
         });
