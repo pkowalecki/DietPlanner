@@ -73,7 +73,7 @@
     <#assign idPolka = id/><#rt>
     <#assign classPolka = class/>
     <#assign isLabel = (label?has_content)>
-    <div id="${divWrapperId}" class="${divWrapperClass} style="${divWrapperStyle}">
+    <div id="${divWrapperId}" class="${divWrapperClass}" style="${divWrapperStyle}">
         <div class="floating-group">
             <@simpleSelectPlain name=name style=style class=classPolka liveSearch=liveSearch id=idPolka disabled=false placeholder=placeholder multiple=multiple source=source showMinus=showMinus selectWrapperStyle=selectWrapperStyle labelled=isLabel selectedValues=selectedValues dataSize=dataSize dataSubtext=dataSubtext dataContainer=dataContainer/>
             <#if label!=""><label class="floating-label" for="${idPolka}" id="labelFor${idPolka}">${label}</label></#if>
@@ -91,7 +91,7 @@
         <select
                 name="${name}"
                 <#if disabled>disabled="disabled"</#if>
-                class="selectpicker form-control floating-select ${classPolka}"
+                class="selectpicker form-control floating-select ${classPolka} "
                 data-style="select-picker-new"
                 data-size="${dataSize}"
                 data-subtext="${dataSubtext}"
@@ -127,6 +127,14 @@
             });
         </script>
     </#if>
+<#--    <script>-->
+<#--        $('.selectpicker').on('show.bs.select', function () {-->
+<#--            $(this).closest('div[style*="overflow"]').css('overflow', 'visible');-->
+<#--        }).on('hide.bs.select', function () {-->
+<#--            $(this).closest('div[style*="overflow"]').css('overflow', 'hidden');-->
+<#--        });-->
+
+<#--    </script>-->
 </#macro>
 
 <#macro simpleButton id, url, buttonText="Wyślij" class="">

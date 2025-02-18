@@ -1,6 +1,6 @@
 .meal-form-container {
     margin: 2% auto;
-    padding: 4% 0;
+    padding: 1% 0;
     width: 90%;
     min-height: 70vh;
     background-color: rgba(255, 255, 255, 90%);
@@ -8,11 +8,9 @@
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
     text-align: center;
-    overflow-x: auto;
 }
 
 .meal-board-container {
-    overflow-x: auto;
     white-space: nowrap;
     padding: 10px;
     max-width: 100%;
@@ -20,7 +18,7 @@
 
 .meal-board-table {
     display: grid;
-    grid-template-columns: minmax(120px, auto) repeat(7, 1fr);
+    grid-template-columns: repeat(7, 1fr);
     gap: 10px;
     align-items: center;
     text-align: center;
@@ -56,6 +54,32 @@
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 4px;
+}
+
+.meal-box {
+    width: 200px;
+    height: 200px;
+    border: 1px solid #ccc;
+    text-align: center;
+    padding: 10px;
+    margin: 5px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    gap: 5px;
+}
+.meal-content {
+    white-space: pre-line;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    max-height: 100px;
+}
+.meal-day {
+    font-weight: bold;
+    margin-bottom: 10px;
 }
 
 @media (max-width: 900px) {

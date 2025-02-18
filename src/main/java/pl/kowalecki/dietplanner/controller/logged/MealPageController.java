@@ -113,12 +113,13 @@ public class MealPageController {
         apiRequest.setMealIds(longlista);
         apiRequest.setMultiplier(form.getMultiplier());
         System.out.println(form);
-        return apiMealService.generateMealBoard(apiRequest)
-                .map(mealBoardData -> {
-                    model.addAttribute("result", mealBoardData);
-                    model.addAttribute("idsList", form.getMeals());
-                    return "pages/logged/foodBoardResult";
-                });
+//        return apiMealService.generateMealBoard(apiRequest)
+//                .map(mealBoardData -> {
+//                    model.addAttribute("result", mealBoardData);
+//                    model.addAttribute("idsList", form.getMeals());
+//                    return "pages/logged/foodBoardResult";
+//                });
+        return Mono.just("pages/logged/foodBoardResult");
     }
 
     private List<Long> prepareIds(List<Long> meals) {
