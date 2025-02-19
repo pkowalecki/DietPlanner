@@ -14,13 +14,13 @@ import pl.kowalecki.dietplanner.controller.helper.AddMealHelper;
 import pl.kowalecki.dietplanner.model.DTO.*;
 import pl.kowalecki.dietplanner.model.DTO.meal.AddMealRequestDTO;
 import pl.kowalecki.dietplanner.model.Meal;
-import pl.kowalecki.dietplanner.model.page.FoodBoardPageData;
 import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
 import pl.kowalecki.dietplanner.services.WebPage.MessageType;
 import pl.kowalecki.dietplanner.services.dietplannerapi.meal.DietPlannerApiClient;
 import pl.kowalecki.dietplanner.services.document.DocumentService;
 import pl.kowalecki.dietplanner.utils.DateUtils;
 import pl.kowalecki.dietplanner.utils.MapUtils;
+import pl.kowalecki.dietplanner.utils.TextTools;
 import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayOutputStream;
@@ -107,26 +107,53 @@ public class MealPageController {
 
 
     @PostMapping(value = "/generateMealBoard")
-    public Mono<String> resultPage(Model model, HttpServletRequest request, HttpServletResponse response, @ModelAttribute("form") FoodBoardPageData form) {
-        FoodBoardPageRequest apiRequest = new FoodBoardPageRequest();
-        List<Long> longlista = prepareIds(form.getMeals());
-        apiRequest.setMealIds(longlista);
-        apiRequest.setMultiplier(form.getMultiplier());
-        System.out.println(form);
-//        return apiMealService.generateMealBoard(apiRequest)
-//                .map(mealBoardData -> {
-//                    model.addAttribute("result", mealBoardData);
-//                    model.addAttribute("idsList", form.getMeals());
-//                    return "pages/logged/foodBoardResult";
-//                });
-        return Mono.just("pages/logged/foodBoardResult");
+    public Mono<String> resultPage(@RequestBody Map<String, Object> rawData, Model model) {
+        Map<String, Map<String, Long>> meals = prepareMeals(rawData);
+        Double multiplier = rawData.containsKey("multiplier")
+                ? Double.valueOf(rawData.get("multiplier").toString()) : 1.0;
+
+        List<Long> mealIds = prepareIds(meals);
+
+        FoodBoardPageRequest requestData = new FoodBoardPageRequest();
+        requestData.setMealIds(mealIds);
+        requestData.setMultiplier(multiplier);
+
+        return apiMealService.generateMealBoard(requestData)
+                .map(mealBoardData -> {
+                    model.addAttribute("result", mealBoardData);
+                    model.addAttribute("idsList", requestData.getMealIds());
+                    return "pages/logged/foodBoardResult";
+                });
     }
 
-    private List<Long> prepareIds(List<Long> meals) {
+    private Map<String, Map<String, Long>> prepareMeals(Map<String, Object> rawData) {
+        Map<String, Map<String, Long>> meals = new HashMap<>();
+
+        rawData.forEach((key, value) -> {
+            if (key.startsWith("meals[")) {
+                String[] parts = key.replaceAll("[^0-9]+", " ").trim().split(" ");
+                if (parts.length == 2) {
+                    String day = parts[0];
+                    String mealType = parts[1];
+
+                    if (TextTools.isTextLengthOk(day, 1, 7) && TextTools.isTextLengthOk(mealType, 1, 4)) {
+                        meals.computeIfAbsent(day, k -> new HashMap<>())
+                                .put(mealType, Long.valueOf(value.toString()));
+                    }
+                }
+            }
+        });
+
+        return meals;
+    }
+
+
+    private List<Long> prepareIds(Map<String, Map<String, Long>> meals) {
         List<Long> ids = new ArrayList<>();
-        for (Long meal : meals) {
-            if(meal == null) ids.add(0L);
-            else ids.add(meal);
+        for (Map<String, Long> day : meals.values()) {
+            for (Long meal : day.values()) {
+                ids.add(meal != null ? meal : 0L);
+            }
         }
         return ids;
     }

@@ -8,12 +8,14 @@
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
     text-align: center;
+    overflow-x: auto;
 }
 
 .meal-board-container {
     white-space: nowrap;
     padding: 10px;
     max-width: 100%;
+    overflow-x: auto;
 }
 
 .meal-board-table {
@@ -23,23 +25,6 @@
     align-items: center;
     text-align: center;
     min-width: 1200px;
-}
-
-.meal-type-header,
-.day-header {
-    font-weight: bold;
-    text-align: center;
-    padding: 10px;
-    background-color: #f5f5f5;
-    border-bottom: 2px solid #ccc;
-}
-
-.meal-type-name {
-    font-weight: bold;
-    text-align: center;
-    padding: 10px;
-    background-color: #eaeaea;
-    border-right: 2px solid #ccc;
 }
 
 .meal-select {
@@ -102,18 +87,42 @@
     word-break: break-word;
 }
 
-@media (max-width: 900px) {
-    .day-header::after {
-        content: attr(data-short);
-    }
+.modal-header {
+    text-align: center;
+    justify-content: center;
+    display: flex;
+    align-items: center;
 }
 
-@media (max-width: 768px) {
-    .meal-board-table {
-        grid-template-columns: minmax(100px, auto) repeat(7, minmax(80px, 1fr));
-    }
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
 
-    .meal-select select {
-        min-width: 80px;
+#addMealButton {
+    align-self: center;
+    margin-top: 15px;
+}
+
+.meal-type-name {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 30px;
+}
+.meal-type-header{
+    font-weight: bold;
+    width: 90px;
+}
+
+@media (max-width: 767px) {
+    .meal-type-name {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    #addMealButton {
+        width: 100%;
     }
 }

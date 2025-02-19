@@ -1,20 +1,4 @@
 <#include "../../webData/header.ftlh">
-    <style>
-        .container{
-            padding: 5px 5px 5px 5px;
-        }
-        .ingredients{
-            display: flex;
-            align-items: center;
-            margin-bottom: 5px;
-        }
-        .checkbox {
-            margin-right: 10px;
-        }
-        .strike{
-            text-decoration: line-through;
-        }
-    </style>
 <div class="form-container">
     <p>Lista zakupów</p>
     <#assign id = 1 />

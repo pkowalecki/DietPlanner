@@ -150,6 +150,13 @@
             const formData = new FormData(form);
             const jsonData = Object.fromEntries(formData.entries());
 
+            for (let key in jsonData) {
+                if (!jsonData[key].trim()) {
+                    showSwalMessage("Błąd", "Pole '" + key + "' nie może być puste.", "error");
+                    return;
+                }
+            }
+
             ajaxCall("${url}", "${method}", "${contentType}", JSON.stringify(jsonData), ${reloadPageAfterSuccess?c});
         });
     </script>
