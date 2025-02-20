@@ -23,18 +23,25 @@ public class DocumentService {
 
     private static void fillTableWithMeals(XWPFTable table, List<String> mealNames) {
         int mealIndex = 0;
+        int numDays = 7; // 7 dni tygodnia
         String[] mealTypes = {"Śniadanie", "Przekąska", "Obiad", "Kolacja"};
+        int mealsPerDay = mealTypes.length; // 4 posiłki na dzień
 
-        for (int rowIndex = 1; rowIndex <= mealTypes.length; rowIndex++) {
-            XWPFTableRow row = table.getRow(rowIndex);
-            for (int colIndex = 1; colIndex <= 7; colIndex++) {
+        for (int colIndex = 1; colIndex <= numDays; colIndex++) {
+            for (int rowIndex = 1; rowIndex <= mealsPerDay; rowIndex++) {
+                XWPFTableRow row = table.getRow(rowIndex);
+                if (row == null) {
+                    row = table.createRow();
+                }
+
                 XWPFTableCell cell = row.getCell(colIndex);
                 if (cell == null) {
                     cell = row.addNewTableCell();
                 }
+
                 if (mealIndex < mealNames.size()) {
                     String mealName = mealNames.get(mealIndex);
-                    cell.setText(mealName.equals("-") || mealName.isEmpty() ? "" : mealName);
+                    cell.setText(mealName == null || mealName.equals("-") || mealName.isEmpty() ? "" : mealName);
                     mealIndex++;
                 } else {
                     cell.setText("");

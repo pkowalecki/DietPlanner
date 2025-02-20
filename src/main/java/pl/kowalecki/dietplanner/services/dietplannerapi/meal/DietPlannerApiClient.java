@@ -11,7 +11,6 @@ import pl.kowalecki.dietplanner.model.DTO.FoodBoardPageRequest;
 import pl.kowalecki.dietplanner.model.DTO.MealStarterPack;
 import pl.kowalecki.dietplanner.model.DTO.PageResponse;
 import pl.kowalecki.dietplanner.model.DTO.meal.AddMealRequestDTO;
-import pl.kowalecki.dietplanner.model.DTO.meal.MealBoardDTO;
 import pl.kowalecki.dietplanner.model.DTO.meal.MealMainInfoDTO;
 import pl.kowalecki.dietplanner.model.Meal;
 import pl.kowalecki.dietplanner.model.DTO.meal.*;
@@ -48,13 +47,20 @@ public class DietPlannerApiClient {
                 .onErrorReturn(Collections.emptyList());
     }
 
-    public Mono<List<MealBoardDTO>> generateMealBoard(FoodBoardPageRequest apiReq) {
+    public Mono<String> generateMealBoard(FoodBoardPageRequest apiReq) {
         return webClient.post()
                 .uri(MEAL_SERVICE_URL+"/meal/generateFoodBoard")
                 .bodyValue(apiReq)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<MealBoardDTO>>() {})
-                .onErrorReturn(Collections.emptyList());
+                .bodyToMono(String.class);
+    }
+
+    public Mono<List<MealBoardDTO>> getShoppingList(String pageId) {
+        return webClient.post()
+                .uri(MEAL_SERVICE_URL+"/meal/getShoppingListData")
+                .bodyValue(pageId)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<List<MealBoardDTO>>() {});
     }
 
     public Mono<ResponseEntity<Void>> addOrUpdateMeal(AddMealRequestDTO addMealRequestDTO) {
@@ -65,13 +71,12 @@ public class DietPlannerApiClient {
                 .toBodilessEntity();
     }
 
-    public Mono<List<String>> getMealNamesByMealId(List<Long> mealIds){
+    public Mono<List<String>> getMealNamesByMealId(String pageId){
         return webClient.post()
                 .uri(MEAL_SERVICE_URL+"/meal/getMealNamesById")
-                .bodyValue(mealIds)
+                .bodyValue(pageId)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<String>>() {})
-                .onErrorReturn(Collections.emptyList());
+                .bodyToMono(new ParameterizedTypeReference<List<String>>() {});
     }
 
     public Mono<List<MealHistoryDTO>> getMealHistoryList(){

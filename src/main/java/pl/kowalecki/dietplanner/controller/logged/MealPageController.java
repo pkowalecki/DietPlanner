@@ -106,25 +106,42 @@ public class MealPageController {
     }
 
 
-    @PostMapping(value = "/generateMealBoard")
-    public Mono<String> resultPage(@RequestBody Map<String, Object> rawData, Model model) {
+    @PostMapping(value = "/generateMealBoard", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Mono<Map<String, String>> resultPage(@RequestBody Map<String, Object> rawData, Model model) {
         Map<String, Map<String, Long>> meals = prepareMeals(rawData);
         Double multiplier = rawData.containsKey("multiplier")
                 ? Double.valueOf(rawData.get("multiplier").toString()) : 1.0;
-
         List<Long> mealIds = prepareIds(meals);
+
+        if (mealIds.stream().allMatch(val -> val.equals(-1L))) {
+            Map<String, String> result = new HashMap<>();
+            result.put("errorMsg", "Musisz wybrać jakiś posiłek");
+            return Mono.just(result);
+        }
 
         FoodBoardPageRequest requestData = new FoodBoardPageRequest();
         requestData.setMealIds(mealIds);
         requestData.setMultiplier(multiplier);
 
         return apiMealService.generateMealBoard(requestData)
-                .map(mealBoardData -> {
-                    model.addAttribute("result", mealBoardData);
-                    model.addAttribute("idsList", requestData.getMealIds());
-                    return "pages/logged/foodBoardResult";
+                .map(urlParam -> {
+                    Map<String, String> result = new HashMap<>();
+                    result.put("redirectUrl", "/app/auth/shoppingList/"+urlParam);
+                    return result;
                 });
     }
+    @GetMapping(value = "/shoppingList/{pageId}")
+    public Mono<String> getShoppingListPage(@PathVariable String pageId, Model model) {
+        return apiMealService.getShoppingList(pageId)
+                .map(shoppingList -> {
+                    model.addAttribute("pageId", pageId);
+                    model.addAttribute("ingredients", shoppingList);
+                    return "pages/logged/foodBoardResult";
+                });
+
+    }
+
 
     private Map<String, Map<String, Long>> prepareMeals(Map<String, Object> rawData) {
         Map<String, Map<String, Long>> meals = new HashMap<>();
@@ -159,8 +176,8 @@ public class MealPageController {
     }
 
     @PostMapping(value = "/downloadMealDocument", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public Mono<ResponseEntity<byte[]>> downloadMealDocument(@RequestParam("mealIds") List<Long> ids) {
-        return apiMealService.getMealNamesByMealId(ids)
+    public Mono<ResponseEntity<byte[]>> downloadMealDocument(@RequestParam String pageId) {
+        return apiMealService.getMealNamesByMealId(pageId)
                 .flatMap(mealNames -> {
                     try (XWPFDocument document = new XWPFDocument();
 

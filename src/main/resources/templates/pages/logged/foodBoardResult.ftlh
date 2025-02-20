@@ -1,13 +1,14 @@
 <#include "../../webData/header.ftlh">
+<link rel="stylesheet" href="../../../static/css/foodBoardResult.css"/>
 <div class="form-container">
-    <p>Lista zakupów</p>
+    <p class="shopping-list-title">Lista zakupów</p>
     <#assign id = 1 />
-    <#list result as food>
+    <#list ingredients as toBuy>
         <div class="ingredients" data-original-parent="ingredients-list" data-original-index="${id - 1}">
             <input type="checkbox" id="check_${id}" class="checkbox" onclick="toggleIngredient(${id})"/>
             <div class="ingredient" id="ingredient_${id}">
-                ${food.getName()} ${food.getIngredientAmount()}${food.getIngredientUnit()}
-                <#list food.getMeasurementList() as measurement>
+                ${toBuy.getName()} ${toBuy.getIngredientAmount()}${toBuy.getIngredientUnit()}
+                <#list toBuy.getMeasurementList() as measurement>
                     ${measurement.getMeasurementAmount()} ${measurement.getMeasurementUnit()}
                 </#list>
             </div>
@@ -15,13 +16,11 @@
         <#assign id = id + 1/>
     </#list>
     <br/>
-    <div id="ingredients-list">
-    </div>
+    <div id="ingredients-list"></div>
     <br/>
-    <div class="ingredients-owned">
-    </div>
+    <div class="ingredients-owned"></div>
     <form action="/app/auth/downloadMealDocument" method="post">
-        <input type="hidden" name="mealIds" value="${idsList?join(',')}"/>
+        <input type="hidden" name="pageId" value="${pageId}"/>
         <button type="submit">Pobierz dokument</button>
     </form>
 </div>
