@@ -1,0 +1,18 @@
+.shopping-list-title {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 15px;
+}
+.ingredients {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.strike {
+    text-decoration: line-through;
+    color: grey;
+}
+.ingredients-owned, #ingredients-list {
+    text-align: left !important;
+}

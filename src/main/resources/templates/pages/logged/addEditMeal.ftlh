@@ -54,7 +54,7 @@
                     <@simpleSelect
                     name="ingredientUnits"
                     source=ingredientUnitList
-                    placeholder="g"
+                    placeholder="Jednostka"
                     id="ingredientUnitsSelect"
                     multiple=false
                     divWrapperStyle="max-width: 70px"
@@ -75,7 +75,7 @@
                     <@simpleSelect
                     name="measurementTypes"
                     source=measurementTypeList
-                    placeholder="porcja"
+                    placeholder="Miara"
                     id="measurementTypesSelect"
                     multiple=false
                     divWrapperStyle="max-width: 130px"

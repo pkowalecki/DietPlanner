@@ -1,50 +1,128 @@
-.meal-board-container {
-    max-width: 100%;
-    height: 80vh;
-    margin: 0 auto;
-    padding: 10px;
-    overflow-x: hidden;
+.meal-form-container {
+    margin: 2% auto;
+    padding: 1% 0;
+    width: 90%;
+    min-height: 70vh;
     background-color: rgba(255, 255, 255, 90%);
     border: 1px solid #cccccc;
     border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    overflow-x: auto;
 }
 
+.meal-board-container {
+    white-space: nowrap;
+    padding: 10px;
+    max-width: 100%;
+    overflow-x: auto;
+}
 
 .meal-board-table {
-    margin-top: 50px;
     display: grid;
-    grid-template-columns: auto repeat(7, auto);
-    gap: 5px;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    align-items: center;
     text-align: center;
+    min-width: 1200px;
 }
 
-.day-short {
-    display: none;
+.meal-select {
+    padding: 5px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
 }
 
-.meal-board-table select {
+.meal-select select {
     width: 100%;
+    min-width: 120px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.meal-box {
+    width: 200px;
+    height: 325px;
+    border: 1px solid #ccc;
+    text-align: center;
+    padding: 10px;
+    margin: 5px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    gap: 5px;
+}
+.meal-box:hover{
+    outline: none;
+    border-color: rgba(34, 39, 43, 0.68);
+}
+
+.meal-content {
+   text-align: left;
+}
+.meal-day {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.meal-type {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+    white-space: normal;
+    max-height: 2.8em;
     font-size: 14px;
 }
 
-.options {
+.meal-text {
+    display: inline;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+}
+
+.modal-header {
+    text-align: center;
+    justify-content: center;
     display: flex;
-    gap: 10px;
+    align-items: center;
+}
+
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#addMealButton {
+    align-self: center;
     margin-top: 15px;
 }
 
-@media (max-width: 992px) {
-    .day-name {
-        display: none;
-    }
-    .day-short {
-        display: block;
-    }
+.meal-type-name {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 30px;
+}
+.meal-type-header{
+    font-weight: bold;
+    width: 90px;
 }
 
-@media (max-width: 768px) {
-    .meal-board-table {
-        grid-template-columns: auto auto;
+@media (max-width: 767px) {
+    .meal-type-name {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    #addMealButton {
+        width: 100%;
     }
 }

@@ -14,12 +14,13 @@ import pl.kowalecki.dietplanner.controller.helper.AddMealHelper;
 import pl.kowalecki.dietplanner.model.DTO.*;
 import pl.kowalecki.dietplanner.model.DTO.meal.AddMealRequestDTO;
 import pl.kowalecki.dietplanner.model.Meal;
-import pl.kowalecki.dietplanner.model.page.FoodBoardPageData;
 import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
 import pl.kowalecki.dietplanner.services.WebPage.MessageType;
 import pl.kowalecki.dietplanner.services.dietplannerapi.meal.DietPlannerApiClient;
 import pl.kowalecki.dietplanner.services.document.DocumentService;
+import pl.kowalecki.dietplanner.utils.DateUtils;
 import pl.kowalecki.dietplanner.utils.MapUtils;
+import pl.kowalecki.dietplanner.utils.TextTools;
 import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayOutputStream;
@@ -63,15 +64,15 @@ public class MealPageController {
         }
         return apiMealService.addOrUpdateMeal(addMealRequestDTO)
                 .flatMap(response -> {
-                            if (response.getStatusCode().is2xxSuccessful()) {
-                                return Mono.just(ResponseEntity.status(HttpStatus.OK).body(webPageService.addMessageToPage(MessageType.SUCCESS, "Posiłek został dodany")));
-                            } else {
-                                String errorMessage = response.getStatusCode().is4xxClientError()
-                                        ? "Nie udało się dodać posiłku."
-                                        : "Wystąpił nieoczekiwany błąd serwera";
-                                return Mono.just(ResponseEntity.status(response.getStatusCode()).body(webPageService.addMessageToPage(MessageType.ERROR, errorMessage)));
-                            }
-                        })
+                    if (response.getStatusCode().is2xxSuccessful()) {
+                        return Mono.just(ResponseEntity.status(HttpStatus.OK).body(webPageService.addMessageToPage(MessageType.SUCCESS, "Posiłek został dodany")));
+                    } else {
+                        String errorMessage = response.getStatusCode().is4xxClientError()
+                                ? "Nie udało się dodać posiłku."
+                                : "Wystąpił nieoczekiwany błąd serwera";
+                        return Mono.just(ResponseEntity.status(response.getStatusCode()).body(webPageService.addMessageToPage(MessageType.ERROR, errorMessage)));
+                    }
+                })
                 .onErrorResume(error -> Mono.just(ResponseEntity.internalServerError()
                         .body(webPageService.addMessageToPage(MessageType.ERROR, "Wystąpił nieoczekiwany błąd serwera"))));
     }
@@ -80,7 +81,24 @@ public class MealPageController {
     public Mono<String> mealPage(Model model, HttpServletRequest request, HttpServletResponse response) {
         return apiMealService.getMealNamesByUserId()
                 .map(mealList -> {
-                    model.addAttribute("mealList", mealList);
+                    model.addAttribute("days", DateUtils.getDaysOfWeek());
+
+                    Map<String, List<Map<String, String>>> mealsByType = new HashMap<>();
+                    List<String> mealTypes = List.of("BREAKFAST", "SNACK", "LUNCH", "SUPPER");
+
+                    for (String type : mealTypes) {
+                        List<Map<String, String>> mappedMeals = MapUtils.mapToFtl(
+                                mealList.stream()
+                                        .filter(meal -> Arrays.asList(meal.getMealTypes().split(",\\s*"))
+                                                .contains(type))
+                                        .collect(Collectors.toList()),
+                                "mealId", "name"
+                        );
+
+                        mealsByType.put(type.toLowerCase() + "List", mappedMeals);
+                    }
+
+                    model.addAllAttributes(mealsByType);
                     return "pages/logged/foodBoardPage";
                 })
                 .defaultIfEmpty("pages/logged/foodBoardPage");
@@ -88,22 +106,78 @@ public class MealPageController {
     }
 
 
-    @PostMapping(value = "/generateMealBoard")
-    public Mono<String> resultPage(Model model, HttpServletRequest request, HttpServletResponse response, @ModelAttribute("form") FoodBoardPageData form) {
-        FoodBoardPageRequest apiRequest = new FoodBoardPageRequest();
-        apiRequest.setMealIds(form.getMealIds());
-        apiRequest.setMultiplier(form.getMultiplier());
-        return apiMealService.generateMealBoard(apiRequest)
-                .map(mealBoardData -> {
-                    model.addAttribute("result", mealBoardData);
-                    model.addAttribute("idsList", form.getMealIds());
+    @PostMapping(value = "/generateMealBoard", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Mono<Map<String, String>> resultPage(@RequestBody Map<String, Object> rawData, Model model) {
+        Map<String, Map<String, Long>> meals = prepareMeals(rawData);
+        Double multiplier = rawData.containsKey("multiplier")
+                ? Double.valueOf(rawData.get("multiplier").toString()) : 1.0;
+        List<Long> mealIds = prepareIds(meals);
+
+        if (mealIds.stream().allMatch(val -> val.equals(-1L))) {
+            Map<String, String> result = new HashMap<>();
+            result.put("errorMsg", "Musisz wybrać jakiś posiłek");
+            return Mono.just(result);
+        }
+
+        FoodBoardPageRequest requestData = new FoodBoardPageRequest();
+        requestData.setMealIds(mealIds);
+        requestData.setMultiplier(multiplier);
+
+        return apiMealService.generateMealBoard(requestData)
+                .map(urlParam -> {
+                    Map<String, String> result = new HashMap<>();
+                    result.put("redirectUrl", "/app/auth/shoppingList/"+urlParam);
+                    return result;
+                });
+    }
+    @GetMapping(value = "/shoppingList/{pageId}")
+    public Mono<String> getShoppingListPage(@PathVariable String pageId, Model model) {
+        return apiMealService.getShoppingList(pageId)
+                .map(shoppingList -> {
+                    model.addAttribute("pageId", pageId);
+                    model.addAttribute("ingredients", shoppingList);
                     return "pages/logged/foodBoardResult";
                 });
+
+    }
+
+
+    private Map<String, Map<String, Long>> prepareMeals(Map<String, Object> rawData) {
+        Map<String, Map<String, Long>> meals = new HashMap<>();
+
+        rawData.forEach((key, value) -> {
+            if (key.startsWith("meals[")) {
+                String[] parts = key.replaceAll("[^0-9]+", " ").trim().split(" ");
+                if (parts.length == 2) {
+                    String day = parts[0];
+                    String mealType = parts[1];
+
+                    if (TextTools.isTextLengthOk(day, 1, 7) && TextTools.isTextLengthOk(mealType, 1, 4)) {
+                        meals.computeIfAbsent(day, k -> new HashMap<>())
+                                .put(mealType, Long.valueOf(value.toString()));
+                    }
+                }
+            }
+        });
+
+        return meals;
+    }
+
+
+    private List<Long> prepareIds(Map<String, Map<String, Long>> meals) {
+        List<Long> ids = new ArrayList<>();
+        for (Map<String, Long> day : meals.values()) {
+            for (Long meal : day.values()) {
+                ids.add(meal != null ? meal : 0L);
+            }
+        }
+        return ids;
     }
 
     @PostMapping(value = "/downloadMealDocument", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public Mono<ResponseEntity<byte[]>> downloadMealDocument(@RequestParam("mealIds") List<Long> ids) {
-        return apiMealService.getMealNamesByMealId(ids)
+    public Mono<ResponseEntity<byte[]>> downloadMealDocument(@RequestParam String pageId) {
+        return apiMealService.getMealNamesByMealId(pageId)
                 .flatMap(mealNames -> {
                     try (XWPFDocument document = new XWPFDocument();
 
@@ -125,8 +199,8 @@ public class MealPageController {
 
     @GetMapping(value = "/mealsHistory")
     public Mono<String> mealsHistory(Model model, HttpServletRequest request, HttpServletResponse response) {
-       return apiMealService.getMealHistoryList()
-                .flatMap(mealHistory ->{
+        return apiMealService.getMealHistoryList()
+                .flatMap(mealHistory -> {
                     model.addAttribute("mealHistory", mealHistory);
                     return Mono.just("pages/logged/mealsHistoryPage");
                 })
@@ -134,22 +208,23 @@ public class MealPageController {
     }
 
     @PostMapping(value = "/mealHistory")
-    public Mono<String> getMealHistoryPage(@RequestParam("id") String param, Model model, HttpServletRequest request, HttpServletResponse response, InputStream inputStream) {
+    public Mono<String> getMealHistoryPage(@RequestParam("id") String param, Model model) {
         return apiMealService.getMealHistoryById(param)
-                .map(mealHistory ->{
+                .map(mealHistory -> {
+                    model.addAttribute("days", DateUtils.getDaysOfWeek());
                     model.addAttribute("mealHistory", mealHistory);
                     return "pages/logged/mealHistoryPage";
                 });
-                //TODO DAĆ TU RETURNA JAKIEGOŚ FAJNEGO.
 
     }
+
     @GetMapping(value = "/details/{id}")
-    public Mono<String> getMealDetailsPage(@PathVariable Long id, Model model){
+    public Mono<String> getMealDetailsPage(@PathVariable Long id, Model model) {
         String actionType = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/app/auth/editMeal/")
                 .toUriString();
         return apiMealService.getMealDetails(id)
-                .map(response ->{
+                .map(response -> {
                     model.addAttribute("meal", response);
                     model.addAttribute("url", actionType);
                     return "pages/logged/mealDetailsPage";
@@ -157,7 +232,7 @@ public class MealPageController {
     }
 
     @GetMapping(value = "/editMeal/{id}")
-    public Mono<String> getEditMealPage(@PathVariable Long id, Model model){
+    public Mono<String> getEditMealPage(@PathVariable Long id, Model model) {
         return Mono.zip(
                 apiMealService.getMealStarterPack(),
                 apiMealService.getMealDetails(id)

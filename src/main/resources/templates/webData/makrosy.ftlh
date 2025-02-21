@@ -69,13 +69,13 @@
     ><#if value?has_content>${value}</#if></textarea>
 </#macro>
 
-<#macro simpleSelect name source style="" class="" liveSearch=true id="" disabled=false placeholder="" divWrapperId="" divWrapperStyle="" selectWrapperStyle="" label="" multiple=true showMinus=false divWrapperClass="" selectedValues=[]>
+<#macro simpleSelect name source style="" class="" liveSearch=true id="" disabled=false placeholder="" divWrapperId="" divWrapperStyle="" selectWrapperStyle="" label="" multiple=true showMinus=false divWrapperClass="" selectedValues=[] dataSize="10" dataSubtext="" dataContainer="">
     <#assign idPolka = id/><#rt>
     <#assign classPolka = class/>
     <#assign isLabel = (label?has_content)>
-    <div id="${divWrapperId}" class="${divWrapperClass} style="${divWrapperStyle}">
+    <div id="${divWrapperId}" class="${divWrapperClass}" style="${divWrapperStyle}">
         <div class="floating-group">
-            <@simpleSelectPlain name=name style=style class=classPolka liveSearch=liveSearch id=idPolka disabled=false placeholder=placeholder multiple=multiple source=source showMinus=showMinus selectWrapperStyle=selectWrapperStyle labelled=isLabel selectedValues=selectedValues/>
+            <@simpleSelectPlain name=name style=style class=classPolka liveSearch=liveSearch id=idPolka disabled=false placeholder=placeholder multiple=multiple source=source showMinus=showMinus selectWrapperStyle=selectWrapperStyle labelled=isLabel selectedValues=selectedValues dataSize=dataSize dataSubtext=dataSubtext dataContainer=dataContainer/>
             <#if label!=""><label class="floating-label" for="${idPolka}" id="labelFor${idPolka}">${label}</label></#if>
             <div class="error-message" id="${idPolka}Error">
                 <i class="error-icon f a-solid fa-circle-exclamation" id="${idPolka}Error" style="display: none"></i>
@@ -84,14 +84,18 @@
     </div>
 </#macro>
 
-<#macro simpleSelectPlain name source style="" class="" liveSearch=true id="" disabled=false placeholder="" divWrapperId="" divWrapperStyle="" multiple=true emptyValue="-" showMinus=false selectWrapperStyle="" labelled=false selectedValues=[]>
+<#macro simpleSelectPlain name source style="" class="" liveSearch=true id="" disabled=false placeholder="" divWrapperId="" divWrapperStyle="" multiple=true emptyValue="-" showMinus=false selectWrapperStyle="" labelled=false selectedValues=[] dataSize="10" dataSubtext="" dataContainer="">
     <#assign idPolka = id/><#rt>
     <#assign classPolka = class/>
     <div style="${selectWrapperStyle}">
         <select
                 name="${name}"
                 <#if disabled>disabled="disabled"</#if>
-                class="selectpicker form-control floating-select ${classPolka}"
+                class="selectpicker form-control floating-select ${classPolka} "
+                data-style="select-picker-new"
+                data-size="${dataSize}"
+                data-subtext="${dataSubtext}"
+                data-container="<#if dataContainer!="">${dataContainer}<#else>body</#if>"
                 <#if liveSearch> data-live-search="true"</#if>
                 <#if style != "">style="floating-select ${style}"</#if>
                 <#if idPolka!="">id="${idPolka}"</#if>
@@ -123,6 +127,14 @@
             });
         </script>
     </#if>
+<#--    <script>-->
+<#--        $('.selectpicker').on('show.bs.select', function () {-->
+<#--            $(this).closest('div[style*="overflow"]').css('overflow', 'visible');-->
+<#--        }).on('hide.bs.select', function () {-->
+<#--            $(this).closest('div[style*="overflow"]').css('overflow', 'hidden');-->
+<#--        });-->
+
+<#--    </script>-->
 </#macro>
 
 <#macro simpleButton id, url, buttonText="Wyślij" class="">
@@ -137,6 +149,13 @@
             const form = document.getElementById("${formToSend}");
             const formData = new FormData(form);
             const jsonData = Object.fromEntries(formData.entries());
+
+            for (let key in jsonData) {
+                if (!jsonData[key].trim()) {
+                    showSwalMessage("Błąd", "Pole '" + key + "' nie może być puste.", "error");
+                    return;
+                }
+            }
 
             ajaxCall("${url}", "${method}", "${contentType}", JSON.stringify(jsonData), ${reloadPageAfterSuccess?c});
         });

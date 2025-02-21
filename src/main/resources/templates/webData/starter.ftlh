@@ -23,4 +23,4 @@
 
 <link rel="icon" type="image/x-icon" href="/static/images/favicon.ico" />
 <#include "makrosy.ftlh">
-
+<#include "swalAlert.ftlh">

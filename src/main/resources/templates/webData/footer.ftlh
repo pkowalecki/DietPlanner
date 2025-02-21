@@ -15,14 +15,18 @@
                 type: method,
                 contentType: contentType,
                 data: data,
-                success: function (response, status, xhr) {
-                    if (response && response.type) {
+                success: function (response) {
+                    if (response.redirectUrl) {
+                        window.location.href = response.redirectUrl;
+                    } else if (response && response.type) {
                         showSwalMessage(response.type, response.message, response.icon);
-                    }else{
+                    } else if (response && response.errorMsg) {
+                        showSwalMessage('Błąd!', response.errorMsg, 'error');
+                    } else {
                         showSwalMessage('Sukces', 'Operacja zakończona pomyślnie.', 'success');
-                    }
-                    if (shouldReloadOnSuccess) {
-                        location.reload();
+                        if (shouldReloadOnSuccess) {
+                            location.reload();
+                        }
                     }
                 },
                 error: function (xhr, status, error) {
@@ -30,9 +34,9 @@
                         const errorResponse = JSON.parse(xhr.responseText);
                         if (xhr.status === 400 && typeof errorResponse === 'object' && !Array.isArray(errorResponse)) {
                             handleFieldErrors(errorResponse);
-                        }else if (errorResponse) {
+                        } else if (errorResponse) {
                             showSwalMessage(errorResponse.type, errorResponse.message, errorResponse.icon);
-                        }else {
+                        } else {
                             showSwalMessage('Error', 'Coś poszło nie tak. Spróbuj ponownie.', 'error');
                         }
                     } catch (e) {

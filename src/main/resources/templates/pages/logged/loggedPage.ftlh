@@ -86,7 +86,7 @@
 
         function fetchSuggestions(query) {
             $.ajax({
-                url: '${liveSearchUrl}?query='+ encodeURIComponent(query),
+                url: '/app/auth/meals/search' + '?query='+ encodeURIComponent(query),
                 method: 'GET',
                 success: function (data) {
                     renderSuggestions(data);
