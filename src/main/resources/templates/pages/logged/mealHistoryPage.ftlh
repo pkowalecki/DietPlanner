@@ -1,64 +1,100 @@
 <#include "../../webData/header.ftlh">
-<link rel="stylesheet" href="../../../static/css/mealHistoryPage.css"/>
 <link rel="stylesheet" href="../../../static/css/foodBoardPage.css"/>
-<div class="meal-board-container">
-    <div class="meal-board-table">
-
-        <div class="meal-type-header">Typ</div>
-        <div class="day-name">Poniedziałek</div>
-        <div class="day-short">Pon</div>
-        <div class="day-name">Wtorek</div>
-        <div class="day-short">Wt</div>
-        <div class="day-name">Środa</div>
-        <div class="day-short">Śr</div>
-        <div class="day-name">Czwartek</div>
-        <div class="day-short">Czw</div>
-        <div class="day-name">Piątek</div>
-        <div class="day-short">Pią</div>
-        <div class="day-name">Sobota</div>
-        <div class="day-short">Sob</div>
-        <div class="day-name">Niedziela</div>
-        <div class="day-short">Nie</div>
-        <#list 1..4 as row>
-            <div class="meal-type">
-                <#if row == 1>Śniadanie</#if>
-                <#if row == 2>Przekąska</#if>
-                <#if row == 3>Obiad</#if>
-                <#if row == 4>Kolacja</#if>
+<link rel="stylesheet" href="../../../static/css/foodBoardResult.css"/>
+<div class="meal-form-container">
+    <div class="meal-board-container">
+        <div class="meal-board-table">
+            <#assign idx = 1 />
+            <#assign mealIdx = 0 />
+            <#list days as day>
+                <div class="meal-box" id="day-${idx}" data-day="${day}">
+                    <div class="meal-day">${day}</div>
+                    <div class="meal-content">
+                        <#list 1..4 as type>
+                            <div class="meal-type">
+                                <b>
+                                    <#if type == 1>Śniadanie:</#if>
+                                    <#if type == 2>Przekąska:</#if>
+                                    <#if type == 3>Obiad:</#if>
+                                    <#if type == 4>Kolacja:</#if>
+                                </b>
+                                <#if mealIdx < mealHistory.mealNames?size>
+                                    <span class="meal-text" data-type="${type}">
+                                    ${mealHistory.mealNames[mealIdx]}
+                                </span>
+                                    <input type="hidden" name="meals[${idx}][${type}]" class="meal-id"
+                                           data-type="${type}" value="${mealIdx}">
+                                    <#assign mealIdx = mealIdx + 1 />
+                                <#else>
+                                    <span class="meal-text" data-type="${type}">Brak</span>
+                                    <input type="hidden" name="meals[${idx}][${type}]" class="meal-id"
+                                           data-type="${type}" value="-1">
+                                </#if>
+                            </div>
+                            <hr/>
+                        </#list>
+                    </div>
+                </div>
+                <#assign idx = idx + 1 />
+            </#list>
+        </div>
+    </div>
+    <form action="/app/auth/downloadMealDocument" method="post">
+        <input type="hidden" name="pageId" value="${mealHistory.getDocumentId()}"/>
+        <button type="submit">Pobierz dokument</button>
+    </form>
+    <p class="shopping-list-title">Lista zakupów</p>
+    <#assign id = 1 />
+    <#list mealHistory.getIngredientsToBuy() as toBuy>
+        <div class="ingredients" data-original-parent="ingredients-list" data-original-index="${id - 1}">
+            <input type="checkbox" id="check_${id}" class="checkbox" onclick="toggleIngredient(${id})"/>
+            <div class="ingredient" id="ingredient_${id}">
+                ${toBuy.getName()} ${toBuy.getIngredientAmount()}${toBuy.getIngredientUnit()}
+                <#list toBuy.getMeasurementList() as measurement>
+                    ${measurement.getMeasurementAmount()} ${measurement.getMeasurementUnit()}
+                </#list>
             </div>
-
-                    <#assign mealIndex = (row - 1) * 7>
-                    <#list 1..7 as column>
-                        <div>
-                            <#if (mealHistory.getMealNames()?has_content && mealHistory.getMealNames()?size > mealIndex + (column - 1))>
-                                ${mealHistory.getMealNames()[mealIndex + (column - 1)]}
-                            <#else >
-                                Brak danych
-                            </#if>
-
-                        </div>
-                    </#list>
-            </#list>
-    </div>
-    <div>
-        <span>
-            Przelicznik:
-            <#if mealHistory.getMultiplier()?has_content>
-                ${mealHistory.getMultiplier()}
-            <#else>
-                Brak danych
-            </#if>
-
-            <button type="button">Wygeneruj tabelkę</button>
-        </span>
-    </div>
-    <div>
-        <h2>Lista zakupów</h2>
-        <#if mealHistory.getIngredientsToBuy()?has_content>
-            <#list mealHistory.getIngredientsToBuy() as ingredientToBuy>
-                <p>${ingredientToBuy.getName()} ${ingredientToBuy.getIngredientAmount()}${ingredientToBuy.getIngredientUnit()}</p>
-            </#list>
-        </#if>
-    </div>
+        </div>
+        <#assign id = id + 1/>
+    </#list>
+    <br/>
+    <div id="ingredients-list"></div>
+    <br/>
+    <div class="ingredients-owned"></div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var ingredientsList = document.getElementById('ingredients-list');
+        var ingredients = document.querySelectorAll('.ingredients');
+        ingredients.forEach(function(element) {
+            ingredientsList.appendChild(element);
+        });
+    });
+
+    function toggleIngredient(id) {
+        var checkbox = document.getElementById('check_' + id);
+        var ingredientDiv = document.getElementById('ingredient_' + id).parentElement;
+        var ingredientsOwned = document.querySelector('.ingredients-owned');
+        var ingredientsList = document.getElementById('ingredients-list');
+
+        if (checkbox.checked) {
+            ingredientDiv.classList.add('strike');
+            ingredientsOwned.appendChild(ingredientDiv);
+        } else {
+            ingredientDiv.classList.remove('strike');
+            var originalParentId = ingredientDiv.getAttribute('data-original-parent');
+            var originalIndex = ingredientDiv.getAttribute('data-original-index');
+            var originalParent = document.getElementById(originalParentId);
+
+            if (originalParent) {
+                var referenceNode = originalParent.children[originalIndex];
+                if (referenceNode) {
+                    originalParent.insertBefore(ingredientDiv, referenceNode);
+                } else {
+                    originalParent.appendChild(ingredientDiv);
+                }
+            }
+        }
+    }
+</script>
 <#include "../../webData/footer.ftlh">

@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -14,7 +16,6 @@ public class IngredientToBuy {
     String name;
     String ingredientAmount;
     String ingredientUnit;
-    String measurementAmount;
-    String measurementUnit;
+    private List<MeasurementDTO> measurementList;
 
 }

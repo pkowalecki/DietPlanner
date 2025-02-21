@@ -15,4 +15,5 @@ public class MealHistoryDetailsDTO {
         List<String> mealNames;
         Double multiplier;
         List<IngredientToBuy> ingredientsToBuy;
+        String documentId;
 }

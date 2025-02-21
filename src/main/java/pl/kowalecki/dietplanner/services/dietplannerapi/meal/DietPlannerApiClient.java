@@ -89,14 +89,14 @@ public class DietPlannerApiClient {
 
     }
 
-    public Mono<MealHistoryDetailsDTO> getMealHistoryById(String mealHistoryId) {
-        String url = MEAL_SERVICE_URL+"/meal/getMealHistoryById?meal=" + URLEncoder.encode(mealHistoryId, StandardCharsets.UTF_8);
-        return webClient.get()
-                .uri(url)
+    public Mono<MealHistoryDetailsDTO> getMealHistoryById(String id) {
+        return webClient.post()
+                .uri(MEAL_SERVICE_URL+"/meal/getMealHistoryById")
+                .bodyValue(id)
                 .retrieve()
-                .bodyToMono(MealHistoryDetailsDTO.class)
-                .onErrorReturn(new MealHistoryDetailsDTO());
+                .bodyToMono(MealHistoryDetailsDTO.class);
     }
+
 
     public Mono<PageResponse<MealMainInfoDTO>> getPageMeals(int page, int size, String mealType) {
         String url = MEAL_SERVICE_URL + "/meal/getMealsData?page=" + page + "&size=" + size + "&mealType=" + mealType;

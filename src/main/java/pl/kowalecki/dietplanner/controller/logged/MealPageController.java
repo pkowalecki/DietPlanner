@@ -208,13 +208,13 @@ public class MealPageController {
     }
 
     @PostMapping(value = "/mealHistory")
-    public Mono<String> getMealHistoryPage(@RequestParam("id") String param, Model model, HttpServletRequest request, HttpServletResponse response, InputStream inputStream) {
+    public Mono<String> getMealHistoryPage(@RequestParam("id") String param, Model model) {
         return apiMealService.getMealHistoryById(param)
                 .map(mealHistory -> {
+                    model.addAttribute("days", DateUtils.getDaysOfWeek());
                     model.addAttribute("mealHistory", mealHistory);
                     return "pages/logged/mealHistoryPage";
                 });
-        //TODO DAĆ TU RETURNA JAKIEGOŚ FAJNEGO.
 
     }
 
