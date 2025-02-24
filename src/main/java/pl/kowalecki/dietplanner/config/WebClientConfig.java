@@ -7,12 +7,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.reactive.function.client.ClientRequest;
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import pl.kowalecki.dietplanner.exception.UnauthorizedException;
 import pl.kowalecki.dietplanner.utils.CookieUtils;
+import reactor.core.publisher.Mono;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Slf4j
 @Configuration
@@ -24,41 +30,68 @@ public class WebClientConfig {
     @Bean
     public WebClient webClient(WebClient.Builder webClientBuilder) {
         return webClientBuilder
-                .filter((request, next) -> {
-
-                    HttpServletRequest httpRequest =
-                            ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-                    HttpServletResponse httpResponse =
-                            ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
-
-                    String accessToken = cookieUtils.extractJwtokenFromAccessCookie(httpRequest);
-                    String refreshToken = cookieUtils.extractRefreshTokenFromRefreshCookie(httpRequest);
-
-                    if (accessToken == null && refreshToken == null) {
-                        throw new UnauthorizedException("Authorization failed. Please log in.");
-                    }
-
-                    ClientRequest.Builder requestBuilder = ClientRequest.from(request);
-
-                    if (accessToken != null) {
-                        requestBuilder.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
-                    } else {
-                        requestBuilder.header("X-Refresh-Token", refreshToken);
-                    }
-
-                    return next.exchange(requestBuilder.build())
-                            .doOnSuccess(clientResponse -> {
-                                if (accessToken == null) {
-                                    String newAccessToken = clientResponse.headers()
-                                            .asHttpHeaders()
-                                            .getFirst(HttpHeaders.AUTHORIZATION);
-
-                                    if (newAccessToken != null) {
-                                        cookieUtils.setAccessTokenCookie(httpResponse, newAccessToken.replace("Bearer ", ""), 15 * 60);
-                                    }
-                                }
-                            });
-                })
+                .filter(authorizationFilter())
+                .filter(errorHandlingFilter())
                 .build();
+    }
+
+    private ExchangeFilterFunction authorizationFilter() {
+        return (request, next) -> {
+            HttpServletRequest httpRequest =
+                    ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            HttpServletResponse httpResponse =
+                    ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+
+            String accessToken = cookieUtils.extractJwtokenFromAccessCookie(httpRequest);
+            String refreshToken = cookieUtils.extractRefreshTokenFromRefreshCookie(httpRequest);
+
+            if (accessToken == null && refreshToken == null) {
+                throw new UnauthorizedException("Authorization failed. Please log in.");
+            }
+
+            ClientRequest.Builder requestBuilder = ClientRequest.from(request);
+
+            if (accessToken != null) {
+                requestBuilder.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
+            } else {
+                requestBuilder.header("X-Refresh-Token", refreshToken);
+            }
+
+            return next.exchange(requestBuilder.build())
+                    .doOnSuccess(clientResponse -> {
+                        if (accessToken == null) {
+                            String newAccessToken = clientResponse.headers()
+                                    .asHttpHeaders()
+                                    .getFirst(HttpHeaders.AUTHORIZATION);
+
+                            if (newAccessToken != null) {
+                                cookieUtils.setAccessTokenCookie(httpResponse, newAccessToken.replace("Bearer ", ""), 15 * 60);
+                            }
+                        }
+                    });
+        };
+    }
+
+    private ExchangeFilterFunction errorHandlingFilter() {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return ExchangeFilterFunction.ofResponseProcessor(clientResponse -> {
+            String timestamp = LocalDateTime.now().format(dtf);
+            if (clientResponse.statusCode().equals(HttpStatus.UNAUTHORIZED)) {
+                return clientResponse.bodyToMono(String.class)
+                        .defaultIfEmpty("Brak dodatkowych informacji")
+                        .flatMap(errorBody -> {
+                            log.error("[{}] Unauthorized access: {}", timestamp, errorBody);
+                            return Mono.error(new UnauthorizedException("Sesja wygasła. Proszę się ponownie zalogować."));
+                        });
+            } else if (clientResponse.statusCode().isError()) {
+                return clientResponse.bodyToMono(String.class)
+                        .defaultIfEmpty("Brak dodatkowych informacji")
+                        .flatMap(errorBody -> {
+                            log.error("[{}] Server error: {}", timestamp, errorBody);
+                            return Mono.error(new RuntimeException("Wystąpił błąd serwera. Proszę spróbować ponownie później."));
+                        });
+            }
+            return Mono.just(clientResponse);
+        });
     }
 }

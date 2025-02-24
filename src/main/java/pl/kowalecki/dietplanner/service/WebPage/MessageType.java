@@ -1,4 +1,4 @@
-package pl.kowalecki.dietplanner.services.WebPage;
+package pl.kowalecki.dietplanner.service.WebPage;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

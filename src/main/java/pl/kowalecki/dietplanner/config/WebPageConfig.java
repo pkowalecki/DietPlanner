@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
 
 import java.io.IOException;
 
@@ -15,15 +14,11 @@ import java.io.IOException;
 @Slf4j
 public class WebPageConfig {
 
-    @Autowired
-    IWebPageService webPageService;
 
     @ModelAttribute
     public void insertPageAttributes(Model model, HttpServletRequest request, HttpServletResponse response) throws IOException {
         //Insertuje wszystkie dane które page wymaga.
         try{
-            model.addAttribute("errors", webPageService.getErrors());
-            model.addAttribute("errorsList", webPageService.getErrorsAsList());
 
         } catch (Throwable e) {
             log.error(e.getMessage());

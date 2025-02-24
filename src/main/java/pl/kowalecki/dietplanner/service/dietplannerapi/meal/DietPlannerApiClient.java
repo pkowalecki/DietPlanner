@@ -1,4 +1,4 @@
-package pl.kowalecki.dietplanner.services.dietplannerapi.meal;
+package pl.kowalecki.dietplanner.service.dietplannerapi.meal;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +17,6 @@ import pl.kowalecki.dietplanner.model.DTO.meal.*;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static pl.kowalecki.dietplanner.utils.UrlTools.MEAL_SERVICE_URL;

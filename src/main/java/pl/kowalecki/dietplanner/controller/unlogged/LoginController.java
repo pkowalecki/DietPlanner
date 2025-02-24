@@ -9,7 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import pl.kowalecki.dietplanner.model.DTO.User.LoginRequest;
-import pl.kowalecki.dietplanner.services.loginService.AuthService;
+import pl.kowalecki.dietplanner.client.auth.AuthClient;
 import pl.kowalecki.dietplanner.utils.CookieUtils;
 import reactor.core.publisher.Mono;
 
@@ -22,7 +22,7 @@ import java.util.Map;
 public class LoginController {
 
     private final CookieUtils cookieUtils;
-    private final AuthService loginService;
+    private final AuthClient loginService;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String index(@RequestParam(value = "sessionExpired", required = false) String sessionExpired, Model model) {

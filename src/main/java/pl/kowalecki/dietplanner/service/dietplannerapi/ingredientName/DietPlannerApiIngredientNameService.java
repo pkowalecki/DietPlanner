@@ -1,4 +1,4 @@
-package pl.kowalecki.dietplanner.services.dietplannerapi.ingredientName;
+package pl.kowalecki.dietplanner.service.dietplannerapi.ingredientName;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;

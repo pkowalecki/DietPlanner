@@ -1,4 +1,4 @@
-package pl.kowalecki.dietplanner.services.dietplannerapi.meal;
+package pl.kowalecki.dietplanner.service.dietplannerapi.meal;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;

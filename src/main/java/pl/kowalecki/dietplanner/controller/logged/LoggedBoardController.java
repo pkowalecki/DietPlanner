@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import pl.kowalecki.dietplanner.UrlBuilder;
 import pl.kowalecki.dietplanner.model.DTO.PageResponse;
 import pl.kowalecki.dietplanner.model.DTO.meal.MealMainInfoDTO;
-import pl.kowalecki.dietplanner.services.dietplannerapi.meal.DietPlannerApiClient;
+import pl.kowalecki.dietplanner.service.dietplannerapi.meal.DietPlannerApiClient;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;

@@ -14,10 +14,9 @@ import pl.kowalecki.dietplanner.controller.helper.AddMealHelper;
 import pl.kowalecki.dietplanner.model.DTO.*;
 import pl.kowalecki.dietplanner.model.DTO.meal.AddMealRequestDTO;
 import pl.kowalecki.dietplanner.model.Meal;
-import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
-import pl.kowalecki.dietplanner.services.WebPage.MessageType;
-import pl.kowalecki.dietplanner.services.dietplannerapi.meal.DietPlannerApiClient;
-import pl.kowalecki.dietplanner.services.document.DocumentService;
+import pl.kowalecki.dietplanner.service.WebPage.MessageType;
+import pl.kowalecki.dietplanner.service.dietplannerapi.meal.DietPlannerApiClient;
+import pl.kowalecki.dietplanner.service.document.DocumentService;
 import pl.kowalecki.dietplanner.utils.DateUtils;
 import pl.kowalecki.dietplanner.utils.MapUtils;
 import pl.kowalecki.dietplanner.utils.TextTools;
@@ -25,7 +24,6 @@ import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,7 +36,6 @@ public class MealPageController {
 
     DietPlannerApiClient apiMealService;
     AddMealHelper addMealHelper;
-    IWebPageService webPageService;
 
     @GetMapping(value = "/addMeal")
     public Mono<String> getListMeal(Model model, HttpServletRequest request, HttpServletResponse httpResponse) {

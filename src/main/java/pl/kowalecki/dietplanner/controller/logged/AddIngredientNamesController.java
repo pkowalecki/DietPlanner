@@ -9,9 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import pl.kowalecki.dietplanner.UrlBuilder;
 import pl.kowalecki.dietplanner.controller.helper.IngredientNamesHelper;
 import pl.kowalecki.dietplanner.model.ingredient.IngredientName;
-import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
-import pl.kowalecki.dietplanner.services.WebPage.MessageType;
-import pl.kowalecki.dietplanner.services.dietplannerapi.ingredientName.DietPlannerApiIngredientNameService;
+import pl.kowalecki.dietplanner.service.WebPage.MessageType;
+import pl.kowalecki.dietplanner.service.dietplannerapi.ingredientName.DietPlannerApiIngredientNameService;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -26,7 +25,6 @@ public class AddIngredientNamesController {
 
     private final DietPlannerApiIngredientNameService apiClient;
     private final IngredientNamesHelper ingredientNamesHelper;
-    private final IWebPageService webPageService;
 
     @GetMapping(value = "/addIngredient")
     public String addIngredientPage(Model model) {

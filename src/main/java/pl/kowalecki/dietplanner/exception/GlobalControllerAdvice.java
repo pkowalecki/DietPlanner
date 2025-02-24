@@ -10,12 +10,16 @@ import org.springframework.web.reactive.function.client.WebClientException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 @ControllerAdvice
 @Slf4j
 @AllArgsConstructor
 public class GlobalControllerAdvice {
+
+    private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @ExceptionHandler(IllegalArgumentException.class)
     public String handleIllegalArgumentException(IllegalArgumentException e, Model model, HttpServletRequest request) {
@@ -28,14 +32,14 @@ public class GlobalControllerAdvice {
     }
 
     private String handleError(Exception e, Model model, HttpServletRequest request, String userMessage) {
+        String timestamp = LocalDateTime.now().format(dtf);
         Map<String, String[]> parameters = request.getParameterMap();
         String requestURI = request.getRequestURI();
-        String errorMessage = userMessage + " (URL: " + requestURI + ")";
+        String errorMessage = String.format("[%s] %s (URL: %s)", timestamp, userMessage, requestURI);
         if (!parameters.isEmpty()) {
             errorMessage += " Parametry: " + parameters.toString();
         }
-        log.error(e.getMessage(), e);
-        log.error(errorMessage);
+        log.error(errorMessage, e);
         model.addAttribute("error", userMessage);
         model.addAttribute("logged", false);
         return "pages/unlogged/errorPage";
@@ -43,10 +47,12 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler(WebClientException.class)
     public String handleWebClientException(Exception e, Model model, HttpServletRequest request) {
-        log.error("WebClient error at {}: {}", request.getRequestURI(), e.getMessage(), e);
+        String timestamp = LocalDateTime.now().format(dtf);
+        String requestURI = request.getRequestURI();
+        log.error("[{}] WebClient error at {}: {}", timestamp, requestURI, e.getMessage(), e);
 
         if (e instanceof WebClientResponseException.Unauthorized) {
-            log.warn("Session expired or unauthorized access detected.");
+            log.warn("[{}] Session expired or unauthorized access detected.", timestamp);
             return "redirect:/?sessionExpired=true";
         }
 

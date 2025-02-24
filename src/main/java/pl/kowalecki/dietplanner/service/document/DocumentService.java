@@ -1,9 +1,7 @@
-package pl.kowalecki.dietplanner.services.document;
+package pl.kowalecki.dietplanner.service.document;
 
 import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

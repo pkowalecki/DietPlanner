@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.Set;
 
 @Getter
 @Setter
@@ -17,6 +16,5 @@ public class RegistrationRequestDTO {
     private String emailReg;
     private String passwordReg;
     private String passwordReg2;
-    private Set<String> role;
 
 }

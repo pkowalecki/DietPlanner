@@ -12,8 +12,6 @@ import java.util.*;
 @AllArgsConstructor
 public class RegisterHelper {
 
-
-
     static Map<String, String> errors;
 
     public Map<String, String> checkRegistrationData(RegistrationRequestDTO registrationRequest) {
@@ -28,37 +26,35 @@ public class RegisterHelper {
 
     private void checkNickname(String nickname) {
         if (!TextTools.isTextLengthOk(nickname, 5, 50)) {
-            errors.put(RegisterPole.NICKNAME.getFieldName(), "Length must be between 5-50");
+            errors.put(RegisterPole.NICKNAME.getFieldName(), "Długość musi być między 5 a 50 znaków");
         }
     }
 
     private void checkUserName(String userName) {
         if (!userName.equals("") && !TextTools.isTextLengthOk(userName, 5, 50)) {
-            errors.put(RegisterPole.NAME.getFieldName(), "Length must be between 5-50");
+            errors.put(RegisterPole.NAME.getFieldName(), "Długość musi być między 5 a 50 znaków");
         }
     }
 
     private void checkSurname(String surname) {
         if (!surname.equals("") && !TextTools.isTextLengthOk(surname, 5, 50)) {
-            errors.put(RegisterPole.SURNAME.getFieldName(), "Length must be between 5-50");
+            errors.put(RegisterPole.SURNAME.getFieldName(), "Długość musi być między 5 a 50 znaków");
         }
     }
 
     private void checkEmail(String email) {
         if (!TextTools.isTextLengthOk(email, 5, 50)) {
-            errors.put(RegisterPole.EMAIL.getFieldName(), "Length must be between 5-50");;
+            errors.put(RegisterPole.EMAIL.getFieldName(), "Długość musi być między 5 a 50 znaków");
         }
-        //TODO TO ROBI API
-//        if (userService.existsUserByEmail(email)) errors.put(RegisterPole.EMAIL.getFieldName(), "Email address already exists");
     }
 
     private void checkPassword(String password, String password2) {
         if (!password.equals(password2)) {
-            errors.put(RegisterPole.PASSWORD2.getFieldName(), "Password not mach");
+            errors.put(RegisterPole.PASSWORD2.getFieldName(), "Hasła nie są zgodne");
             return;
         }
         if (!TextTools.passwordPatternValidate(password))
-            errors.put(RegisterPole.PASSWORD.getFieldName(), "Pattern not match");
+            errors.put(RegisterPole.PASSWORD.getFieldName(), "Hasło nie spełnia wymagań");
     }
 
 }
