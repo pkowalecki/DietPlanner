@@ -11,8 +11,7 @@
 <div class="container-fluid">
     <div class="center-content">
         <img class="row g-3" src="../../../static/images/recipe-book-svgrepo-com.svg" alt="Happy book SVG">
-        <form class="row g-3 login-form" style="padding-left: 42px; padding-right: 42px;" method="POST" name="loginForm"
-              action="/app/login">
+        <form class="row g-3 login-form" style="padding-left: 42px; padding-right: 42px;" id="loginForm">
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="email" name="email" placeholder="User email"
@@ -27,7 +26,7 @@
                 <a id="registerBtn" href="#">Create account</a>
             </div>
             <div class="d-grid gap-2">
-                <button type="submit" class="btn btn-primary btn-block">Login</button>
+                <button type="submit" class="btn btn-primary btn-block">Zaloguj</button>
             </div>
         </form>
     </div>
@@ -107,6 +106,7 @@
             $("#registerModal").modal("hide");
         });
 
+
         $(document).on('submit', '#registerForm', function (e) {
             e.preventDefault();
             $(".error-message").text("");
@@ -137,6 +137,32 @@
                         showSwalMessage("Sukces", response.message, response.icon);
                         $('#registerModal').modal('hide');
                         $('#registerForm')[0].reset();
+                    } else if (response.status === 'ERROR') {
+                        showSwalMessage("Błąd", response.message, response.icon);
+                    }
+                },
+                error: function () {
+                    showSwalMessage('Błąd', 'Wystąpił nieoczekiwany błąd', 'error');
+                }
+            });
+        });
+
+        $(document).on('submit', '#loginForm', function (e) {
+            e.preventDefault();
+
+            var formData = {
+                email: $('#email').val(),
+                password: $('#password').val(),
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: '/login',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function (response) {
+                    if (response.status === 'REDIRECT' && response.redirectUrl) {
+                        window.location.href=response.redirectUrl;
                     } else if (response.status === 'ERROR') {
                         showSwalMessage("Błąd", response.message, response.icon);
                     }
