@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=0.9">
-<#include "../../webData/starter.ftlh">
-<link rel="stylesheet" href="../../../static/css/loginPage.css"/>
+    <#include "../../webData/starter.ftlh">
+    <#include "../../webData/swalAlert.ftlh">
+    <link rel="stylesheet" href="../../../static/css/loginPage.css"/>
 </head>
 <div class="container-fluid">
     <div class="center-content">
@@ -32,36 +33,6 @@
     </div>
     <div id="registerModalContainer"></div>
 </div>
-
-<#if error?? && error != "">
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var swalContent = {};
-            swalContent = {
-                title: "Error",
-                text: '${error}',
-                icon: "error",
-                confirmButtonColor: "#052d73"
-            };
-            Swal.fire(swalContent);
-        });
-    </script>
-</#if>
-<#if sessionExpired?? && sessionExpired == true>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var swalContent = {};
-            swalContent = {
-                title: "Error",
-                text: 'Twoja sesja wygasła. Proszę zaloguj się ponownie',
-                icon: "error",
-                confirmButtonColor: "#052d73"
-            };
-            Swal.fire(swalContent);
-        });
-    </script>
-</#if>
-
 <script>
     function setupPasswordStrengthIndicator() {
         let pswd = document.getElementById("passwordReg");
@@ -117,7 +88,7 @@
         $("#registerBtn").click(function (e) {
             e.preventDefault();
             $.ajax({
-                url: '/app/registerModal',
+                url: '/registerModal',
                 method: 'GET',
                 success: function (response) {
                     $('#registerModalContainer').html(response);
@@ -126,7 +97,7 @@
                     setupPasswordStrengthIndicator();
                 },
                 error: function () {
-                    alert('Failed to load registration modal.');
+                    showSwalMessage('Błąd', 'Nie udało się załadować okna rejestracji', 'error');
                 }
             });
         });
@@ -152,24 +123,26 @@
 
             $.ajax({
                 type: 'POST',
-                url: '/app/register',
+                url: '/register',
                 contentType: 'application/json',
                 data: JSON.stringify(formData),
                 success: function (response) {
-                    if (response.status === 'BAD_DATA') {
-                        var errors = response.data;
+                    if (response.status === 'ERROR' && response.additionalData) {
+                        var errors = response.additionalData;
                         for (var field in errors) {
                             $('#' + field + 'Error').text(errors[field]);
                             $('#' + field).addClass('is-invalid');
                         }
-                    } else if (response.status === 'OK') {
-                        alert(response.message);
+                    } else if (response.status === 'SUCCESS') {
+                        showSwalMessage("Sukces", response.message, response.icon);
                         $('#registerModal').modal('hide');
                         $('#registerForm')[0].reset();
+                    } else if (response.status === 'ERROR') {
+                        showSwalMessage("Błąd", response.message, response.icon);
                     }
                 },
                 error: function () {
-                    alert('An error occurred while processing your request.');
+                    showSwalMessage('Błąd', 'Wystąpił nieoczekiwany błąd', 'error');
                 }
             });
         });

@@ -2,7 +2,6 @@ package pl.kowalecki.dietplanner.client.auth;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -32,12 +31,11 @@ public class AuthClient {
                 .toEntity(new ParameterizedTypeReference<>() {});
     }
 
-    public Mono<HttpStatusCode> registerUser(RegistrationRequestDTO registerRequest) {
+    public Mono<ResponseEntity<String>> registerUser(RegistrationRequestDTO registerRequest) {
         return webClient.post()
                 .uri("/register")
                 .bodyValue(registerRequest)
                 .retrieve()
-                .toBodilessEntity()
-                .map(ResponseEntity::getStatusCode);
+                .toEntity(new ParameterizedTypeReference<>() {});
     }
 }

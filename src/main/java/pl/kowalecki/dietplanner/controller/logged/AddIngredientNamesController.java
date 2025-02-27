@@ -33,24 +33,25 @@ public class AddIngredientNamesController {
         return ADD_INGREDIENT_VIEW;
     }
 
-    @PostMapping(value = "/addIngredientName")
-    public Mono<ResponseEntity<Map<String,String>>> addIngredient(@RequestBody IngredientName ingredientName){
-        Map<String, String> errors = ingredientNamesHelper.checkIngredients(ingredientName);
-        if(!errors.isEmpty()){
-            return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors));
-        }
-        return apiClient.addIngredientName(ingredientName).flatMap(
-                response -> {
-                    if (response.getStatusCode().is2xxSuccessful()){
-                        return Mono.just(ResponseEntity.status(HttpStatus.OK).body(webPageService.addMessageToPage(MessageType.SUCCESS, "Składnik został dodany")));
-                    }else if(response.getStatusCode().is4xxClientError()) {
-                        return Mono.just(ResponseEntity.status(response.getStatusCode()).body(webPageService.addMessageToPage( MessageType.ERROR, "Nie udało się dodać składnika.")));
-                    }else{
-                        return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(webPageService.addMessageToPage(MessageType.ERROR, "Wystąpił nieoczekiwany błąd serwera")));
-                    }
-                })
-            .onErrorResume(error -> Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(webPageService.addMessageToPage(MessageType.ERROR, "Wystąpił nieoczekiwany błąd serwera"))));
-    }
+    //fixme
+//    @PostMapping(value = "/addIngredientName")
+//    public Mono<ResponseEntity<Map<String,String>>> addIngredient(@RequestBody IngredientName ingredientName){
+//        Map<String, String> errors = ingredientNamesHelper.checkIngredients(ingredientName);
+//        if(!errors.isEmpty()){
+//            return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors));
+//        }
+//        return apiClient.addIngredientName(ingredientName).flatMap(
+//                response -> {
+//                    if (response.getStatusCode().is2xxSuccessful()){
+//                        return Mono.just(ResponseEntity.status(HttpStatus.OK).body(webPageService.addMessageToPage(MessageType.SUCCESS, "Składnik został dodany")));
+//                    }else if(response.getStatusCode().is4xxClientError()) {
+//                        return Mono.just(ResponseEntity.status(response.getStatusCode()).body(webPageService.addMessageToPage( MessageType.ERROR, "Nie udało się dodać składnika.")));
+//                    }else{
+//                        return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(webPageService.addMessageToPage(MessageType.ERROR, "Wystąpił nieoczekiwany błąd serwera")));
+//                    }
+//                })
+//            .onErrorResume(error -> Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(webPageService.addMessageToPage(MessageType.ERROR, "Wystąpił nieoczekiwany błąd serwera"))));
+//    }
 
     @GetMapping("/ingredientNames/search")
     @ResponseBody

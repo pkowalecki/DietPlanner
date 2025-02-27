@@ -1,14 +1,6 @@
 <footer id="footer">
+    <#include "swalAlert.ftlh">
     <script>
-        function showSwalMessage(type, message, icon) {
-            Swal.fire({
-                title: type,
-                text: message,
-                icon: icon,
-                confirmButtonColor: "#052d73"
-            });
-        }
-
         function ajaxCall(url, method, contentType, data, shouldReloadOnSuccess = false) {
             $.ajax({
                 url: url,
@@ -45,18 +37,6 @@
                 }
             });
         }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            <#if webMsg?? && webMsg?has_content>
-            var swalContent = {
-                title: '${webMsg.type?capitalize}',
-                text: '${webMsg.message}',
-                icon: '${webMsg.icon}',
-                confirmButtonColor: "#052d73"
-            };
-            showSwalMessage(swalContent.title, swalContent.text, swalContent.icon);
-            </#if>
-        });
 
         function handleFieldErrors(errors) {
             $('.text-danger').text('');

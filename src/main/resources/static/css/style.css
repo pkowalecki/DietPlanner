@@ -132,7 +132,7 @@ footer {
 .modal {
     display: none;
     position: fixed;
-    z-index: 1;
+    z-index: 1050;
     left: 0;
     top: 0;
     width: 100%;
@@ -146,6 +146,7 @@ footer {
     margin: 15% auto;
     padding: 20px;
     border: 1px solid #888;
+    z-index: 1060;
 }
 
 @media (min-width: 576px) {

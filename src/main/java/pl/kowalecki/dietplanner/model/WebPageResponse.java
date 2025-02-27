@@ -8,10 +8,10 @@ import java.util.Map;
 
 @Data
 @Builder
-public class CustomResponse {
+public class WebPageResponse {
     private ActionType status;
     private String message;
     private String icon;
     private String redirectUrl;
-    private Map<String, Object> additionalData;
+    private Map<String, String> additionalData;
 }

@@ -14,17 +14,23 @@ import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import pl.kowalecki.dietplanner.exception.UnauthorizedException;
+import pl.kowalecki.dietplanner.model.ClientErrorResponse;
+import pl.kowalecki.dietplanner.model.WebPageResponse;
+import pl.kowalecki.dietplanner.service.WebPage.IWebPageResponseBuilder;
 import pl.kowalecki.dietplanner.utils.CookieUtils;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Configuration
 @AllArgsConstructor
 public class WebClientConfig {
 
+    private final IWebPageResponseBuilder webResponse;
     private final CookieUtils cookieUtils;
 
     @Bean
@@ -74,21 +80,30 @@ public class WebClientConfig {
 
     private ExchangeFilterFunction errorHandlingFilter() {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
         return ExchangeFilterFunction.ofResponseProcessor(clientResponse -> {
             String timestamp = LocalDateTime.now().format(dtf);
+
             if (clientResponse.statusCode().equals(HttpStatus.UNAUTHORIZED)) {
-                return clientResponse.bodyToMono(String.class)
-                        .defaultIfEmpty("Brak dodatkowych informacji")
+                return clientResponse.bodyToMono(ClientErrorResponse.class)
+                        .onErrorResume(e -> Mono.just(new ClientErrorResponse("Sesja wygasła", "Unauthorized", 401, "gateway", clientResponse.request().getURI().toString(), timestamp)))
                         .flatMap(errorBody -> {
-                            log.error("[{}] Unauthorized access: {}", timestamp, errorBody);
-                            return Mono.error(new UnauthorizedException("Sesja wygasła. Proszę się ponownie zalogować."));
+                            log.error("[{}] Unauthorized access: {}", timestamp, errorBody.getMessage());
+                            WebPageResponse response = webResponse.buildRedirect("/app/login?sessionExpired=true");
+                            return Mono.error(new UnauthorizedException(response.getMessage()));
                         });
             } else if (clientResponse.statusCode().isError()) {
-                return clientResponse.bodyToMono(String.class)
-                        .defaultIfEmpty("Brak dodatkowych informacji")
+                return clientResponse.bodyToMono(ClientErrorResponse.class)
+                        .onErrorResume(e -> Mono.just(new ClientErrorResponse("Wystąpił błąd serwera", "ServerError", 500, "unknown", clientResponse.request().getURI().toString(), timestamp)))
                         .flatMap(errorBody -> {
-                            log.error("[{}] Server error: {}", timestamp, errorBody);
-                            return Mono.error(new RuntimeException("Wystąpił błąd serwera. Proszę spróbować ponownie później."));
+                            log.error("[{}] Server error from {}: {} ({}). Requested URL: {}", timestamp, errorBody.getServiceName(), errorBody.getMessage(), errorBody.getStatusCode(), errorBody.getRequestedUrl());
+
+                            Map<String, String> additionalData = new HashMap<>();
+                            additionalData.put("serviceName", errorBody.getServiceName());
+                            additionalData.put("requestedUrl", errorBody.getRequestedUrl());
+
+                            WebPageResponse response = webResponse.buildErrorWithFields(additionalData);
+                            return Mono.error(new RuntimeException(response.getMessage()));
                         });
             }
             return Mono.just(clientResponse);

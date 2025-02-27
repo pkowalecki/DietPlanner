@@ -19,7 +19,7 @@ import java.io.IOException;
 public class CookieRequestFilter extends OncePerRequestFilter {
 
     private final CookieUtils cookieUtils;
-    private final RouteUtils routeUtils;;
+    private final RouteUtils routeUtils;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)

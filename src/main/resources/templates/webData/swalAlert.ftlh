@@ -1,14 +1,10 @@
-<#if webMsg?? && webMsg?has_content>
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var swalContent = {};
-        swalContent = {
-            title: '${webMsg.type?capitalize}',
-            text: '${webMsg.message}',
-            icon: '${webMsg.icon}',
+<script>
+    function showSwalMessage(type, message, icon) {
+        Swal.fire({
+            title: type,
+            text: message,
+            icon: icon,
             confirmButtonColor: "#052d73"
-        };
-        Swal.fire(swalContent);
-    });
+        });
+    }
 </script>
-</#if>
