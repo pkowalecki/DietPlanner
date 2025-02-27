@@ -9,19 +9,20 @@ import java.util.Map;
 public class WebPageResponseBuilderImpl implements IWebPageResponseBuilder {
 
     @Override
-    public WebPageResponse buildRedirect(String url) {
-        return WebPageResponse.builder()
-                .status(ActionType.REDIRECT)
-                .redirectUrl(url)
-                .build();
+    public WebPageResponse buildRedirect(String url){
+        return createRedirect(url, "");
+    }
+    @Override
+    public WebPageResponse buildRedirect(String url, String message){
+        return createRedirect(url, message);
     }
 
     @Override
     public WebPageResponse buildMessage(String message, boolean success) {
         return WebPageResponse.builder()
-                .status(success?ActionType.SUCCESS:ActionType.MESSAGE)
+                .status(success ? ActionType.SUCCESS : ActionType.MESSAGE)
                 .message(message)
-                .icon(success?"success":"info")
+                .icon(success ? "success" : "info")
                 .build();
     }
 
@@ -40,5 +41,20 @@ public class WebPageResponseBuilderImpl implements IWebPageResponseBuilder {
                 .status(ActionType.ERROR)
                 .additionalData(additionalData)
                 .build();
+    }
+
+    private WebPageResponse createRedirect(String url, String message) {
+        if (message != null && !message.isEmpty()) {
+            return WebPageResponse.builder()
+                    .status(ActionType.REDIRECT)
+                    .redirectUrl(url)
+                    .message(message)
+                    .build();
+        } else {
+            return WebPageResponse.builder()
+                    .status(ActionType.REDIRECT)
+                    .redirectUrl(url)
+                    .build();
+        }
     }
 }

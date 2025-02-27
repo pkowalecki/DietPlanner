@@ -38,4 +38,10 @@ public class AuthClient {
                 .retrieve()
                 .toEntity(new ParameterizedTypeReference<>() {});
     }
+    public Mono<ResponseEntity<String>> confirmRegistration(String token){
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder.path("/confirm").queryParam("token", token).build())
+                .retrieve()
+                .toEntity(String.class);
+    }
 }

@@ -22,6 +22,11 @@ public class GlobalControllerAdvice {
 
     private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+    @ExceptionHandler(ClientErrorException.class)
+    public String handleClientErrorException(ClientErrorException e, Model model, HttpServletRequest request) {
+        return handleError(e, model, request, "Wystąpił błąd żądania: " + e.getMessage());
+    }
+
     @ExceptionHandler({ IllegalArgumentException.class, Exception.class })
     public String handleGenericException(Exception e, Model model, HttpServletRequest request) {
         return handleError(e, model, request, "Wystąpił nieoczekiwany błąd.");
