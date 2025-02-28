@@ -12,53 +12,51 @@ import java.util.*;
 @AllArgsConstructor
 public class RegisterHelper {
 
-
-
-    static Map<String, String> errors;
-
     public Map<String, String> checkRegistrationData(RegistrationRequestDTO registrationRequest) {
-        errors = new HashMap<>();
-        checkNickname(registrationRequest.getNickname());
-        checkUserName(registrationRequest.getName());
-        checkSurname(registrationRequest.getSurname());
-        checkEmail(registrationRequest.getEmailReg());
-        checkPassword(registrationRequest.getPasswordReg(), registrationRequest.getPasswordReg2());
+        Map<String, String> errors = new HashMap<>();
+        checkNickname(registrationRequest.getNickname(), errors);
+        checkUserName(registrationRequest.getName(), errors);
+        checkSurname(registrationRequest.getSurname(), errors);
+        checkEmail(registrationRequest.getEmailReg(), errors);
+        checkPassword(registrationRequest.getPasswordReg(), registrationRequest.getPasswordReg2(), errors);
         return errors;
     }
 
-    private void checkNickname(String nickname) {
+    private void checkNickname(String nickname, Map<String, String> errors) {
         if (!TextTools.isTextLengthOk(nickname, 5, 50)) {
-            errors.put(RegisterPole.NICKNAME.getFieldName(), "Length must be between 5-50");
+            errors.put(RegisterPole.NICKNAME.getFieldName(), "Długość musi być między 5 a 50 znaków");
         }
     }
 
-    private void checkUserName(String userName) {
-        if (!userName.equals("") && !TextTools.isTextLengthOk(userName, 5, 50)) {
-            errors.put(RegisterPole.NAME.getFieldName(), "Length must be between 5-50");
+    private void checkUserName(String userName, Map<String, String> errors) {
+        if (!TextTools.isTextLengthOk(userName, 5, 50)) {
+            errors.put(RegisterPole.NAME.getFieldName(), "Długość musi być między 5 a 50 znaków");
         }
     }
 
-    private void checkSurname(String surname) {
-        if (!surname.equals("") && !TextTools.isTextLengthOk(surname, 5, 50)) {
-            errors.put(RegisterPole.SURNAME.getFieldName(), "Length must be between 5-50");
+    private void checkSurname(String surname, Map<String, String> errors) {
+        if (!TextTools.isTextLengthOk(surname, 5, 50)) {
+            errors.put(RegisterPole.SURNAME.getFieldName(), "Długość musi być między 5 a 50 znaków");
         }
     }
 
-    private void checkEmail(String email) {
+    private void checkEmail(String email, Map<String, String> errors) {
         if (!TextTools.isTextLengthOk(email, 5, 50)) {
-            errors.put(RegisterPole.EMAIL.getFieldName(), "Length must be between 5-50");;
+            errors.put(RegisterPole.EMAIL.getFieldName(), "Długość musi być między 5 a 50 znaków");
         }
-        //TODO TO ROBI API
-//        if (userService.existsUserByEmail(email)) errors.put(RegisterPole.EMAIL.getFieldName(), "Email address already exists");
     }
 
-    private void checkPassword(String password, String password2) {
-        if (!password.equals(password2)) {
-            errors.put(RegisterPole.PASSWORD2.getFieldName(), "Password not mach");
+    private void checkPassword(String password, String password2, Map<String, String> errors) {
+        if (password == null || password2 == null){
+            errors.put(RegisterPole.PASSWORD.getFieldName(), "Hasło nie spełnia wymagań");
             return;
         }
-        if (!TextTools.passwordPatternValidate(password))
-            errors.put(RegisterPole.PASSWORD.getFieldName(), "Pattern not match");
+        if (!password.equals(password2)) {
+            errors.put(RegisterPole.PASSWORD2.getFieldName(), "Hasła nie są zgodne");
+            return;
+        }
+        if (!TextTools.passwordPatternValidate(password)) {
+            errors.put(RegisterPole.PASSWORD.getFieldName(), "Hasło nie spełnia wymagań");
+        }
     }
-
 }

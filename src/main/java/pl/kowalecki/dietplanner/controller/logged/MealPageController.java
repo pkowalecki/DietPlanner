@@ -14,10 +14,9 @@ import pl.kowalecki.dietplanner.controller.helper.AddMealHelper;
 import pl.kowalecki.dietplanner.model.DTO.*;
 import pl.kowalecki.dietplanner.model.DTO.meal.AddMealRequestDTO;
 import pl.kowalecki.dietplanner.model.Meal;
-import pl.kowalecki.dietplanner.services.WebPage.IWebPageService;
-import pl.kowalecki.dietplanner.services.WebPage.MessageType;
-import pl.kowalecki.dietplanner.services.dietplannerapi.meal.DietPlannerApiClient;
-import pl.kowalecki.dietplanner.services.document.DocumentService;
+import pl.kowalecki.dietplanner.service.WebPage.MessageType;
+import pl.kowalecki.dietplanner.service.dietplannerapi.meal.DietPlannerApiClient;
+import pl.kowalecki.dietplanner.service.document.DocumentService;
 import pl.kowalecki.dietplanner.utils.DateUtils;
 import pl.kowalecki.dietplanner.utils.MapUtils;
 import pl.kowalecki.dietplanner.utils.TextTools;
@@ -25,7 +24,6 @@ import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,7 +36,6 @@ public class MealPageController {
 
     DietPlannerApiClient apiMealService;
     AddMealHelper addMealHelper;
-    IWebPageService webPageService;
 
     @GetMapping(value = "/addMeal")
     public Mono<String> getListMeal(Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
@@ -54,28 +51,29 @@ public class MealPageController {
                 .defaultIfEmpty("pages/logged/addEditMeal");
     }
 
-
-    @PostMapping(value = "/addOrUpdateMeal")
-    public Mono<ResponseEntity<Map<String, String>>> addMeal(@RequestBody AddMealRequestDTO addMealRequestDTO, Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
-        Map<String, String> errors = addMealHelper.checkData(addMealRequestDTO);
-
-        if (!errors.isEmpty()) {
-            return Mono.just(ResponseEntity.badRequest().body(errors));
-        }
-        return apiMealService.addOrUpdateMeal(addMealRequestDTO)
-                .flatMap(response -> {
-                    if (response.getStatusCode().is2xxSuccessful()) {
-                        return Mono.just(ResponseEntity.status(HttpStatus.OK).body(webPageService.addMessageToPage(MessageType.SUCCESS, "Posiłek został dodany")));
-                    } else {
-                        String errorMessage = response.getStatusCode().is4xxClientError()
-                                ? "Nie udało się dodać posiłku."
-                                : "Wystąpił nieoczekiwany błąd serwera";
-                        return Mono.just(ResponseEntity.status(response.getStatusCode()).body(webPageService.addMessageToPage(MessageType.ERROR, errorMessage)));
-                    }
-                })
-                .onErrorResume(error -> Mono.just(ResponseEntity.internalServerError()
-                        .body(webPageService.addMessageToPage(MessageType.ERROR, "Wystąpił nieoczekiwany błąd serwera"))));
-    }
+//fixme
+//    @PostMapping(value = "/addOrUpdateMeal")
+//    public Mono<ResponseEntity<Map<String, String>>> addMeal(@RequestBody AddMealRequestDTO addMealRequestDTO, Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
+//        Map<String, String> errors = addMealHelper.checkData(addMealRequestDTO);
+//
+//        if (!errors.isEmpty()) {
+//            return Mono.just(ResponseEntity.badRequest().body(errors));
+//        }
+//        return apiMealService.addOrUpdateMeal(addMealRequestDTO)
+//                .flatMap(response -> {
+//                    if (response.getStatusCode().is2xxSuccessful()) {
+//
+//                        return Mono.just(ResponseEntity.status(HttpStatus.OK).body(webPageService.addMessageToPage(MessageType.SUCCESS, "Posiłek został dodany")));
+//                    } else {
+//                        String errorMessage = response.getStatusCode().is4xxClientError()
+//                                ? "Nie udało się dodać posiłku."
+//                                : "Wystąpił nieoczekiwany błąd serwera";
+//                        return Mono.just(ResponseEntity.status(response.getStatusCode()).body(webPageService.addMessageToPage(MessageType.ERROR, errorMessage)));
+//                    }
+//                })
+//                .onErrorResume(error -> Mono.just(ResponseEntity.internalServerError()
+//                        .body(webPageService.addMessageToPage(MessageType.ERROR, "Wystąpił nieoczekiwany błąd serwera"))));
+//    }
 
     @GetMapping(value = "/generateMealBoard")
     public Mono<String> mealPage(Model model, HttpServletRequest request, HttpServletResponse response) {

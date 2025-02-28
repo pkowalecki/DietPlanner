@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=0.9">
-<#include "../../webData/starter.ftlh">
-<link rel="stylesheet" href="../../../static/css/loginPage.css"/>
+    <#include "../../webData/starter.ftlh">
+    <#include "../../webData/swalAlert.ftlh">
+    <link rel="stylesheet" href="../../../static/css/loginPage.css"/>
 </head>
 <div class="container-fluid">
     <div class="center-content">
         <img class="row g-3" src="../../../static/images/recipe-book-svgrepo-com.svg" alt="Happy book SVG">
-        <form class="row g-3 login-form" style="padding-left: 42px; padding-right: 42px;" method="POST" name="loginForm"
-              action="/app/login">
+        <form class="row g-3 login-form" style="padding-left: 42px; padding-right: 42px;" id="loginForm">
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="email" name="email" placeholder="User email"
@@ -26,42 +26,12 @@
                 <a id="registerBtn" href="#">Create account</a>
             </div>
             <div class="d-grid gap-2">
-                <button type="submit" class="btn btn-primary btn-block">Login</button>
+                <button type="submit" class="btn btn-primary btn-block">Zaloguj</button>
             </div>
         </form>
     </div>
     <div id="registerModalContainer"></div>
 </div>
-
-<#if error?? && error != "">
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var swalContent = {};
-            swalContent = {
-                title: "Error",
-                text: '${error}',
-                icon: "error",
-                confirmButtonColor: "#052d73"
-            };
-            Swal.fire(swalContent);
-        });
-    </script>
-</#if>
-<#if sessionExpired?? && sessionExpired == true>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var swalContent = {};
-            swalContent = {
-                title: "Error",
-                text: 'Twoja sesja wygasła. Proszę zaloguj się ponownie',
-                icon: "error",
-                confirmButtonColor: "#052d73"
-            };
-            Swal.fire(swalContent);
-        });
-    </script>
-</#if>
-
 <script>
     function setupPasswordStrengthIndicator() {
         let pswd = document.getElementById("passwordReg");
@@ -117,7 +87,7 @@
         $("#registerBtn").click(function (e) {
             e.preventDefault();
             $.ajax({
-                url: '/app/registerModal',
+                url: '/registerModal',
                 method: 'GET',
                 success: function (response) {
                     $('#registerModalContainer').html(response);
@@ -126,7 +96,7 @@
                     setupPasswordStrengthIndicator();
                 },
                 error: function () {
-                    alert('Failed to load registration modal.');
+                    showSwalMessage('Błąd', 'Nie udało się załadować okna rejestracji', 'error');
                 }
             });
         });
@@ -135,6 +105,7 @@
             e.preventDefault();
             $("#registerModal").modal("hide");
         });
+
 
         $(document).on('submit', '#registerForm', function (e) {
             e.preventDefault();
@@ -152,24 +123,52 @@
 
             $.ajax({
                 type: 'POST',
-                url: '/app/register',
+                url: '/register',
                 contentType: 'application/json',
                 data: JSON.stringify(formData),
                 success: function (response) {
-                    if (response.status === 'BAD_DATA') {
-                        var errors = response.data;
+                    if (response.status === 'ERROR' && response.additionalData) {
+                        var errors = response.additionalData;
                         for (var field in errors) {
                             $('#' + field + 'Error').text(errors[field]);
                             $('#' + field).addClass('is-invalid');
                         }
-                    } else if (response.status === 'OK') {
-                        alert(response.message);
+                    } else if (response.status === 'SUCCESS') {
+                        showSwalMessage("Sukces", response.message, response.icon);
                         $('#registerModal').modal('hide');
                         $('#registerForm')[0].reset();
+                    } else if (response.status === 'ERROR') {
+                        showSwalMessage("Błąd", response.message, response.icon);
                     }
                 },
                 error: function () {
-                    alert('An error occurred while processing your request.');
+                    showSwalMessage('Błąd', 'Wystąpił nieoczekiwany błąd', 'error');
+                }
+            });
+        });
+
+        $(document).on('submit', '#loginForm', function (e) {
+            e.preventDefault();
+
+            var formData = {
+                email: $('#email').val(),
+                password: $('#password').val(),
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: '/login',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function (response) {
+                    if (response.status === 'REDIRECT' && response.redirectUrl) {
+                        window.location.href=response.redirectUrl;
+                    } else if (response.status === 'ERROR') {
+                        showSwalMessage("Błąd", response.message, response.icon);
+                    }
+                },
+                error: function () {
+                    showSwalMessage('Błąd', 'Wystąpił nieoczekiwany błąd', 'error');
                 }
             });
         });

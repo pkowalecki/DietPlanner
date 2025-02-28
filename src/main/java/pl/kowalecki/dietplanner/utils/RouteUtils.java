@@ -11,7 +11,9 @@ public class RouteUtils {
             "/",
             "/app/",
             "/app/login",
-            "/app/registerModal"
+            "/register",
+            "/registerModal",
+            "/confirm"
     );
 
     /**
