@@ -25,7 +25,7 @@ public class AuthClient {
 
     public Mono<ResponseEntity<Map<String, String>>> postUserLogin(LoginRequest loginRequest) {
         return webClient.post()
-                .uri("/login")
+                .uri("/public/login")
                 .bodyValue(loginRequest)
                 .retrieve()
                 .toEntity(new ParameterizedTypeReference<>() {});
@@ -33,14 +33,14 @@ public class AuthClient {
 
     public Mono<ResponseEntity<String>> registerUser(RegistrationRequestDTO registerRequest) {
         return webClient.post()
-                .uri("/register")
+                .uri("/public/register")
                 .bodyValue(registerRequest)
                 .retrieve()
                 .toEntity(new ParameterizedTypeReference<>() {});
     }
     public Mono<ResponseEntity<String>> confirmRegistration(String token){
         return webClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/confirm").queryParam("token", token).build())
+                .uri(uriBuilder -> uriBuilder.path("/public/confirm").queryParam("token", token).build())
                 .retrieve()
                 .toEntity(String.class);
     }

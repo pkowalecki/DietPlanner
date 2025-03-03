@@ -1,6 +1,5 @@
 package pl.kowalecki.dietplanner.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import pl.kowalecki.dietplanner.model.DTO.MealType;
 import pl.kowalecki.dietplanner.model.ingredient.IngredientDTO;
@@ -26,5 +25,5 @@ public class Meal {
     private String notes ="";
     private List<MealType> mealTypes = new ArrayList<>();
     private Double portions = 1.0;
-    private boolean isDeleted = false ;
+    private boolean mealPublic;
 }

@@ -32,16 +32,17 @@ public class GlobalControllerAdvice {
         return handleError(e, model, request, "Wystąpił nieoczekiwany błąd.");
     }
 
+    //FIXME poprawić rediry
     @ExceptionHandler(UnauthorizedException.class)
     public Object handleUnauthorizedException(UnauthorizedException e, HttpServletRequest request) {
         log.warn("Session expired or unauthorized access: {}", e.getMessage());
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("text/html")) {
-            return "redirect:/app/login?sessionExpired=true";
+            return "redirect:/login?sessionExpired=true";
         }
         Map<String, Object> errorResponse = new HashMap<>();
         errorResponse.put("type", "redirect");
-        errorResponse.put("redirectUrl", "/app/login?sessionExpired=true");
+        errorResponse.put("redirectUrl", "/login?sessionExpired=true");
         errorResponse.put("message", "Sesja wygasła. Proszę się ponownie zalogować.");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }

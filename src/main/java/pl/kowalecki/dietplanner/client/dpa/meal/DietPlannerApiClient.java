@@ -1,4 +1,4 @@
-package pl.kowalecki.dietplanner.service.dietplannerapi.meal;
+package pl.kowalecki.dietplanner.client.dpa.meal;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,9 +36,9 @@ public class DietPlannerApiClient {
                 .bodyToMono(MealStarterPack.class);
     }
 
-    public Mono<List<MealNameDTO>> getMealNamesByUserId() {
+    public Mono<List<MealNameDTO>> getAllUserMeals() {
         return webClient.get()
-                .uri(MEAL_SERVICE_URL+"/meal/allMeal")
+                .uri(MEAL_SERVICE_URL+"/meal/getAllUserMeals")
                 .retrieve()
                 .bodyToFlux(MealNameDTO.class)
                 .collectList()

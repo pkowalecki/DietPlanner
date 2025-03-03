@@ -10,6 +10,8 @@
             <@simpleTextArea name="notes" placeholder="Wprowadź notatki..." label="Notatki" id="notes" rows="4" value="${meal.getNotes()}"/>
             <@simpleSelect name="mealType" id="mealType" source=mealTypeList placeholder="dummy" label="Typ posiłku" divWrapperClass="form-group-container" selectedValues=selectedMealTypeIds![]/>
             <@simpleInput name="portions" placeholder="Na ile porcji dzielisz przepis?" label="Liczba porcji" id="portions" type="number" step="0.25" min="0" max="1000" value="${meal.getPortions()}"/>
+            Czy chcesz aby ten posiłek był dostępny publicznie?
+            <input type="checkbox" id="mealPublic" name="mealPublic"/>
         </div>
 
         <div id="ingredientList">
@@ -167,7 +169,8 @@
                 notes: $("#notes").val(),
                 mealTypes: $("#mealType").val(),
                 ingredients: ingredientsList,
-                portions: $("#portions").val()
+                portions: $("#portions").val(),
+                mealPublic: $('#mealPublic').prop('checked')
             };
 
             $.ajax({

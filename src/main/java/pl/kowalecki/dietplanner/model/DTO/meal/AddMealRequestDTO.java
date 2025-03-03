@@ -13,7 +13,8 @@ public record AddMealRequestDTO(
         String notes,
         List<IngredientDTO> ingredients,
         List<Integer> mealTypes,
-        double portions
+        double portions,
+        boolean mealPublic
 ) {
     @Getter
     public enum AddMealPole {

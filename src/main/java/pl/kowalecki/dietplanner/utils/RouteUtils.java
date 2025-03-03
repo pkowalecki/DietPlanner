@@ -9,8 +9,7 @@ public class RouteUtils {
 
     private static final List<String> OPEN_PATHS = List.of(
             "/",
-            "/app/",
-            "/app/login",
+            "/login",
             "/register",
             "/registerModal",
             "/confirm"

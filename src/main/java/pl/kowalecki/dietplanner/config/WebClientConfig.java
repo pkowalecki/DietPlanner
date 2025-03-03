@@ -98,6 +98,7 @@ public class WebClientConfig {
                         .onErrorResume(e -> Mono.just(new ClientErrorResponse("Błąd klienta", "ClientError", clientResponse.statusCode().value(), "unknown", clientResponse.request().getURI().toString(), timestamp)))
                         .flatMap(errorBody -> {
                             log.error("[{}] Client error from {}: {} ({}). Requested URL: {}", timestamp, errorBody.getServiceName(), errorBody.getMessage(), errorBody.getStatusCode(), errorBody.getRequestedUrl());
+//                        return Mono.error(webResponse.buildErrorMessage("Wystąpił błąd klienta"));
                             return Mono.error(new ClientErrorException(errorBody.getMessage(), errorBody.getStatusCode(), errorBody.getRequestedUrl()));
                         });
             }
