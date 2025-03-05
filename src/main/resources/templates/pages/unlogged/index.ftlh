@@ -18,12 +18,12 @@
                        autocomplete="on" required>
             </div>
             <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
+                <label for="password" class="form-label">Hasło</label>
                 <input type="password" class="form-control" id="password" name="password"
                        placeholder="Password" autocomplete="on" required>
             </div>
             <div class="mb-3 group form-link">
-                <a id="registerBtn" href="#">Create account</a>
+                <a id="registerBtn" href="#">Załóż konto</a>
             </div>
             <div class="d-grid gap-2">
                 <button type="submit" class="btn btn-primary btn-block">Zaloguj</button>
