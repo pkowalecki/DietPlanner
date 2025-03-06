@@ -4,13 +4,14 @@
     <h2>Dodaj lub edytuj składnik</h2>
     <p>Wartości odżywcze powinny być dodawane w odniesieniu do 100g/100ml na produkt</p>
     <div class="mainFields">
+        <div class="form-field div1">
+            <@simpleInputPlain id="liveSearch" name="liveSearch" placeholder="Wyszukaj składnik"/>
+            <div id="suggestionsList" class="suggestions-list"></div>
+        </div>
         <form id="ingredient-form">
-                <div class="form-field div1">
-                    <@simpleInputPlain id="liveSearch" name="liveSearch" placeholder="Wyszukaj składnik"/>
-                    <div id="suggestionsList" class="suggestions-list"></div>
-                </div>
+            <input type="hidden" name="ingredientId" id="ingredientId" value="-1"/>
                 <div class="form-field">
-                    <@simpleInput name="ingredientName" placeholder="Wpisz nazwę składnika" label="Składnik" id="ingredientName" />
+                    <@simpleInput name="ingredientName" placeholder="Wpisz nazwę składnika" label="Składnik" id="ingredientName" required=true/>
                     <@simpleInput name="ingredientBrand" placeholder="Marka produktu" label="Marka" id="ingredientBrand" />
                 </div>
                 <div class="form-field">
@@ -23,8 +24,7 @@
                     <@sendFormButton
                     id="sendIngredientForm"
                     formToSend="ingredient-form"
-                    url="/app/auth/addIngredientName"
-                    reloadPageAfterSuccess=true />
+                    url="/app/auth/addIngredientName"/>
                 </div>
         </form>
     </div>
@@ -55,9 +55,9 @@
                             listItem.textContent = ingredient.ingredientBrand && ingredient.ingredientBrand.trim()
                                 ? ingredient.ingredientName + ", " + ingredient.ingredientBrand
                                 : ingredient.ingredientName;
-
                             listItem.classList.add('suggestion-item');
                             listItem.addEventListener('click', () => {
+                                document.getElementById('ingredientId').value = ingredient.ingredientId || '-1';
                                 document.getElementById('ingredientName').value = ingredient.ingredientName || '';
                                 document.getElementById('ingredientBrand').value = ingredient.ingredientBrand || '';
                                 document.getElementById('protein').value = ingredient.protein || '';

@@ -8,7 +8,11 @@
                 contentType: contentType,
                 data: data,
                 success: function (response) {
-                    if (response.redirectUrl) {
+                    console.log(response);
+                    if (response.status === 'ERROR' && response.additionalData) {
+                        var errors = response.additionalData;
+                        handleFieldErrors(errors);
+                    }else if (response.redirectUrl) {
                         window.location.href = response.redirectUrl;
                     } else if (response && response.type) {
                         showSwalMessage(response.type, response.message, response.icon);

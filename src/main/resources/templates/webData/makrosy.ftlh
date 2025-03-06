@@ -1,12 +1,12 @@
 <#macro onClick objId url urlParams formId >
 
 </#macro>
-<#macro simpleInput name inputStyle="" class="" min="" max="" type="text" id="" disabled=false placeholder="" divWrapperId="" divWrapperStyle="" label="" labelStyle="" step="" value="">
+<#macro simpleInput name inputStyle="" class="" min="" max="" type="text" id="" disabled=false placeholder="" divWrapperId="" divWrapperStyle="" label="" labelStyle="" step="" value="" required=false>
     <#assign idPolka = id/><#rt>
     <#assign classPolka = class/>
     <div class="form-group-container" id="${divWrapperId}" style="">
         <div class="floating-group">
-            <@simpleInputPlain name=name inputStyle=inputStyle class=classPolka min=min max=max type=type id=idPolka disabled=false placeholder=placeholder step=step value=value/>
+            <@simpleInputPlain name=name inputStyle=inputStyle class=classPolka min=min max=max type=type id=idPolka disabled=false placeholder=placeholder step=step value=value required=required/>
             <#if label!=""><label class="floating-label" for="${idPolka}" id="labelFor${idPolka}"
                                   style="${labelStyle}">${label}</label></#if>
             <div class="error-message" id="${idPolka}Error">
@@ -16,7 +16,7 @@
     </div>
 </#macro>
 
-<#macro simpleInputPlain name inputStyle="" class="" min="" max="" type="text" id="" disabled=false placeholder="" step="" value="">
+<#macro simpleInputPlain name inputStyle="" class="" min="" max="" type="text" id="" disabled=false placeholder="" step="" value="" required=false>
     <#assign idPolka = id/><#rt>
     <#assign classPolka = class/>
     <input <#if disabled>disabled="disabled"</#if>
@@ -35,6 +35,7 @@
            autocomplete="off"
             <#if placeholder !="">placeholder="${placeholder}"</#if>
             <#if value!=""> value="${value}" </#if>
+            <#if required> required</#if>
     />
 </#macro>
 
@@ -149,14 +150,14 @@
             const form = document.getElementById("${formToSend}");
             const formData = new FormData(form);
             const jsonData = Object.fromEntries(formData.entries());
+            const requiredFields = form.querySelectorAll("[required]");
 
-            for (let key in jsonData) {
-                if (!jsonData[key].trim()) {
-                    showSwalMessage("Błąd", "Pole '" + key + "' nie może być puste.", "error");
+            for (let field of requiredFields) {
+                if (!jsonData[field.name] || !jsonData[field.name].trim()) {
+                    showSwalMessage("Błąd", "Pole '" + field.labels[0].innerText + "' nie może być puste.", "error");
                     return;
                 }
             }
-
             ajaxCall("${url}", "${method}", "${contentType}", JSON.stringify(jsonData), ${reloadPageAfterSuccess?c});
         });
     </script>

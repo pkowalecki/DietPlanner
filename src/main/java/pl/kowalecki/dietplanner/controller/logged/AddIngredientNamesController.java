@@ -1,16 +1,18 @@
 package pl.kowalecki.dietplanner.controller.logged;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import pl.kowalecki.dietplanner.UrlBuilder;
+import pl.kowalecki.dietplanner.client.dpa.ingredient.DietPlannerApiIngredientClient;
 import pl.kowalecki.dietplanner.controller.helper.IngredientNamesHelper;
+import pl.kowalecki.dietplanner.model.ClientErrorResponse;
+import pl.kowalecki.dietplanner.model.WebPageResponse;
 import pl.kowalecki.dietplanner.model.ingredient.IngredientName;
-import pl.kowalecki.dietplanner.service.WebPage.MessageType;
-import pl.kowalecki.dietplanner.service.dietplannerapi.ingredientName.DietPlannerApiIngredientNameService;
+import pl.kowalecki.dietplanner.service.WebPage.IWebPageResponseBuilder;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -23,8 +25,9 @@ public class AddIngredientNamesController {
 
     private final String ADD_INGREDIENT_VIEW = "pages/logged/addIngredient";
 
-    private final DietPlannerApiIngredientNameService apiClient;
+    private final DietPlannerApiIngredientClient apiClient;
     private final IngredientNamesHelper ingredientNamesHelper;
+    private final IWebPageResponseBuilder webPageResponse;
 
     @GetMapping(value = "/addIngredient")
     public String addIngredientPage(Model model) {
@@ -33,25 +36,32 @@ public class AddIngredientNamesController {
         return ADD_INGREDIENT_VIEW;
     }
 
-    //fixme
-//    @PostMapping(value = "/addIngredientName")
-//    public Mono<ResponseEntity<Map<String,String>>> addIngredient(@RequestBody IngredientName ingredientName){
-//        Map<String, String> errors = ingredientNamesHelper.checkIngredients(ingredientName);
-//        if(!errors.isEmpty()){
-//            return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors));
-//        }
-//        return apiClient.addIngredientName(ingredientName).flatMap(
-//                response -> {
-//                    if (response.getStatusCode().is2xxSuccessful()){
-//                        return Mono.just(ResponseEntity.status(HttpStatus.OK).body(webPageService.addMessageToPage(MessageType.SUCCESS, "Składnik został dodany")));
-//                    }else if(response.getStatusCode().is4xxClientError()) {
-//                        return Mono.just(ResponseEntity.status(response.getStatusCode()).body(webPageService.addMessageToPage( MessageType.ERROR, "Nie udało się dodać składnika.")));
-//                    }else{
-//                        return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(webPageService.addMessageToPage(MessageType.ERROR, "Wystąpił nieoczekiwany błąd serwera")));
-//                    }
-//                })
-//            .onErrorResume(error -> Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(webPageService.addMessageToPage(MessageType.ERROR, "Wystąpił nieoczekiwany błąd serwera"))));
-//    }
+    //TODO na webie poprawić wymagane pola
+    @PostMapping(value = "/addIngredientName")
+    @ResponseBody
+    public Mono<WebPageResponse> addIngredient(@RequestBody IngredientName ingredientName) {
+        Map<String, String> errors = ingredientNamesHelper.checkIngredients(ingredientName);
+        if (!errors.isEmpty()) {
+            return Mono.just(webPageResponse.buildErrorWithFields(errors));
+        }
+        return apiClient.addIngredientName(ingredientName)
+                .flatMap(response -> {
+                    if (response.getStatusCode().is2xxSuccessful()) {
+                        return Mono.just(webPageResponse.buildRedirect("/app/auth/addIngredient", "Składnik został dodany."));
+                    } else {
+                        return Mono.just(webPageResponse.buildErrorMessage("Nie udało się dodać składnika."));
+                    }
+                })
+                .onErrorResume(WebClientResponseException.class, ex -> {
+                    try {
+                        ClientErrorResponse errorResponse = new ObjectMapper()
+                                .readValue(ex.getResponseBodyAsString(), ClientErrorResponse.class);
+                        return Mono.just(webPageResponse.buildErrorMessage(errorResponse.getMessage()));
+                    } catch (Exception parseEx) {
+                        return Mono.just(webPageResponse.buildErrorMessage("Wystąpił nieoczekiwany błąd"));
+                    }
+                });
+    }
 
     @GetMapping("/ingredientNames/search")
     @ResponseBody

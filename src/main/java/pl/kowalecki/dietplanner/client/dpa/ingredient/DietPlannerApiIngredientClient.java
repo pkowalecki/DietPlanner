@@ -1,5 +1,8 @@
-package pl.kowalecki.dietplanner.service.dietplannerapi.ingredientName;
+package pl.kowalecki.dietplanner.client.dpa.ingredient;
 
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -14,27 +17,27 @@ import java.util.List;
 import static pl.kowalecki.dietplanner.utils.UrlTools.MEAL_SERVICE_URL;
 
 @Service
-public class DietPlannerApiIngredientNameService {
+@RequiredArgsConstructor
+@Slf4j
+public class DietPlannerApiIngredientClient {
+
+    private final static String INGREDIENT_URL = MEAL_SERVICE_URL + "/ingredient";
 
     private final WebClient webClient;
-
-    public DietPlannerApiIngredientNameService(WebClient webClient) {
-        this.webClient = webClient;
-    }
-
-    public Mono<ResponseEntity<Void>> addIngredientName(IngredientName IngredientName) {
+    public Mono<ResponseEntity<Void>> addIngredientName(IngredientName ingredientName) {
         return webClient.post()
-                .uri(MEAL_SERVICE_URL + "/ingredient/ingredientNames/ingredient")
-                .bodyValue(IngredientName)
+                .uri(INGREDIENT_URL + "/ingredientNames/addOrEditIngredientDetails")
+                .bodyValue(ingredientName)
                 .retrieve()
                 .toBodilessEntity();
     }
 
     public Mono<List<IngredientName>> searchIngredientName(String query) {
-        String url = MEAL_SERVICE_URL + "/ingredient/ingredientNames/search?query=" + URLEncoder.encode(query, StandardCharsets.UTF_8);
+        String url = INGREDIENT_URL + "/ingredientNames/search?query=" + URLEncoder.encode(query, StandardCharsets.UTF_8);
         return webClient.get()
                 .uri(url)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<List<IngredientName>>() {});
     }
+
 }

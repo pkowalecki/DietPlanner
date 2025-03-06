@@ -27,32 +27,32 @@ public class IngredientNamesHelper {
 
     private void checkIngredientName(String name) {
         if (!TextTools.isTextLengthOk(name, 3, 254))
-            errors.put(IngredientNamePole.INGREDIENT_NAME.getFieldName(), "Ingredient name should be between 3-254");
+            errors.put(IngredientNamePole.INGREDIENT_NAME.getFieldName(), "Nazwa składnika powinna mieć co najmniej 3 znaki");
     }
 
     private void checkIngredientBrand(String brand) {
         if (!TextTools.isTextLengthOk(brand, 1, 254))
-            errors.put(IngredientNamePole.INGREDIENT_BRAND.getFieldName(), "Brand name should be between 3-254");
+            errors.put(IngredientNamePole.INGREDIENT_BRAND.getFieldName(), "Marka składnika powinna mieć co najmniej 3 znaki");
 
     }
 
     private void checkProteins(double protein) {
         if (!NumberUtils.isDoubleLengthOk(protein, 0.0, 1000.0))
-            errors.put(IngredientNamePole.PROTEIN.getFieldName(), "Protein should be between 0-1000");
+            errors.put(IngredientNamePole.PROTEIN.getFieldName(), "Zawartość białka powinna być między 0.0 a 1000.0");
     }
 
     private void checkCarbohydrates(double carbohydrates) {
         if (!NumberUtils.isDoubleLengthOk(carbohydrates, 0.0, 1000.0))
-            errors.put(IngredientNamePole.CARBOHYDRATES.getFieldName(), "Carbohydrates should be between 0-1000");
+            errors.put(IngredientNamePole.CARBOHYDRATES.getFieldName(), "Zawartość węgli powinna być między 0.0 a 1000.0");
     }
 
     private void checkFat(double fat) {
         if (!NumberUtils.isDoubleLengthOk(fat, 0.0, 1000.0))
-            errors.put(IngredientNamePole.PROTEIN.getFieldName(), "Fat should be between 0-1000");
+            errors.put(IngredientNamePole.PROTEIN.getFieldName(), "Zawartość tłuszczu powinna być między 0.0 a 1000.0");
     }
 
     private void checkKcal(double kcal) {
         if (!NumberUtils.isDoubleLengthOk(kcal, 0.0, 9999.9))
-            errors.put(IngredientNamePole.KCAL.getFieldName(), "Kcal should be between 0-1000");
+            errors.put(IngredientNamePole.KCAL.getFieldName(), "Wartość kcal powinna być między 0.0 a 9999.0");
     }
 }
