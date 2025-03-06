@@ -34,6 +34,7 @@
             </a>
         </#list>
     </div>
+    <#if totalElements?? && 0 < totalElements>
     <div>
         <div>
             Liczba elementów: ${totalElements}
@@ -58,6 +59,7 @@
             </#if>
         </div>
     </div>
+    </#if>
 </div>
 <script>
 

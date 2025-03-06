@@ -5,7 +5,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=0.9">
     <#include "../../webData/starter.ftlh">
-    <#include "../../webData/swalAlert.ftlh">
     <link rel="stylesheet" href="../../../static/css/loginPage.css"/>
 </head>
 <div class="container-fluid">
@@ -18,12 +17,12 @@
                        autocomplete="on" required>
             </div>
             <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
+                <label for="password" class="form-label">Hasło</label>
                 <input type="password" class="form-control" id="password" name="password"
                        placeholder="Password" autocomplete="on" required>
             </div>
             <div class="mb-3 group form-link">
-                <a id="registerBtn" href="#">Create account</a>
+                <a id="registerBtn" href="#">Załóż konto</a>
             </div>
             <div class="d-grid gap-2">
                 <button type="submit" class="btn btn-primary btn-block">Zaloguj</button>
@@ -174,5 +173,15 @@
         });
     });
 </script>
-
+<#if sessionExpired?? && sessionExpired>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            showSwalMessage(
+                'Sesja wygasła',
+                'Twoja sesja wygasła. Proszę zalogować się ponownie.',
+                'warning'
+            );
+        });
+    </script>
+</#if>
 </html>

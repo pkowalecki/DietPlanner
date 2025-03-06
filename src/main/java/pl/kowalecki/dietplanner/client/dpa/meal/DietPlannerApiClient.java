@@ -97,13 +97,12 @@ public class DietPlannerApiClient {
 
 
     public Mono<PageResponse<MealMainInfoDTO>> getPageMeals(int page, int size, String mealType) {
-        String url = MEAL_SERVICE_URL + "/meal/getMealsData?page=" + page + "&size=" + size + "&mealType=" + mealType;
+        String url = MEAL_SERVICE_URL + "/meal/getMeals?page=" + page + "&size=" + size + "&mealType=" + mealType;
 
         return webClient.get()
                 .uri(url)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<PageResponse<MealMainInfoDTO>>() {})
-                .onErrorReturn(new PageResponse<>(Collections.emptyList(), page, size, 0, 0));
+                .bodyToMono(new ParameterizedTypeReference<PageResponse<MealMainInfoDTO>>() {});
     }
 
     public Mono<Meal> getMealDetails(Long id) {
