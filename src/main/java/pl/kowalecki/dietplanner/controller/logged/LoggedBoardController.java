@@ -11,6 +11,7 @@ import pl.kowalecki.dietplanner.UrlBuilder;
 import pl.kowalecki.dietplanner.model.DTO.PageResponse;
 import pl.kowalecki.dietplanner.model.DTO.meal.MealMainInfoDTO;
 import pl.kowalecki.dietplanner.client.dpa.meal.DietPlannerApiClient;
+import pl.kowalecki.dietplanner.service.WebPage.IWebPageResponseBuilder;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
@@ -25,9 +26,10 @@ import java.util.stream.IntStream;
 public class LoggedBoardController {
 
     private final DietPlannerApiClient dietPlannerApiClient;
+    private final IWebPageResponseBuilder responseBuilder;
 
     @GetMapping("/loggedUserBoard")
-    public String getLoggedUserBoard(
+    public Mono<String> getLoggedUserBoard(
             @RequestParam(value = "mealType", required = false, defaultValue = "all") String mealType,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             Model model) {
@@ -40,32 +42,32 @@ public class LoggedBoardController {
         model.addAttribute("liveSearchUrl", liveSearchUrl.buildUrl());
         model.addAttribute("details", detailsUrl.buildUrl());
 
-        PageResponse<MealMainInfoDTO> mealPage = dietPlannerApiClient.getPageMeals(currentPage - 1, 10, mealType).block();
+        return dietPlannerApiClient.getPageMeals(currentPage - 1, 10, mealType)
+                .flatMap(response -> {
+                    List<MealMainInfoDTO> meals = Optional.ofNullable(response)
+                            .map(PageResponse::getContent)
+                            .orElse(Collections.emptyList());
 
-        List<MealMainInfoDTO> meals = Optional.ofNullable(mealPage)
-                .map(PageResponse::getContent)
-                .orElse(Collections.emptyList());
+                    int totalPages = Optional.ofNullable(response)
+                            .map(PageResponse::getTotalPages)
+                            .orElse(1);
 
-        int totalPages = Optional.ofNullable(mealPage)
-                .map(PageResponse::getTotalPages)
-                .orElse(1);
+                    long totalElements = Optional.ofNullable(response)
+                            .map(PageResponse::getTotalElements)
+                            .orElse(0L);
 
-        long totalElements = Optional.ofNullable(mealPage)
-                .map(PageResponse::getTotalElements)
-                .orElse(0L);
+                    List<Integer> totalPagesListed = IntStream.rangeClosed(1, totalPages)
+                            .boxed()
+                            .collect(Collectors.toList());
 
-        List<Integer> totalPagesListed = IntStream.rangeClosed(1, totalPages)
-                .boxed()
-                .collect(Collectors.toList());
-
-        model.addAttribute("totalPages", totalPages);
-        model.addAttribute("totalElements", totalElements);
-        model.addAttribute("currentPage", currentPage);
-        model.addAttribute("totalPagesListed", totalPagesListed);
-        model.addAttribute("meals", meals);
-        model.addAttribute("activeMealType", mealType);
-
-        return "pages/logged/loggedPage";
+                    model.addAttribute("totalPages", totalPages);
+                    model.addAttribute("totalElements", totalElements);
+                    model.addAttribute("currentPage", currentPage);
+                    model.addAttribute("totalPagesListed", totalPagesListed);
+                    model.addAttribute("meals", meals);
+                    model.addAttribute("activeMealType", mealType);
+                    return Mono.just("pages/logged/loggedPage");
+                });
     }
 
     @GetMapping("/meals/search")

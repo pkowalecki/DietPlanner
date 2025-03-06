@@ -20,7 +20,7 @@ public class LoginController {
 
     private final ILoginService loginService;
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @GetMapping("/")
     public Mono<String> index(@RequestParam(value = "sessionExpired", required = false) String sessionExpired, Model model) {
         if ("true".equals(sessionExpired)) {
             model.addAttribute("sessionExpired", true);

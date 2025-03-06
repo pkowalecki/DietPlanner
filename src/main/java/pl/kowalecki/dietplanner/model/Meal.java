@@ -26,4 +26,5 @@ public class Meal {
     private List<MealType> mealTypes = new ArrayList<>();
     private Double portions = 1.0;
     private boolean mealPublic;
+    private boolean canEdit = false;
 }

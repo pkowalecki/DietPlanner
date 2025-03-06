@@ -1,5 +1,7 @@
 package pl.kowalecki.dietplanner.config;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -8,9 +10,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.reactive.function.client.ClientRequest;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import pl.kowalecki.dietplanner.exception.ClientErrorException;
@@ -31,7 +35,6 @@ import java.util.Map;
 @AllArgsConstructor
 public class WebClientConfig {
 
-    private final IWebPageResponseBuilder webResponse;
     private final CookieUtils cookieUtils;
 
     @Bean
@@ -82,27 +85,106 @@ public class WebClientConfig {
     private ExchangeFilterFunction errorHandlingFilter() {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-        return ExchangeFilterFunction.ofResponseProcessor(clientResponse -> {
-            String timestamp = LocalDateTime.now().format(dtf);
+        return (request, next) -> next.exchange(request)
+                .flatMap(clientResponse -> {
+                    if (clientResponse.statusCode().isError()) {
+                        return clientResponse.bodyToMono(String.class)
+                                .flatMap(errorBody -> {
+                                    String timestamp = LocalDateTime.now().format(dtf);
+                                    ClientErrorResponse errorResponse = parseErrorResponse(clientResponse, errorBody, timestamp);
 
-            if (clientResponse.statusCode().equals(HttpStatus.UNAUTHORIZED)) {
-                return clientResponse.bodyToMono(ClientErrorResponse.class)
-                        .onErrorResume(e -> Mono.just(new ClientErrorResponse("Sesja wygasła", "Unauthorized", 401, "gateway", clientResponse.request().getURI().toString(), timestamp)))
-                        .flatMap(errorBody -> {
-                            log.error("[{}] Unauthorized access: {}", timestamp, errorBody.getMessage());
-                            WebPageResponse response = webResponse.buildRedirect("/app/login?sessionExpired=true");
-                            return Mono.error(new UnauthorizedException(response.getMessage()));
-                        });
-            } else if (clientResponse.statusCode().is5xxServerError()) {
-                return clientResponse.bodyToMono(ClientErrorResponse.class)
-                        .onErrorResume(e -> Mono.just(new ClientErrorResponse("Błąd klienta", "ClientError", clientResponse.statusCode().value(), "unknown", clientResponse.request().getURI().toString(), timestamp)))
-                        .flatMap(errorBody -> {
-                            log.error("[{}] Client error from {}: {} ({}). Requested URL: {}", timestamp, errorBody.getServiceName(), errorBody.getMessage(), errorBody.getStatusCode(), errorBody.getRequestedUrl());
-//                        return Mono.error(webResponse.buildErrorMessage("Wystąpił błąd klienta"));
-                            return Mono.error(new ClientErrorException(errorBody.getMessage(), errorBody.getStatusCode(), errorBody.getRequestedUrl()));
-                        });
+                                    log.error("[{}] Client error from {}: {} ({}). Requested URL: {}",
+                                            timestamp,
+                                            errorResponse.getServiceName(),
+                                            errorResponse.getMessage(),
+                                            errorResponse.getStatusCode(),
+                                            errorResponse.getRequestedUrl());
+
+                                    return Mono.error(new ClientErrorException(
+                                            errorResponse.getMessage(),
+                                            errorResponse.getStatusCode(),
+                                            errorResponse.getRequestedUrl()
+                                    ));
+                                })
+                                .switchIfEmpty(Mono.defer(() -> {
+                                    String timestamp = LocalDateTime.now().format(dtf);
+                                    ClientErrorResponse fallbackError = createFallbackErrorResponse(clientResponse, timestamp);
+
+                                    log.error("[{}] No error body received. Fallback error from {}: {} ({}). Requested URL: {}",
+                                            timestamp,
+                                            fallbackError.getServiceName(),
+                                            fallbackError.getMessage(),
+                                            fallbackError.getStatusCode(),
+                                            fallbackError.getRequestedUrl());
+
+                                    throw new ClientErrorException(
+                                            fallbackError.getMessage(),
+                                            fallbackError.getStatusCode(),
+                                            fallbackError.getRequestedUrl()
+                                    );
+                                }))
+                                .then(Mono.just(clientResponse));
+                    }
+
+                    return Mono.just(clientResponse);
+                });
+    }
+
+    private ClientErrorResponse parseErrorResponse(ClientResponse clientResponse, String errorBody, String timestamp) {
+        try {
+            if (StringUtils.hasText(errorBody)) {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode errorNode = mapper.readTree(errorBody);
+
+                String message = extractErrorMessage(errorNode);
+                String serviceName = extractServiceName(errorNode);
+
+                return new ClientErrorResponse(
+                        message,
+                        "ClientError",
+                        clientResponse.statusCode().value(),
+                        serviceName,
+                        clientResponse.request().getURI().toString(),
+                        timestamp
+                );
             }
-            return Mono.just(clientResponse);
-        });
+        } catch (Exception e) {
+            log.warn("Failed to parse error body: {}", e.getMessage());
+        }
+
+        return createFallbackErrorResponse(clientResponse, timestamp);
+    }
+
+    private String extractErrorMessage(JsonNode errorNode) {
+        String[] possibleMessageFields = {"message", "error", "errorMessage", "detail"};
+
+        for (String field : possibleMessageFields) {
+            if (errorNode.has(field)) {
+                String message = errorNode.get(field).asText();
+                if (StringUtils.hasText(message)) {
+                    return message;
+                }
+            }
+        }
+
+        return "Wystąpił błąd podczas przetwarzania żądania";
+    }
+
+    private String extractServiceName(JsonNode errorNode) {
+        if (errorNode.has("service")) {
+            return errorNode.get("service").asText("unknown");
+        }
+        return "unknown";
+    }
+
+    private ClientErrorResponse createFallbackErrorResponse(ClientResponse clientResponse, String timestamp) {
+        return new ClientErrorResponse(
+                "Wystąpił nieoczekiwany błąd",
+                "ClientError",
+                clientResponse.statusCode().value(),
+                "unknown",
+                clientResponse.request().getURI().toString(),
+                timestamp
+        );
     }
 }

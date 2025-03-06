@@ -7,10 +7,12 @@
                 <div class="">
                     <p class="meal-title">${meal.name}</p>
                 </div>
-                <div class="meal-buttons-container">
-                    <@simpleButton id="bEditMeal_${meal.getMealId()}" url="${url}${meal.getMealId()}" buttonText="Edytuj posiłek"/>
-                    <@simpleButton id="bDeleteMeal_${meal.getMealId()}" url="" buttonText="Usuń posiłek"/>
-                </div>
+                <#if meal.isCanEdit()?? && meal.isCanEdit()>
+                    <div class="meal-buttons-container">
+                        <@simpleButton id="bEditMeal_${meal.getMealId()}" url="${url}${meal.getMealId()}" buttonText="Edytuj posiłek"/>
+                        <@simpleButton id="bDeleteMeal_${meal.getMealId()}" url="" buttonText="Usuń posiłek"/>
+                    </div>
+                </#if>
             </div>
             <p class="meal-description">${meal.description}</p>
         </div>

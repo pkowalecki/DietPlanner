@@ -5,7 +5,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=0.9">
     <#include "../../webData/starter.ftlh">
-    <#include "../../webData/swalAlert.ftlh">
     <link rel="stylesheet" href="../../../static/css/loginPage.css"/>
 </head>
 <div class="container-fluid">
@@ -174,5 +173,15 @@
         });
     });
 </script>
-
+<#if sessionExpired?? && sessionExpired>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            showSwalMessage(
+                'Sesja wygasła',
+                'Twoja sesja wygasła. Proszę zalogować się ponownie.',
+                'warning'
+            );
+        });
+    </script>
+</#if>
 </html>
