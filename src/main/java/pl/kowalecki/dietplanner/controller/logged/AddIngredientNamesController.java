@@ -36,7 +36,6 @@ public class AddIngredientNamesController {
         return ADD_INGREDIENT_VIEW;
     }
 
-    //TODO na webie poprawić wymagane pola
     @PostMapping(value = "/addIngredientName")
     @ResponseBody
     public Mono<WebPageResponse> addIngredient(@RequestBody IngredientName ingredientName) {

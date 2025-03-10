@@ -11,7 +11,7 @@
         <form id="ingredient-form">
             <input type="hidden" name="ingredientId" id="ingredientId" value="-1"/>
                 <div class="form-field">
-                    <@simpleInput name="ingredientName" placeholder="Wpisz nazwę składnika" label="Składnik" id="ingredientName" required=true/>
+                    <@simpleInput name="ingredientName" placeholder="Wpisz nazwę składnika" label="Składnik" id="ingredientName" min="3" max="254" required=true/>
                     <@simpleInput name="ingredientBrand" placeholder="Marka produktu" label="Marka" id="ingredientBrand" />
                 </div>
                 <div class="form-field">

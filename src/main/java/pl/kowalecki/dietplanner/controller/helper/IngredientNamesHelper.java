@@ -13,7 +13,6 @@ public class IngredientNamesHelper {
 
     HashMap<String, String> errors = new HashMap<>();
 
-
     public Map<String, String> checkIngredients(IngredientName ingredient) {
         errors = new HashMap<>();
         checkIngredientName(ingredient.getName());
@@ -31,7 +30,8 @@ public class IngredientNamesHelper {
     }
 
     private void checkIngredientBrand(String brand) {
-        if (!TextTools.isTextLengthOk(brand, 1, 254))
+        if (brand == null || brand.isEmpty()) return;
+        if (!TextTools.isTextLengthOk(brand, 3, 254))
             errors.put(IngredientNamePole.INGREDIENT_BRAND.getFieldName(), "Marka składnika powinna mieć co najmniej 3 znaki");
 
     }

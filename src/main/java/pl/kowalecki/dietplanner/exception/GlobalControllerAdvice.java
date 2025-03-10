@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 
 import java.nio.file.AccessDeniedException;
@@ -33,6 +34,11 @@ public class GlobalControllerAdvice {
     @ExceptionHandler({ IllegalArgumentException.class, Exception.class })
     public String handleGenericException(Exception e, Model model, HttpServletRequest request) {
         return handleError(e, model, request, "Wystąpił nieoczekiwany błąd.");
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public String handleNoHandlerFoundException(Exception e, Model model, HttpServletRequest request) {
+        return handleError(e, model, request, "Wygląda na to, że podana ścieżka nie istnieje.");
     }
 
     @ExceptionHandler(UnauthorizedException.class)

@@ -57,6 +57,7 @@ public class MealPageController {
     }
 
     @PostMapping(value = "/addOrUpdateMeal")
+    @ResponseBody
     public Mono<WebPageResponse> addMeal(@RequestBody AddMealRequestDTO addMealRequestDTO, Model model, HttpServletRequest request, HttpServletResponse httpResponse) {
         Map<String, String> errors = addMealHelper.checkData(addMealRequestDTO);
 
@@ -66,7 +67,7 @@ public class MealPageController {
         return apiMealService.addOrUpdateMeal(addMealRequestDTO)
                 .flatMap(response -> {
                     if (response.getStatusCode().is2xxSuccessful()) {
-                        return Mono.just(responseBuilder.buildRedirect("/app/auth/addOrUpdateMeal", "Posiłek został dodany."));
+                        return Mono.just(responseBuilder.buildRedirect("/addOrUpdateMeal", "Posiłek został dodany."));
                     } else {
                         return Mono.just(responseBuilder.buildErrorMessage("Nie udało się dodać posiłku."));
                     }

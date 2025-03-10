@@ -41,8 +41,7 @@ public class DietPlannerApiClient {
                 .uri(MEAL_SERVICE_URL+"/meal/getAllUserMeals")
                 .retrieve()
                 .bodyToFlux(MealNameDTO.class)
-                .collectList()
-                .onErrorReturn(Collections.emptyList());
+                .collectList();
     }
 
     public Mono<String> generateMealBoard(FoodBoardPageRequest apiReq) {
@@ -82,8 +81,7 @@ public class DietPlannerApiClient {
                 .uri(MEAL_SERVICE_URL + "/meal/getMealHistory")
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<List<MealHistoryDTO>>() {})
-                .map(list -> list.stream().map(mealHistoryMapper::mapToDto).toList())
-                .onErrorReturn(Collections.emptyList());
+                .map(list -> list.stream().map(mealHistoryMapper::mapToDto).toList());
 
     }
 
@@ -117,9 +115,7 @@ public class DietPlannerApiClient {
         return webClient.get()
                 .uri(url)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<MealMainInfoDTO>>() {})
-                .doOnNext(response -> System.out.println("Response: " + response))
-                .onErrorReturn(Collections.emptyList());
+                .bodyToMono(new ParameterizedTypeReference<List<MealMainInfoDTO>>() {});
 
     }
 }
