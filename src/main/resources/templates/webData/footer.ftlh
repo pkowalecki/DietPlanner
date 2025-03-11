@@ -8,36 +8,23 @@
                 contentType: contentType,
                 data: data,
                 success: function (response) {
-                    console.log(response);
-                    if (response.status === 'ERROR' && response.additionalData) {
-                        var errors = response.additionalData;
-                        handleFieldErrors(errors);
-                    }else if (response.redirectUrl) {
-                        window.location.href = response.redirectUrl;
-                    } else if (response && response.type) {
+                    if (response && response.type) {
                         showSwalMessage(response.type, response.message, response.icon);
-                    } else if (response && response.errorMsg) {
-                        showSwalMessage('Błąd!', response.errorMsg, 'error');
-                    } else {
-                        showSwalMessage('Sukces', 'Operacja zakończona pomyślnie.', 'success');
                         if (shouldReloadOnSuccess) {
                             location.reload();
                         }
+                    } else if (response.status === 'REDIRECT' && response.redirectUrl) {
+                        window.location.href = response.redirectUrl;
+                    } else if (response.status === 'ERROR' && response.additionalData) {
+                        var errors = response.additionalData;
+                        handleFieldErrors(errors);
+                    }
+                    else{
+                        alert("nieznany typ odpowiedzi ale sukces - do sprawdzenia");
                     }
                 },
                 error: function (xhr, status, error) {
-                    try {
-                        const errorResponse = JSON.parse(xhr.responseText);
-                        if (xhr.status === 400 && typeof errorResponse === 'object' && !Array.isArray(errorResponse)) {
-                            handleFieldErrors(errorResponse);
-                        } else if (errorResponse) {
-                            showSwalMessage(errorResponse.type, errorResponse.message, errorResponse.icon);
-                        } else {
-                            showSwalMessage('Error', 'Coś poszło nie tak. Spróbuj ponownie.', 'error');
-                        }
-                    } catch (e) {
-                        showSwalMessage('Error', 'Nie można przetworzyć odpowiedzi. Spróbuj ponownie.', 'error');
-                    }
+                    showSwalMessage('Error', 'Nie można przetworzyć odpowiedzi. Spróbuj ponownie.', 'error');
                 }
             });
         }

@@ -85,7 +85,7 @@ public class MealPageController {
 
     @GetMapping(value = "/generateMealBoard")
     public Mono<String> mealPage(Model model, HttpServletRequest request, HttpServletResponse response) {
-        return apiMealService.getAllUserMeals()
+        return apiMealService.getMealsToBoard()
                 .map(mealList -> {
                     model.addAttribute("days", DateUtils.getDaysOfWeek());
 
@@ -114,7 +114,7 @@ public class MealPageController {
 
     @PostMapping(value = "/generateMealBoard", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public Mono<Map<String, String>> resultPage(@RequestBody Map<String, Object> rawData, Model model) {
+    public Mono<WebPageResponse> resultPage(@RequestBody Map<String, Object> rawData, Model model) {
         Map<String, Map<String, Long>> meals = prepareMeals(rawData);
         Double multiplier = rawData.containsKey("multiplier")
                 ? Double.valueOf(rawData.get("multiplier").toString()) : 1.0;
@@ -123,7 +123,7 @@ public class MealPageController {
         if (mealIds.stream().allMatch(val -> val.equals(-1L))) {
             Map<String, String> result = new HashMap<>();
             result.put("errorMsg", "Musisz wybrać jakiś posiłek");
-            return Mono.just(result);
+            return Mono.just(responseBuilder.buildErrorWithFields(result));
         }
 
         FoodBoardPageRequest requestData = new FoodBoardPageRequest();
@@ -131,11 +131,7 @@ public class MealPageController {
         requestData.setMultiplier(multiplier);
 
         return apiMealService.generateMealBoard(requestData)
-                .map(urlParam -> {
-                    Map<String, String> result = new HashMap<>();
-                    result.put("redirectUrl", "/app/auth/shoppingList/" + urlParam);
-                    return result;
-                });
+                .map(urlParam -> responseBuilder.buildRedirect("/app/auth/shoppingList/" + urlParam));
     }
 
     @GetMapping(value = "/shoppingList/{pageId}")

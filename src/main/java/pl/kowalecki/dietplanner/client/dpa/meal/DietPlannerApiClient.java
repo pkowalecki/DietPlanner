@@ -16,7 +16,6 @@ import pl.kowalecki.dietplanner.model.Meal;
 import pl.kowalecki.dietplanner.model.DTO.meal.*;
 import reactor.core.publisher.Mono;
 
-import java.util.Collections;
 import java.util.List;
 
 import static pl.kowalecki.dietplanner.utils.UrlTools.MEAL_SERVICE_URL;
@@ -36,9 +35,9 @@ public class DietPlannerApiClient {
                 .bodyToMono(MealStarterPack.class);
     }
 
-    public Mono<List<MealNameDTO>> getAllUserMeals() {
+    public Mono<List<MealNameDTO>> getMealsToBoard() {
         return webClient.get()
-                .uri(MEAL_SERVICE_URL+"/meal/getAllUserMeals")
+                .uri(MEAL_SERVICE_URL+"/meal/getMealsToBoard")
                 .retrieve()
                 .bodyToFlux(MealNameDTO.class)
                 .collectList();
