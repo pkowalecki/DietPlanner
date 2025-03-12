@@ -31,8 +31,8 @@ public class IngredientNamesHelper {
 
     private void checkIngredientBrand(String brand) {
         if (brand == null || brand.isEmpty()) return;
-        if (!TextTools.isTextLengthOk(brand, 3, 254))
-            errors.put(IngredientNamePole.INGREDIENT_BRAND.getFieldName(), "Marka składnika powinna mieć co najmniej 3 znaki");
+        if (!TextTools.isTextLengthOk(brand, 2, 254))
+            errors.put(IngredientNamePole.INGREDIENT_BRAND.getFieldName(), "Marka składnika powinna mieć co najmniej 2 znaki");
 
     }
 

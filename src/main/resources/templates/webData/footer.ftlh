@@ -8,18 +8,18 @@
                 contentType: contentType,
                 data: data,
                 success: function (response) {
-                    if (response && response.type) {
-                        showSwalMessage(response.type, response.message, response.icon);
-                        if (shouldReloadOnSuccess) {
-                            location.reload();
-                        }
-                    } else if (response.status === 'REDIRECT' && response.redirectUrl) {
-                        window.location.href = response.redirectUrl;
+                    console.log(response);
+                    if (response.status === 'REDIRECT' && response.redirectUrl) {
+                        showSwalMessageWithRedirDialog(response.message, response.redirectUrl);
                     } else if (response.status === 'ERROR' && response.additionalData) {
                         var errors = response.additionalData;
                         handleFieldErrors(errors);
-                    }
-                    else{
+                    } else if (response && response.status) {
+                        showSwalMessage(response.status, response.message, response.icon);
+                        if (shouldReloadOnSuccess) {
+                            location.reload();
+                        }
+                    } else {
                         alert("nieznany typ odpowiedzi ale sukces - do sprawdzenia");
                     }
                 },
