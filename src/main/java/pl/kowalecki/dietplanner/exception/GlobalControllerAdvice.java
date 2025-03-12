@@ -9,6 +9,8 @@ import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.NoHandlerFoundException;
+import pl.kowalecki.dietplanner.service.WebPage.IWebPageResponseBuilder;
 
 
 import java.nio.file.AccessDeniedException;
@@ -22,17 +24,28 @@ import java.util.Map;
 @AllArgsConstructor
 public class GlobalControllerAdvice {
 
+    private IWebPageResponseBuilder responseBuilder;
     private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @ExceptionHandler({ClientErrorException.class, AccessDeniedException.class})
-    public String handleClientErrorException(Exception e, Model model, HttpServletRequest request) {
-        String errorMessage = extractErrorMessage(e);
-        return handleError(e, model, request, errorMessage);
+    public Object handleClientErrorException(Exception e, Model model, HttpServletRequest request) {
+        boolean isAjaxRequest = "XMLHttpRequest".equals(request.getHeader("X-Requested-With"));
+
+        if (isAjaxRequest) {
+            return ResponseEntity.ok(responseBuilder.buildErrorMessage("Wystąpił błąd komunikacji z klientem"));
+        } else {
+            return handleError(e, model, request, "Wystąpił błąd komunikacji z klientem");
+        }
     }
 
     @ExceptionHandler({ IllegalArgumentException.class, Exception.class })
     public String handleGenericException(Exception e, Model model, HttpServletRequest request) {
         return handleError(e, model, request, "Wystąpił nieoczekiwany błąd.");
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public String handleNoHandlerFoundException(Exception e, Model model, HttpServletRequest request) {
+        return handleError(e, model, request, "Wygląda na to, że podana ścieżka nie istnieje.");
     }
 
     @ExceptionHandler(UnauthorizedException.class)

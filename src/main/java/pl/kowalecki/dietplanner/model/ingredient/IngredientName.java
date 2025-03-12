@@ -14,4 +14,5 @@ public class IngredientName {
     private double carbohydrates;
     private double fat;
     private double kcal;
+    private String ingredientId;
 }

@@ -16,7 +16,6 @@ import pl.kowalecki.dietplanner.model.Meal;
 import pl.kowalecki.dietplanner.model.DTO.meal.*;
 import reactor.core.publisher.Mono;
 
-import java.util.Collections;
 import java.util.List;
 
 import static pl.kowalecki.dietplanner.utils.UrlTools.MEAL_SERVICE_URL;
@@ -36,13 +35,12 @@ public class DietPlannerApiClient {
                 .bodyToMono(MealStarterPack.class);
     }
 
-    public Mono<List<MealNameDTO>> getAllUserMeals() {
+    public Mono<List<MealNameDTO>> getMealsToBoard() {
         return webClient.get()
-                .uri(MEAL_SERVICE_URL+"/meal/getAllUserMeals")
+                .uri(MEAL_SERVICE_URL+"/meal/getMealsToBoard")
                 .retrieve()
                 .bodyToFlux(MealNameDTO.class)
-                .collectList()
-                .onErrorReturn(Collections.emptyList());
+                .collectList();
     }
 
     public Mono<String> generateMealBoard(FoodBoardPageRequest apiReq) {
@@ -82,8 +80,7 @@ public class DietPlannerApiClient {
                 .uri(MEAL_SERVICE_URL + "/meal/getMealHistory")
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<List<MealHistoryDTO>>() {})
-                .map(list -> list.stream().map(mealHistoryMapper::mapToDto).toList())
-                .onErrorReturn(Collections.emptyList());
+                .map(list -> list.stream().map(mealHistoryMapper::mapToDto).toList());
 
     }
 
@@ -117,9 +114,7 @@ public class DietPlannerApiClient {
         return webClient.get()
                 .uri(url)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<MealMainInfoDTO>>() {})
-                .doOnNext(response -> System.out.println("Response: " + response))
-                .onErrorReturn(Collections.emptyList());
+                .bodyToMono(new ParameterizedTypeReference<List<MealMainInfoDTO>>() {});
 
     }
 }

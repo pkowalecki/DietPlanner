@@ -4,12 +4,12 @@
     <form id="mealForm">
         <input type="hidden" name="mealId" value="<#if meal?? && meal.getMealId()??>${meal.getMealId()}<#else>-1</#if>"/>
         <div class="mainFields">
-            <@simpleInput name="mealName" placeholder="Nazwa posiłku" label="Nazwa posiłku" id="mealName" value="${meal.getName()}" />
-            <@simpleTextArea name="recipe" placeholder="Wprowadź przepis..." label="Przepis" id="recipe" rows="4" value="${meal.getRecipe()}"/>
+            <@simpleInput name="mealName" placeholder="Nazwa posiłku" label="Nazwa posiłku" id="mealName" value="${meal.getName()}" min="5" max="254" required=true/>
+            <@simpleTextArea name="recipe" placeholder="Wprowadź przepis..." label="Przepis" id="recipe" rows="4" value="${meal.getRecipe()}" minLength="5" maxLength="10000" required=true/>
             <@simpleTextArea name="description" placeholder="Wprowadź opis tutaj..." label="Opis posiłku" id="description" rows="4" value="${meal.getDescription()}" />
             <@simpleTextArea name="notes" placeholder="Wprowadź notatki..." label="Notatki" id="notes" rows="4" value="${meal.getNotes()}"/>
-            <@simpleSelect name="mealType" id="mealType" source=mealTypeList placeholder="dummy" label="Typ posiłku" divWrapperClass="form-group-container" selectedValues=selectedMealTypeIds![]/>
-            <@simpleInput name="portions" placeholder="Na ile porcji dzielisz przepis?" label="Liczba porcji" id="portions" type="number" step="0.25" min="0" max="1000" value="${meal.getPortions()}"/>
+            <@simpleSelect name="mealType" id="mealType" source=mealTypeList placeholder="dummy" label="Typ posiłku" divWrapperClass="form-group-container" selectedValues=selectedMealTypeIds![] required=true/>
+            <@simpleInput name="portions" placeholder="Na ile porcji dzielisz przepis?" label="Liczba porcji" id="portions" type="number" step="0.25" min="0" max="1000" value="${meal.getPortions()}" required=true/>
             Czy chcesz aby ten posiłek był dostępny publicznie?
             <input type="checkbox" id="mealPublic" name="mealPublic"/>
         </div>
@@ -158,6 +158,7 @@
                 alert("Wybierz wszystkie wartości.");
             }
         }
+        //to do naprawy, wołać ajaxcall i po problemie. FIXME TODO
 
         $("#submitButton").click(e => {
             e.preventDefault();

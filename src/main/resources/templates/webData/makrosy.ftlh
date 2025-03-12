@@ -1,13 +1,13 @@
 <#macro onClick objId url urlParams formId >
 
 </#macro>
-<#macro simpleInput name inputStyle="" class="" min="" max="" type="text" id="" disabled=false placeholder="" divWrapperId="" divWrapperStyle="" label="" labelStyle="" step="" value="">
+<#macro simpleInput name inputStyle="" class="" min="" max="" type="text" id="" disabled=false placeholder="" divWrapperId="" divWrapperStyle="" label="" labelStyle="" step="" value="" required=false>
     <#assign idPolka = id/><#rt>
     <#assign classPolka = class/>
     <div class="form-group-container" id="${divWrapperId}" style="">
         <div class="floating-group">
-            <@simpleInputPlain name=name inputStyle=inputStyle class=classPolka min=min max=max type=type id=idPolka disabled=false placeholder=placeholder step=step value=value/>
-            <#if label!=""><label class="floating-label" for="${idPolka}" id="labelFor${idPolka}"
+            <@simpleInputPlain name=name inputStyle=inputStyle class=classPolka min=min max=max type=type id=idPolka disabled=false placeholder=placeholder step=step value=value required=required/>
+            <#if label!=""><label class="floating-label <#if required>required</#if>" for="${idPolka}" id="labelFor${idPolka}"
                                   style="${labelStyle}">${label}</label></#if>
             <div class="error-message" id="${idPolka}Error">
                 <i class="error-icon fa-solid fa-circle-exclamation" id="${idPolka}Error" style="display: none"></i>
@@ -16,7 +16,7 @@
     </div>
 </#macro>
 
-<#macro simpleInputPlain name inputStyle="" class="" min="" max="" type="text" id="" disabled=false placeholder="" step="" value="">
+<#macro simpleInputPlain name inputStyle="" class="" min="" max="" type="text" id="" disabled=false placeholder="" step="" value="" required=false>
     <#assign idPolka = id/><#rt>
     <#assign classPolka = class/>
     <input <#if disabled>disabled="disabled"</#if>
@@ -35,16 +35,17 @@
            autocomplete="off"
             <#if placeholder !="">placeholder="${placeholder}"</#if>
             <#if value!=""> value="${value}" </#if>
+            <#if required> required</#if>
     />
 </#macro>
 
-<#macro simpleTextArea name style="" class="" minLength="" maxLength="" rows="" id="" disabled=false placeholder="" divWrapperId="" divWrapperStyle="" label="" value="">
+<#macro simpleTextArea name style="" class="" minLength="" maxLength="" rows="" id="" disabled=false placeholder="" divWrapperId="" divWrapperStyle="" label="" value="" required=false>
     <#assign idPolka = id/><#rt>
     <#assign classPolka = class/>
     <div class="form-group-container" id="${divWrapperId}" style="">
         <div class="floating-group">
-            <@simpleTextAreaPlain name=name style=style class=classPolka minLength=minLength maxLength=maxLength rows=rows id=idPolka disabled=false placeholder=placeholder value=value/>
-            <label class="floating-label" for="${idPolka}" id="labelFor${idPolka}">${label}</label>
+            <@simpleTextAreaPlain name=name style=style class=classPolka minLength=minLength maxLength=maxLength rows=rows id=idPolka disabled=false placeholder=placeholder value=value required=required/>
+            <label class="floating-label <#if required>required</#if>" for="${idPolka}" id="labelFor${idPolka}">${label}</label>
             <div class="error-message" id="${idPolka}Error">
                 <i class="error-icon fa-solid fa-circle-exclamation" id="${idPolka}Error" style="display: none"></i>
             </div>
@@ -52,7 +53,7 @@
     </div>
 </#macro>
 
-<#macro simpleTextAreaPlain name style="" class="" minLength="" maxLength="" rows="" id="" disabled=false placeholder="" value="">
+<#macro simpleTextAreaPlain name style="" class="" minLength="" maxLength="" rows="" id="" disabled=false placeholder="" value="" required=false>
     <#assign idPolka = id/><#rt>
     <#assign classPolka = class/>
     <textarea
@@ -66,17 +67,18 @@
            autocomplete="off"
             <#if placeholder !="">placeholder="${placeholder}"</#if>
             <#if rows !="">rows="${rows}"</#if>
+            <#if required>required</#if>
     ><#if value?has_content>${value}</#if></textarea>
 </#macro>
 
-<#macro simpleSelect name source style="" class="" liveSearch=true id="" disabled=false placeholder="" divWrapperId="" divWrapperStyle="" selectWrapperStyle="" label="" multiple=true showMinus=false divWrapperClass="" selectedValues=[] dataSize="10" dataSubtext="" dataContainer="">
+<#macro simpleSelect name source style="" class="" liveSearch=true id="" disabled=false placeholder="" divWrapperId="" divWrapperStyle="" selectWrapperStyle="" label="" multiple=true showMinus=false divWrapperClass="" selectedValues=[] dataSize="10" dataSubtext="" dataContainer="" required=false>
     <#assign idPolka = id/><#rt>
     <#assign classPolka = class/>
     <#assign isLabel = (label?has_content)>
     <div id="${divWrapperId}" class="${divWrapperClass}" style="${divWrapperStyle}">
         <div class="floating-group">
-            <@simpleSelectPlain name=name style=style class=classPolka liveSearch=liveSearch id=idPolka disabled=false placeholder=placeholder multiple=multiple source=source showMinus=showMinus selectWrapperStyle=selectWrapperStyle labelled=isLabel selectedValues=selectedValues dataSize=dataSize dataSubtext=dataSubtext dataContainer=dataContainer/>
-            <#if label!=""><label class="floating-label" for="${idPolka}" id="labelFor${idPolka}">${label}</label></#if>
+            <@simpleSelectPlain name=name style=style class=classPolka liveSearch=liveSearch id=idPolka disabled=false placeholder=placeholder multiple=multiple source=source showMinus=showMinus selectWrapperStyle=selectWrapperStyle labelled=isLabel selectedValues=selectedValues dataSize=dataSize dataSubtext=dataSubtext dataContainer=dataContainer required=required/>
+            <#if label!=""><label class="floating-label <#if required>required</#if>" for="${idPolka}" id="labelFor${idPolka}">${label}</label></#if>
             <div class="error-message" id="${idPolka}Error">
                 <i class="error-icon f a-solid fa-circle-exclamation" id="${idPolka}Error" style="display: none"></i>
             </div>
@@ -84,7 +86,7 @@
     </div>
 </#macro>
 
-<#macro simpleSelectPlain name source style="" class="" liveSearch=true id="" disabled=false placeholder="" divWrapperId="" divWrapperStyle="" multiple=true emptyValue="-" showMinus=false selectWrapperStyle="" labelled=false selectedValues=[] dataSize="10" dataSubtext="" dataContainer="">
+<#macro simpleSelectPlain name source style="" class="" liveSearch=true id="" disabled=false placeholder="" divWrapperId="" divWrapperStyle="" multiple=true emptyValue="-" showMinus=false selectWrapperStyle="" labelled=false selectedValues=[] dataSize="10" dataSubtext="" dataContainer="" required=false>
     <#assign idPolka = id/><#rt>
     <#assign classPolka = class/>
     <div style="${selectWrapperStyle}">
@@ -102,6 +104,7 @@
                 <#if placeholder !="">title="${placeholder}"</#if>
                 <#if multiple>multiple</#if>
                 onchange="<#if labelled>toggleLabelActive('${idPolka}')</#if>"
+                <#if required>required</#if>
         >
             <#if source?exists && 0 < source?size>
                 <#if showMinus>
@@ -149,14 +152,14 @@
             const form = document.getElementById("${formToSend}");
             const formData = new FormData(form);
             const jsonData = Object.fromEntries(formData.entries());
+            const requiredFields = form.querySelectorAll("[required]");
 
-            for (let key in jsonData) {
-                if (!jsonData[key].trim()) {
-                    showSwalMessage("Błąd", "Pole '" + key + "' nie może być puste.", "error");
+            for (let field of requiredFields) {
+                if (!jsonData[field.name] || !jsonData[field.name].trim()) {
+                    showSwalMessage("Błąd", "Pole '" + field.labels[0].innerText + "' nie może być puste.", "error");
                     return;
                 }
             }
-
             ajaxCall("${url}", "${method}", "${contentType}", JSON.stringify(jsonData), ${reloadPageAfterSuccess?c});
         });
     </script>

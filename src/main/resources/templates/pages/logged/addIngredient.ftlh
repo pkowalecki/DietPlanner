@@ -2,15 +2,17 @@
 <link rel="stylesheet" href="../../../static/css/addIngredientPage.css"/>
 <div class="form-container">
     <h2>Dodaj lub edytuj składnik</h2>
-    <p>Wartości odżywcze powinny być dodawane w odniesieniu do 100g/100ml na produkt</p>
+    <p>Wartości odżywcze powinny być dodawane w odniesieniu do 100g/100ml na produkt.</p>
+    <p>Jeżeli chcesz edytować wartości, w pierwszej kolejności wyszukaj dany składnik.</p>
     <div class="mainFields">
+        <div class="form-field div1">
+            <@simpleInputPlain id="liveSearch" name="liveSearch" placeholder="Wyszukaj składnik"/>
+            <div id="suggestionsList" class="suggestions-list"></div>
+        </div>
         <form id="ingredient-form">
-                <div class="form-field div1">
-                    <@simpleInputPlain id="liveSearch" name="liveSearch" placeholder="Wyszukaj składnik"/>
-                    <div id="suggestionsList" class="suggestions-list"></div>
-                </div>
+            <input type="hidden" name="ingredientId" id="ingredientId" value="-1"/>
                 <div class="form-field">
-                    <@simpleInput name="ingredientName" placeholder="Wpisz nazwę składnika" label="Składnik" id="ingredientName" />
+                    <@simpleInput name="ingredientName" placeholder="Wpisz nazwę składnika" label="Składnik" id="ingredientName" min="3" max="254" required=true/>
                     <@simpleInput name="ingredientBrand" placeholder="Marka produktu" label="Marka" id="ingredientBrand" />
                 </div>
                 <div class="form-field">
@@ -19,15 +21,9 @@
                     <@simpleInput name="fat" placeholder="Tłuszcze" label="Tłuszcze" id="fat" type="number" step="0.25" min="0" max="1000"/>
                     <@simpleInput name="kcal" placeholder="Kcal" label="Kcal" id="kcal" type="number" step="0.25" min="0" max="1000"/>
                 </div>
-                <div class="form-field center-me">
-                    <@sendFormButton
-                    id="sendIngredientForm"
-                    formToSend="ingredient-form"
-                    url="/app/auth/addIngredientName"
-                    reloadPageAfterSuccess=true />
-                </div>
         </form>
     </div>
+        <@sendFormButton id="sendIngredientForm" formToSend="ingredient-form" url="/app/auth/addIngredientName"/>
 </div>
 
 
@@ -55,9 +51,9 @@
                             listItem.textContent = ingredient.ingredientBrand && ingredient.ingredientBrand.trim()
                                 ? ingredient.ingredientName + ", " + ingredient.ingredientBrand
                                 : ingredient.ingredientName;
-
                             listItem.classList.add('suggestion-item');
                             listItem.addEventListener('click', () => {
+                                document.getElementById('ingredientId').value = ingredient.ingredientId || '-1';
                                 document.getElementById('ingredientName').value = ingredient.ingredientName || '';
                                 document.getElementById('ingredientBrand').value = ingredient.ingredientBrand || '';
                                 document.getElementById('protein').value = ingredient.protein || '';
