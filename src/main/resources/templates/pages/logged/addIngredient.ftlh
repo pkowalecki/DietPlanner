@@ -40,7 +40,7 @@
 
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
-            const url = '${liveSearchUrl}?query=' + encodeURIComponent(query);
+            const url = '/auth/ingredientNames/search?query=' + encodeURIComponent(query);
             fetch(url)
                 .then(response => response.json())
                 .then(data => {

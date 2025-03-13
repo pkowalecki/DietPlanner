@@ -19,7 +19,7 @@ public class MealHistoryController {
 
     private final IMealHistoryService mealHistoryService;
 
-    @GetMapping(value = "/mealsHistory")
+    @GetMapping(value = "/")
     public Mono<String> mealsHistory(Model model) {
         return mealHistoryService.getMealHistories(model);
     }

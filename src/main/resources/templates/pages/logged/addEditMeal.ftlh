@@ -158,7 +158,6 @@
                 alert("Wybierz wszystkie wartości.");
             }
         }
-        //to do naprawy, wołać ajaxcall i po problemie. FIXME TODO
 
         $("#submitButton").click(e => {
             e.preventDefault();
@@ -175,7 +174,7 @@
             };
 
             $.ajax({
-                url: '/app/auth/addOrUpdateMeal',
+                url: '/auth/meals/addOrUpdateMeal',
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(mealData),

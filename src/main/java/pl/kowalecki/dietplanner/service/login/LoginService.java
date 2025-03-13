@@ -21,7 +21,7 @@ import java.util.Map;
 @Service
 @AllArgsConstructor
 @Slf4j
-public class LoginServiceImpl implements ILoginService {
+public class LoginService implements ILoginService {
 
     private final CookieUtils cookieUtils;
     private final AuthClient loginService;
@@ -38,7 +38,7 @@ public class LoginServiceImpl implements ILoginService {
 
                         cookieUtils.setAccessTokenCookie(httpResponse, accessToken, 15 * 60);
                         cookieUtils.setRefreshTokenCookie(httpResponse, refreshToken, 7 * 24 * 60 * 60);
-                        return Mono.just(responseBuilder.buildRedirect("/app/auth/loggedUserBoard"));
+                        return Mono.just(responseBuilder.buildRedirect("/auth/mainBoard"));
                     } else {
                         return Mono.just(responseBuilder.buildErrorMessage("Wystąpił błąd w trakcie procesu logowania."));
                     }

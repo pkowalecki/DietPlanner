@@ -19,7 +19,7 @@
     <div id="ingredients-list"></div>
     <br/>
     <div class="ingredients-owned"></div>
-    <form action="/app/auth/downloadMealDocument" method="post">
+    <form action="/auth/document/downloadMealDocument" method="post">
         <input type="hidden" name="pageId" value="${pageId}"/>
         <button type="submit">Pobierz dokument</button>
     </form>

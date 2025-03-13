@@ -7,21 +7,7 @@
     <#include "starter.ftlh">
 
     <link rel="stylesheet" href="/static/css/headerNavbar.css">
-
-    <#if webMsg?? && webMsg?has_content>
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                var swalContent = {};
-                swalContent = {
-                    title: '${webMsg.type?capitalize}',
-                    text: '${webMsg.message}',
-                    icon: '${webMsg.icon}',
-                    confirmButtonColor: "#052d73"
-                };
-                Swal.fire(swalContent);
-            });
-        </script>
-    </#if>
+    
 </head>
 <body>
 <header>
@@ -42,16 +28,16 @@
 
             <#else >
                 <ul>
-                    <li class="active"><a href="#" onclick="location.href='/app/auth/loggedUserBoard'">Strona główna</a>
+                    <li class="active"><a href="#" onclick="location.href='/auth/mainBoard'">Strona główna</a>
                     </li>
                     <li class="dropdown">
                         <a href="#">Posiłek</a>
                         <ul class="dropdown-content">
-                            <li><a href="#" onclick="location.href='/app/auth/addMeal'">Dodaj posiłek</a></li>
-                            <li><a href="#" onclick="location.href='/app/auth/addIngredient'">Dodaj składnik</a></li>
-                            <li><a href="#" onclick="location.href='/app/auth/generateMealBoard'">Wygeneruj plan
+                            <li><a href="#" onclick="location.href='/auth/meals/'">Dodaj posiłek</a></li>
+                            <li><a href="#" onclick="location.href='/auth/ingredient/'">Dodaj składnik</a></li>
+                            <li><a href="#" onclick="location.href='/auth/meal-board/'">Wygeneruj plan
                                     żywienia</a></li>
-                            <li><a href="#" onclick="location.href='/app/auth/mealsHistory'">Historia posiłków</a></li>
+                            <li><a href="#" onclick="location.href='/auth/meal-history/'">Historia posiłków</a></li>
                         </ul>
                     </li>
 

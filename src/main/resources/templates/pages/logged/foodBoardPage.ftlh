@@ -39,7 +39,7 @@
             <@sendFormButton
             id="sendMealBoardForm"
             formToSend="mealBoardForm"
-            url="/app/auth/generateMealBoard"/>
+            url="/auth/meal-board/generateMealBoard"/>
         </div>
     </form>
 </div>

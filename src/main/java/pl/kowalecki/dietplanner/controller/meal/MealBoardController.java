@@ -17,7 +17,7 @@ public class MealBoardController {
 
     private IMealBoardService mealBoardService;
 
-    @GetMapping(value = "/generateMealBoard")
+    @GetMapping(value = "/")
     public Mono<String> mealPage(Model model) {
         return mealBoardService.getMealBoardPage(model);
     }
