@@ -2,6 +2,7 @@
 <link rel="stylesheet" href="../../../static/css/main-page.css"/>
 <div class="form-container">
     <#assign activeMealType = activeMealType! "all">
+    <#assign actionType = "/auth/mainBoard">
     <#assign baseUrl = actionType + "?mealType=" + activeMealType + "&page=">
     <div class="filter-container">
         <div class="filter-buttons">
@@ -21,7 +22,7 @@
 
     <div class="item-grid" id="meal-grid">
         <#list meals as meal>
-            <a href="details/${meal.getMealId()}" class="item-link">
+            <a href="/auth/meals/details/${meal.getMealId()}" class="item-link">
                 <div class="item-container">
                     <div class="icon">
                         <div class="no-image">Brak zdjęcia</div>
@@ -88,7 +89,7 @@
 
         function fetchSuggestions(query) {
             $.ajax({
-                url: '/app/auth/meals/search' + '?query='+ encodeURIComponent(query),
+                url: '/auth/meals/search?query='+ encodeURIComponent(query),
                 method: 'GET',
                 success: function (data) {
                     renderSuggestions(data);
@@ -106,7 +107,7 @@
                 data.forEach(function (meal) {
 
                     suggestionsList.append(
-                        `<li class="suggestion-item"><a href="${details}<#noparse>${meal.mealId}" style="color: #333;">${meal.name}</#noparse></a></li>`
+                        `<li class="suggestion-item"><a href="/auth/meals/details/<#noparse>${meal.mealId}" style="color: #333;">${meal.name}</#noparse></a></li>`
                     );
                     suggestionsList.addClass('show');
                 });

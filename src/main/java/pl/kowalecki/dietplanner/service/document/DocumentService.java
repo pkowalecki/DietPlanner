@@ -1,14 +1,49 @@
 package pl.kowalecki.dietplanner.service.document;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import pl.kowalecki.dietplanner.client.dpa.meal.DietPlannerApiClient;
+import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-public class DocumentService {
+@Service
+@AllArgsConstructor
+@Slf4j
+public class DocumentService implements IDocumentService {
+
+    DietPlannerApiClient dpaClient;
+
+    @Override
+    public Mono<ResponseEntity<byte[]>> downloadMealsPlan(String pageId) {
+        return dpaClient.getMealNamesByMealId(pageId)
+                .flatMap(mealNames -> {
+                    try (XWPFDocument document = new XWPFDocument();
+                         ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                        byte[] documentBytes = DocumentService.createMealDocument(document, out, mealNames);
+
+                        return Mono.just(ResponseEntity.ok()
+                                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"jedzonko.docx\"")
+                                .body(documentBytes));
+                    } catch (IOException e) {
+                        return Mono.error(new RuntimeException("Błąd generowania dokumentu", e));
+                    }
+                })
+                .onErrorResume(e -> Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(("Błąd serwera: " + e.getMessage()).getBytes(StandardCharsets.UTF_8))));
+    }
 
 
     public static byte[] createMealDocument(XWPFDocument document, ByteArrayOutputStream out, List<String> mealNames) throws IOException {

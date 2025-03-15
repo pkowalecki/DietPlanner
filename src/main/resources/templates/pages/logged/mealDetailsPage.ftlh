@@ -9,7 +9,7 @@
                 </div>
                 <#if meal.isCanEdit()?? && meal.isCanEdit()>
                     <div class="meal-buttons-container">
-                        <@simpleButton id="bEditMeal_${meal.getMealId()}" url="${url}${meal.getMealId()}" buttonText="Edytuj posiłek"/>
+                        <@simpleButton id="bEditMeal_${meal.getMealId()}" url="/auth/meals/editMeal/${meal.getMealId()}" buttonText="Edytuj posiłek"/>
                         <@simpleButton id="bDeleteMeal_${meal.getMealId()}" url="" buttonText="Usuń posiłek"/>
                     </div>
                 </#if>

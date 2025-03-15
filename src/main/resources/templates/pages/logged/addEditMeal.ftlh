@@ -172,7 +172,7 @@
             };
 
             $.ajax({
-                url: '/app/auth/addOrUpdateMeal',
+                url: '/auth/meals/addOrUpdateMeal',
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(mealData),
