@@ -33,7 +33,6 @@ public class CookieRequestFilter extends OncePerRequestFilter {
         String refreshToken = cookieUtils.extractRefreshTokenFromRefreshCookie(request);
 
         if (accessToken == null && refreshToken == null) {
-            //FIXME Zrobić poprawny redir na brak sesji
             response.sendRedirect("/app/login?sessionExpired=true");
             return;
         }
