@@ -107,7 +107,7 @@
                 data.forEach(function (meal) {
 
                     suggestionsList.append(
-                        `<li class="suggestion-item"><a href="/auth/details/<#noparse>${meal.mealId}" style="color: #333;">${meal.name}</#noparse></a></li>`
+                        `<li class="suggestion-item"><a href="/auth/meals/details/<#noparse>${meal.mealId}" style="color: #333;">${meal.name}</#noparse></a></li>`
                     );
                     suggestionsList.addClass('show');
                 });
