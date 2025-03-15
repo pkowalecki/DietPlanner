@@ -2,7 +2,8 @@
 <link rel="stylesheet" href="../../../static/css/addMealPage.css"/>
 <div class="form-container">
     <form id="mealForm">
-        <input type="hidden" name="mealId" value="<#if meal?? && meal.getMealId()??>${meal.getMealId()}<#else>-1</#if>"/>
+        <input type="hidden" name="mealId"
+               value="<#if meal?? && meal.getMealId()??>${meal.getMealId()}<#else>-1</#if>"/>
         <div class="mainFields">
             <@simpleInput name="mealName" placeholder="Nazwa posiłku" label="Nazwa posiłku" id="mealName" value="${meal.getName()}" min="5" max="254" required=true/>
             <@simpleTextArea name="recipe" placeholder="Wprowadź przepis..." label="Przepis" id="recipe" rows="4" value="${meal.getRecipe()}" minLength="5" maxLength="10000" required=true/>
@@ -10,22 +11,18 @@
             <@simpleTextArea name="notes" placeholder="Wprowadź notatki..." label="Notatki" id="notes" rows="4" value="${meal.getNotes()}"/>
             <@simpleSelect name="mealType" id="mealType" source=mealTypeList placeholder="dummy" label="Typ posiłku" divWrapperClass="form-group-container" selectedValues=selectedMealTypeIds![] required=true/>
             <@simpleInput name="portions" placeholder="Na ile porcji dzielisz przepis?" label="Liczba porcji" id="portions" type="number" step="0.25" min="0" max="1000" value="${meal.getPortions()}" required=true/>
-            Czy chcesz aby ten posiłek był dostępny publicznie?
-            <input type="checkbox" id="mealPublic" name="mealPublic"/>
+            <@toggleSwitch id="mealPublic" name="mealPublic" label="Czy chcesz aby ten posiłek był dostępny publicznie?" value="${meal.isMealPublic()?string}" />
         </div>
 
         <div id="ingredientList">
         </div>
 
         <div class="mb-3 goCenter">
-            <a id="openIngredientModalBtn" href="#">Add Ingredient</a>
+            <button id="openIngredientModalBtn" type="button" class="btn btn-primary mt-3" onclick="">Dodaj składnik</button>
             <div class="error-message" id="ingredientError"></div>
         </div>
-
-
-<#--        <@sendFormButton id="sendFormButton" formToSend="mealForm" method="post" url="/app/auth/addMeal" buttonText="Wyślij"   />-->
     </form>
-    <button type="submit" id="submitButton" class="btn btn-primary mt-3">Submit</button>
+    <button type="submit" id="submitButton" class="btn btn-primary mt-3">Wyślij</button>
 </div>
 
 <div id="ingredientModal" class="modal" role="dialog">
@@ -88,6 +85,7 @@
         </div>
     </div>
 </div>
+
 
 
 <script>
@@ -178,7 +176,9 @@
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(mealData),
-                success: () => showSwalMessage("Sukces", "Posiłek został dodany!", "success"),
+                success: function (response) {
+                    showSwalMessageWithRedirDialog(response.message, response.redirectUrl)
+                },
                 error: () => showSwalMessage("Błąd", "Nie udało się dodać posiłku.", "error")
             });
         });

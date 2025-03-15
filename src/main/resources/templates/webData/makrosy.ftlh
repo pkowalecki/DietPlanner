@@ -165,6 +165,29 @@
     </script>
 </#macro>
 
+<#macro toggleSwitch name id="" label="" value="false" disabled=false>
+    <div class="row m-t-1">
+        <div class="col-lg-5">
+            <p class="switch-opis">
+                ${label}
+            </p>
+        </div>
+        <div class="col-lg-2 text-center m-t-1">
+            <label class="switch switch-green">
+                <input type="checkbox" class="switch-input"
+                       <#if disabled?? && disabled==true>disabled="disabled" </#if>
+                       name="${name}"
+                       value="true"
+                        <#if value?? && value?string == "true">checked="checked"</#if>
+                        <#if id != ""> id="${id}" <#else>id="${name}"</#if>
+                >
+                <span class="switch-label" data-on="Tak" data-off="Nie"></span>
+                <span class="switch-handle"></span>
+            </label>
+        </div>
+    </div>
+</#macro>
+
 <script>
 
     function toggleLabelActive(selectId) {
