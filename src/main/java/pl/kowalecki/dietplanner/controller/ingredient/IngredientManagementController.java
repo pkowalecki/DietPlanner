@@ -28,7 +28,7 @@ public class IngredientManagementController {
         return ingredientManagementService.addIngredient(ingredientName);
     }
 
-    @GetMapping("/ingredientNames/search")
+    @GetMapping("/search")
     @ResponseBody
     public Mono<List<IngredientName>> searchIngredients(@RequestParam("query") String query) {
         return ingredientManagementService.searchIngredients(query);

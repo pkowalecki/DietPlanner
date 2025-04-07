@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 @Controller
 @AllArgsConstructor
 @Slf4j
-@RequestMapping("/app/auth")
+@RequestMapping("/auth")
 public class MealPageController {
 
     DietPlannerApiClient apiMealService;
@@ -112,7 +112,7 @@ public class MealPageController {
     }
 
 
-    @PostMapping(value = "/generateMealBoard", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/meal-board/generateMealBoard", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Mono<WebPageResponse> resultPage(@RequestBody Map<String, Object> rawData, Model model) {
         Map<String, Map<String, Long>> meals = prepareMeals(rawData);
@@ -131,7 +131,7 @@ public class MealPageController {
         requestData.setMultiplier(multiplier);
 
         return apiMealService.generateMealBoard(requestData)
-                .map(urlParam -> responseBuilder.buildRedirect("/app/auth/shoppingList/" + urlParam));
+                .map(urlParam -> responseBuilder.buildRedirect("/auth/shopping-list/" + urlParam));
     }
 
     @GetMapping(value = "/shoppingList/{pageId}")

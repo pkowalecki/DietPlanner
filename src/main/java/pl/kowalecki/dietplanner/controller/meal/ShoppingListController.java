@@ -20,7 +20,7 @@ public class ShoppingListController {
 
     IShoppingListService shoppingListService;
 
-    @GetMapping(value = "/shoppingList/{pageId}")
+    @GetMapping(value = "/{pageId}")
     public Mono<String> getShoppingListPage(@PathVariable String pageId, Model model) {
         return shoppingListService.getShoppingList(pageId, model);
     }
